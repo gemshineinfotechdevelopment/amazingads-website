@@ -1,11 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 
+interface BackendInfo {
+  status: string
+  message: string
+  port?: number | string
+}
+
 function App() {
   const [count, setCount] = useState(0)
+  const [backendInfo, setBackendInfo] = useState<BackendInfo | null>(null)
+  const [backendLoading, setBackendLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/health')
+      .then((res) => res.json())
+      .then((data: BackendInfo) => {
+        setBackendInfo(data)
+        setBackendLoading(false)
+      })
+      .catch(() => {
+        setBackendInfo(null)
+        setBackendLoading(false)
+      })
+  }, [])
 
   return (
     <>
@@ -28,6 +49,30 @@ function App() {
         >
           Count is {count}
         </button>
+
+        <div style={{
+          marginTop: '1.5rem',
+          padding: '1rem',
+          borderRadius: '8px',
+          background: backendInfo ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          border: `1px solid ${backendInfo ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+          textAlign: 'center',
+          maxWidth: '420px',
+          marginInline: 'auto'
+        }}>
+          <p style={{ margin: 0, fontWeight: 600 }}>
+            {backendLoading
+              ? 'Checking backend connection...'
+              : backendInfo
+              ? `🟢 Backend Active: Port ${backendInfo.port || 5000}`
+              : '🔴 Backend Disconnected'}
+          </p>
+          <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', opacity: 0.85 }}>
+            {backendInfo
+              ? backendInfo.message
+              : 'Run `npm run dev:server` or `npm run dev` to start server (port 5000)'}
+          </p>
+        </div>
       </section>
 
       <div className="ticks"></div>

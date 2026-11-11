@@ -1,32 +1,57 @@
-# React + TypeScript + Vite
+# Amazing Ads Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Fullstack architecture setup with Frontend in `src/` and Backend in `server/`.
 
-Currently, two official plugins are available:
+## Folder Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+amazingads-website/
+├── src/                # Frontend (React 19 + TypeScript + Vite)
+│   ├── assets/
+│   ├── App.css
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── server/             # Backend (Node.js + Express)
+│   ├── routes/
+│   │   └── api.js      # API routes (/api/health, /api/ads, etc.)
+│   ├── .env            # Backend environment variables (PORT=5000)
+│   ├── .env.example
+│   └── index.js        # Express server entry point
+├── vite.config.ts      # Vite config with proxy to backend
+├── package.json        # Unified scripts
+└── tsconfig.json
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Ports
+
+- **Frontend**: `http://localhost:5173`
+- **Backend API**: `http://localhost:5000`
+
+---
+
+## How to Run
+
+### 1. Run Both Frontend and Backend together (Concurrent)
+```bash
+npm run dev
+```
+
+### 2. Run Only Frontend (Port 5173)
+```bash
+npm run dev:client
+# or
+npm run client
+```
+
+### 3. Run Only Backend (Port 5000)
+```bash
+npm run dev:server
+# or (without nodemon)
+npm run server
+```
+
+### 4. Build Frontend for Production
+```bash
+npm run build
+```
