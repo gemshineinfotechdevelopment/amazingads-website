@@ -7,11 +7,13 @@ import { FloatingConcierge } from './components/FloatingConcierge';
 
 // Dedicated Standalone Pages
 import { HomePage } from './pages/HomePage';
+import { AboutPage } from './pages/AboutPage';
 import { CollectionsPage } from './pages/CollectionsPage';
 import { CalculatorPage } from './pages/CalculatorPage';
 import { ProofingPage } from './pages/ProofingPage';
 import { CraftPage } from './pages/CraftPage';
 import { CorporatePage } from './pages/CorporatePage';
+import { ContactPage } from './pages/ContactPage';
 import { DielinesPage } from './pages/DielinesPage';
 
 const AppContent = () => {
@@ -20,6 +22,8 @@ const AppContent = () => {
 
   const renderActivePage = () => {
     switch (currentPage) {
+      case 'about':
+        return <AboutPage onOpenSampleKit={() => setIsSampleKitOpen(true)} />;
       case 'collections':
         return <CollectionsPage />;
       case 'calculator':
@@ -30,6 +34,8 @@ const AppContent = () => {
         return <CraftPage />;
       case 'corporate':
         return <CorporatePage />;
+      case 'contact':
+        return <ContactPage onOpenSampleKit={() => setIsSampleKitOpen(true)} />;
       case 'dielines':
         return <DielinesPage />;
       case 'home':

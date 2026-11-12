@@ -93,11 +93,11 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
               Press Studio
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-              <li><button onClick={() => navigate('calculator')} style={footerLinkStyle}>Quote Configurator</button></li>
+              <li><button onClick={() => navigate('about')} style={footerLinkStyle}>About Amazing Ads</button></li>
               <li><button onClick={() => navigate('proofing')} style={footerLinkStyle}>Virtual Proofing Studio</button></li>
-              <li><button onClick={() => navigate('craft')} style={footerLinkStyle}>Paper & Finish Library</button></li>
-              <li><button onClick={() => navigate('dielines')} style={footerLinkStyle}>Vector Dielines & Prep</button></li>
-              <li><button onClick={() => navigate('corporate')} style={footerLinkStyle}>Corporate Concierge (B2B)</button></li>
+              <li><button onClick={() => navigate('corporate')} style={footerLinkStyle}>Corporate Bulk (B2B)</button></li>
+              <li><button onClick={() => navigate('calculator')} style={footerLinkStyle}>Quote Configurator</button></li>
+              <li><button onClick={() => navigate('contact')} style={footerLinkStyle}>Contact Sivakasi Works</button></li>
               <li><button onClick={onOpenSampleKit} style={footerLinkStyle}>Request Free Swatch Kit</button></li>
             </ul>
           </div>

@@ -33,12 +33,12 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   }, []);
 
   const navItems: { id: PageRoute; label: string }[] = [
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
     { id: 'collections', label: 'Products' },
-    { id: 'calculator', label: 'Quote Configurator' },
     { id: 'proofing', label: 'Virtual Proofing' },
-    { id: 'craft', label: 'Materials & Craft' },
     { id: 'corporate', label: 'Corporate Bulk' },
-    { id: 'dielines', label: 'Dielines & Specs' }
+    { id: 'contact', label: 'Contact' }
   ];
 
   return (
@@ -94,13 +94,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '10px' }} className="desktop-nav">
-          <button
-            onClick={() => navigate('home')}
-            className={`nav-link-btn ${currentPage === 'home' ? 'active' : ''}`}
-          >
-            Home
-          </button>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="desktop-nav">
           {navItems.map((item) => (
             <button 
               key={item.id}
@@ -195,13 +189,6 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
             gap: '12px'
           }}
         >
-          <button 
-            onClick={() => { navigate('home'); setMobileMenuOpen(false); }} 
-            className={`nav-link-btn ${currentPage === 'home' ? 'active' : ''}`}
-            style={{ textAlign: 'left', width: '100%' }}
-          >
-            Home
-          </button>
           {navItems.map((item) => (
             <button 
               key={item.id}

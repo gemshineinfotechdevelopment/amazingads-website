@@ -2,11 +2,13 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 
 export type PageRoute = 
   | 'home'
+  | 'about'
   | 'collections'
   | 'calculator'
   | 'proofing'
   | 'craft'
   | 'corporate'
+  | 'contact'
   | 'dielines';
 
 interface RouterContextType {
@@ -25,11 +27,13 @@ function getInitialPage(): PageRoute {
   const hash = window.location.hash.replace('#/', '').replace('#', '').toLowerCase();
   const validPages: PageRoute[] = [
     'home',
+    'about',
     'collections',
     'calculator',
     'proofing',
     'craft',
     'corporate',
+    'contact',
     'dielines'
   ];
   if (validPages.includes(hash as PageRoute)) {
