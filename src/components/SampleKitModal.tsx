@@ -12,7 +12,10 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
   const [company, setCompany] = useState('');
   const [phone, setPhone] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
-  const [selectedStyles, setSelectedStyles] = useState<string[]>(['24K Gold Foil Wall', 'Traditional Daily Panchangam']);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([
+    'Gold/Silver PET Foil Calendar',
+    'Custom 5D Calendars'
+  ]);
   
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SampleKitResult | null>(null);
@@ -126,11 +129,11 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
                 📦 Sivakasi Works Sample Box Contents:
               </strong>
               <ul style={{ paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <li>24K Gold Foil Die Stamped Kappa Board Specimen (15 × 20 in)</li>
-                <li>Traditional Daily Panchangam 365-Leaf Sample Pad</li>
-                <li>12-Sheet Monthly Scenic Wall Calendar on 210 GSM Art Paper</li>
-                <li>3D / 5D Lenticular Optical Motion Swatch Card</li>
-                <li>Paper Grammages & Foil Swatches (60 to 500 GSM)</li>
+                <li>Gold / Silver PET Foil Calendar Specimen (15 × 20 in)</li>
+                <li>Custom 5D Holographic Lenticular Motion Swatch</li>
+                <li>Stone Art Sculptural Relief Texture Sample</li>
+                <li>Promotional Advertising Hand Fan Specimen with Handle</li>
+                <li>Special Products & Bespoke Executive Gift Swatch Book</li>
               </ul>
             </div>
 
@@ -191,9 +194,15 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
               </div>
 
               <div>
-                <label>Styles of Interest</label>
+                <label>Products of Interest</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '6px' }}>
-                  {['24K Gold Foil Wall', 'Daily Panchangam', '12-Sheet Monthly', '3D Lenticular Motion', 'Executive Tabletop Desk', 'Kundan Frame'].map(style => (
+                  {[
+                    'Gold/Silver PET Foil Calendar',
+                    'Special Products',
+                    'Custom 5D Calendars',
+                    'Stone Art Calendars',
+                    'Hand Fan'
+                  ].map(style => (
                     <button
                       key={style}
                       type="button"

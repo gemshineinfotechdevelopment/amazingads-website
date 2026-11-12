@@ -7,14 +7,11 @@ interface ProductCatalogProps {
 
 const CATEGORIES = [
   'All',
-  'Gold/Silver PET Foil',
+  'Gold/Silver PET Foil Calendar',
+  'Special Products',
   'Custom 5D Calendars',
   'Stone Art Calendars',
-  'Hand Fan',
-  'Special Products',
-  'Daily Calendars',
-  'Monthly Wall Calendars',
-  'Tabletop & Desk'
+  'Hand Fan'
 ];
 
 export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {

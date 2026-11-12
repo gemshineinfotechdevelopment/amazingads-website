@@ -3,42 +3,41 @@ import { calculateQuote, type QuotePayload, type QuoteResult } from '../services
 import { useRouter } from '../context/RouterContext';
 
 const FORMAT_OPTIONS = [
-  { id: 'Real 24K Gold Foil Wall', label: '24K Gold Foil Stamped Wall', size: '17 × 27 in / 15 × 20 in', icon: '👑', popular: true, base: 145 },
-  { id: 'Traditional Daily Sheet', label: 'Daily Sheet Panchangam', size: 'Jumbo 9 × 11.5 in', icon: '🗓️', popular: true, base: 65 },
-  { id: '12-Sheet Monthly Wall', label: '12-Sheet Monthly Art Wall', size: '15 × 20 in (Art Paper)', icon: '🖼️', popular: true, base: 110 },
-  { id: '3D / 5D Lenticular Motion', label: '3D / 5D Lenticular Motion', size: '12 × 18 in (75 LPI)', icon: '🌀', popular: false, base: 220 },
-  { id: 'Executive Tabletop Desk', label: 'Tabletop Desk Easel', size: '8.5 × 6 in (Landscape)', icon: '📐', popular: false, base: 95 },
-  { id: '24K Gold Foil Photo Frame', label: '24K Gold Foil Photo Frame', size: '12 × 18 in (Teak/Gold Frame)', icon: '🖼️', popular: true, base: 180 },
-  { id: 'Kundan Stone Embossed', label: 'Kundan Stone Luxury Frame', size: '14 × 20 in Frame', icon: '💎', popular: false, base: 280 }
+  { id: 'Gold / Silver PET Foil Calendar', label: 'Gold / Silver PET Foil Calendar', size: '17 × 27 in / 15 × 20 in', icon: '👑', popular: true, base: 145 },
+  { id: 'Special Products', label: 'Special Products (LED / Gifts / Sets)', size: 'Bespoke Executive Spec', icon: '🎁', popular: true, base: 195 },
+  { id: 'Custom 5D Calendars', label: 'Custom 5D Holographic Calendars', size: '12 × 18 in (75 LPI 5D Lens)', icon: '🌀', popular: true, base: 220 },
+  { id: 'Stone Art Calendars', label: 'Stone Art Sculptural Calendars', size: '14 × 20 in Frame', icon: '🗿', popular: false, base: 280 },
+  { id: 'Hand Fan', label: 'Promotional Advertising Hand Fan', size: 'Standard 8 × 8 in with Handle', icon: '🪭', popular: false, base: 28 }
 ];
 
 const PAPER_OPTIONS = [
-  { id: '400 GSM Rigid Board', label: '400 GSM Virgin Kappa Board', desc: 'Heavyweight rigid backing board for gold foil stamping & tin mounting', tag: 'Gold Foil' },
-  { id: '60 GSM Maplitho Daily', label: '60 GSM Smooth Maplitho', desc: 'Crisp micro-perforated daily panchangam tear-off leaves', tag: 'Daily Sheet' },
-  { id: '210 GSM Bilt Royal Gloss', label: '210 GSM Bilt Royal Art Paper', desc: 'Double-coated high-gloss art paper for multi-sheet wall calendars', tag: 'Monthly Wall' },
-  { id: '300 GSM Velvet Card', label: '300 GSM Matte Velvet Card', desc: 'Anti-scratch matte card for executive tabletop wire-o desk calendars', tag: 'Table Desk' },
-  { id: '75 LPI Lenticular PET', label: '75 LPI Optical Lenticular Sheet', desc: 'Precision optical micro-lens sheet for 3D depth and angle motion', tag: '3D Specialty' }
+  { id: '400 GSM Rigid Board', label: '400 GSM Rigid Kappa Board + PET Foil', desc: 'Heavyweight rigid backing for Gold/Silver PET foil and metallic stamping', tag: 'PET Foil' },
+  { id: '75 LPI Lenticular PET', label: '75 LPI Optical Lenticular 5D Sheet', desc: 'Precision optical micro-lens sheet for 5D depth and angle motion', tag: 'Custom 5D' },
+  { id: 'Composite Stone Resin Board', label: 'Stone-Infused Composite Resin Mount', desc: 'High-density tactile sculptural texture for stone art frames', tag: 'Stone Art' },
+  { id: 'Virgin PP Plastic (0.6mm)', label: 'Virgin PP Polypropylene Plastic / Card', desc: 'Waterproof, tear-proof, flexible plastic for promotional hand fans', tag: 'Hand Fan' },
+  { id: 'Cast Acrylic & Luxury MDF', label: 'Cast Acrylic & Velvet Wood Mount', desc: 'Illuminated LED calendars & bespoke executive gift organizers', tag: 'Special Products' }
 ];
 
 const FINISH_OPTIONS = [
-  { id: '24K Heated Brass Gold Foil', label: '24K Heated Brass Gold Foil', desc: 'Mirror metallic reflection on deities, borders, and corporate logo', surcharge: '₹22/unit' },
-  { id: 'Spot Gloss UV & Velvet Lamination', label: 'Spot Gloss UV + Soft Velvet', desc: 'Velvet soft lamination with raised glass-like gloss highlights', surcharge: '₹16/unit' },
-  { id: '3D Optical Lenticular Depth', label: '3D Depth & Image Morphing', desc: 'Holographic dimensional effect visible without 3D glasses', surcharge: '₹45/unit' },
-  { id: 'Hand-Set Kundan Stones & Glitter', label: 'Kundan Stones & Glitter Flocking', desc: 'Hand-crafted gemstone work with soft fabric velvet flocking', surcharge: '₹55/unit' }
+  { id: 'Mirror Gold & Silver Foil Emboss', label: 'Gold & Silver PET Foil Emboss', desc: 'High-gloss mirror metallic reflection on deities and corporate logo', surcharge: '₹22/unit' },
+  { id: '5D Optical Depth Lenticular', label: '5D Optical Depth & Morphing', desc: 'Dynamic holographic 3D dimensional effect without glasses', surcharge: '₹45/unit' },
+  { id: 'Antique Stone Wash & Kundan Work', label: 'Sculpted Stone Wash & Gems', desc: 'Hand-crafted stone relief textures with antique metallic highlights', surcharge: '₹55/unit' },
+  { id: 'Double-Sided UV Gloss Lamination', label: 'UV Full Color Gloss Protection', desc: 'Vibrant offset print coating for durable outdoor hand fans', surcharge: '₹6/unit' },
+  { id: 'Spot UV & Laser Engraving', label: 'Spot UV & Laser Etched Branding', desc: 'Prestige finish for special corporate gift sets & acrylic LED units', surcharge: '₹35/unit' }
 ];
 
 const BINDING_OPTIONS = [
-  { id: 'Heavy-Gauge Anti-Rust Tin Plate', label: 'Anti-Rust Tin Plate with Loop', desc: 'Traditional Sivakasi tin mounting with heavy-duty galvanized hanger' },
-  { id: 'Twin Wire-O Gold Spiral', label: 'Twin Wire-O Metallic Gold Spiral', desc: 'High-tensile wire spiral for tabletop easel or multi-sheet wall calendars' },
-  { id: 'Deluxe Moulded Synthetic Gold Frame', label: 'Carved Moulded Gold Frame', desc: 'Ornate synthetic wooden finish frame with wall mounting cleat' },
-  { id: 'Rigid Hardboard Easel Stand', label: '2mm Rigid Kappa Triangular Easel', desc: 'Sturdy desktop easel stand wrapped in black buckram paper' }
+  { id: 'Heavy-Gauge Anti-Rust Tin Plate', label: 'Anti-Rust Tin Plate with Center Loop', desc: 'Traditional Sivakasi tin mounting for PET foil calendars' },
+  { id: 'Deluxe Moulded Synthetic Gold Frame', label: 'Carved Moulded Royal Frame', desc: 'Ornate wooden-finish frame for 5D and stone art calendars' },
+  { id: 'Ergonomic Safety Plastic Handle', label: 'Sturdy Contour Grip Handle', desc: 'Reinforced unbreakable handle for promotional hand fans' },
+  { id: 'Custom Luxury Magnetic Rigid Box', label: 'Bespoke Executive Desk Box / Stand', desc: 'Prestige packaging for Special Products and corporate gifts' }
 ];
 
 export const CalendarCustomizer = () => {
   const { pageParams } = useRouter();
-  const [format, setFormat] = useState('Real 24K Gold Foil Wall');
+  const [format, setFormat] = useState('Gold / Silver PET Foil Calendar');
   const [paperGsm, setPaperGsm] = useState('400 GSM Rigid Board');
-  const [finish, setFinish] = useState('24K Heated Brass Gold Foil');
+  const [finish, setFinish] = useState('Mirror Gold & Silver Foil Emboss');
   const [binding, setBinding] = useState('Heavy-Gauge Anti-Rust Tin Plate');
   const [quantity, setQuantity] = useState(250);
 
@@ -46,43 +45,35 @@ export const CalendarCustomizer = () => {
   useEffect(() => {
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
-      if (p.includes('gold') || p.includes('foil')) {
-        setFormat('Real 24K Gold Foil Wall');
+      if (p.includes('pet') || p.includes('gold') || p.includes('foil')) {
+        setFormat('Gold / Silver PET Foil Calendar');
         setPaperGsm('400 GSM Rigid Board');
-        setFinish('24K Heated Brass Gold Foil');
-      }
-      else if (p.includes('daily') || p.includes('panchangam') || p.includes('sheet')) {
-        setFormat('Traditional Daily Sheet');
-        setPaperGsm('60 GSM Maplitho Daily');
+        setFinish('Mirror Gold & Silver Foil Emboss');
         setBinding('Heavy-Gauge Anti-Rust Tin Plate');
       }
-      else if (p.includes('monthly') || p.includes('12-sheet')) {
-        setFormat('12-Sheet Monthly Wall');
-        setPaperGsm('210 GSM Bilt Royal Gloss');
-        setBinding('Twin Wire-O Gold Spiral');
+      else if (p.includes('special')) {
+        setFormat('Special Products');
+        setPaperGsm('Cast Acrylic & Luxury MDF');
+        setFinish('Spot UV & Laser Engraving');
+        setBinding('Custom Luxury Magnetic Rigid Box');
       }
-      else if (p.includes('3d') || p.includes('lenticular')) {
-        setFormat('3D / 5D Lenticular Motion');
+      else if (p.includes('5d') || p.includes('3d') || p.includes('lenticular')) {
+        setFormat('Custom 5D Calendars');
         setPaperGsm('75 LPI Lenticular PET');
-        setFinish('3D Optical Lenticular Depth');
+        setFinish('5D Optical Depth Lenticular');
         setBinding('Deluxe Moulded Synthetic Gold Frame');
       }
-      else if (p.includes('table') || p.includes('desk') || p.includes('easel')) {
-        setFormat('Executive Tabletop Desk');
-        setPaperGsm('300 GSM Velvet Card');
-        setBinding('Twin Wire-O Gold Spiral');
-      }
-      else if (p.includes('photo') || (p.includes('gold') && p.includes('frame'))) {
-        setFormat('24K Gold Foil Photo Frame');
-        setPaperGsm('400 GSM Rigid Board');
-        setFinish('24K Heated Brass Gold Foil');
+      else if (p.includes('stone')) {
+        setFormat('Stone Art Calendars');
+        setPaperGsm('Composite Stone Resin Board');
+        setFinish('Antique Stone Wash & Kundan Work');
         setBinding('Deluxe Moulded Synthetic Gold Frame');
       }
-      else if (p.includes('kundan') || p.includes('stone')) {
-        setFormat('Kundan Stone Embossed');
-        setPaperGsm('400 GSM Rigid Board');
-        setFinish('Hand-Set Kundan Stones & Glitter');
-        setBinding('Deluxe Moulded Synthetic Gold Frame');
+      else if (p.includes('fan') || p.includes('hand')) {
+        setFormat('Hand Fan');
+        setPaperGsm('Virgin PP Plastic (0.6mm)');
+        setFinish('Double-Sided UV Gloss Lamination');
+        setBinding('Ergonomic Safety Plastic Handle');
       }
     }
   }, [pageParams]);

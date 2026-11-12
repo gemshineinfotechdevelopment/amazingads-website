@@ -63,11 +63,11 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <span style={{ fontSize: '1.8rem' }}>🖼️</span>
-                <span className="foil-badge">6 EDITIONS</span>
+                <span className="foil-badge">5 PRODUCTS</span>
               </div>
               <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>The Collections</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                24K Gold Foil Wall, 365 Daily Panchangam, 3D Lenticular, and Executive Desk Easels.
+                Gold/Silver PET Foil Calendar, Special Products, Custom 5D Calendars, Stone Art Calendars, and Hand Fan.
               </p>
               <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
                 View Editions →

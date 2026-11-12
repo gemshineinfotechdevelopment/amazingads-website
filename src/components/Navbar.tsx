@@ -33,12 +33,12 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   }, []);
 
   const navItems: { id: PageRoute; label: string }[] = [
-    { id: 'collections', label: 'Collections' },
+    { id: 'collections', label: 'Products' },
     { id: 'calculator', label: 'Quote Configurator' },
     { id: 'proofing', label: 'Virtual Proofing' },
-    { id: 'craft', label: 'Paper & Foils' },
+    { id: 'craft', label: 'Materials & Craft' },
     { id: 'corporate', label: 'Corporate Bulk' },
-    { id: 'dielines', label: 'Dielines & Prep' }
+    { id: 'dielines', label: 'Dielines & Specs' }
   ];
 
   return (

@@ -27,7 +27,7 @@ export const CollectionsPage = () => {
             The <span className="gold-gradient-text">Collection</span>
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '540px', margin: '0 auto' }}>
-            Seven signature Sivakasi editions: 24K Gold Foil Wall, Gold Foil Photo Frames, 365 Daily Panchangam, 3D Lenticular, and Executive Desk Easels.
+            Five signature editions: Gold/Silver PET Foil Calendar, Special Products, Custom 5D Calendars, Stone Art Calendars, and Hand Fan.
           </p>
         </div>
 

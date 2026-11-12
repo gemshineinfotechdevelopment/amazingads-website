@@ -76,14 +76,14 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
           {/* Column 2: Collections */}
           <div>
             <h4 style={{ fontSize: '0.9rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '18px' }}>
-              Collections
+              Products
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Atelier Wall Calendars</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Executive Desk Easels</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>American Walnut Blocks</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>365 Daily Tear-Off Editions</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>100% Recycled Kraft Seeds</button></li>
+              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Gold/Silver PET Foil Calendar</button></li>
+              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Special Products</button></li>
+              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Custom 5D Calendars</button></li>
+              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Stone Art Calendars</button></li>
+              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Promotional Hand Fan</button></li>
             </ul>
           </div>
 

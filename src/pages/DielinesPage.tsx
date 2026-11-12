@@ -14,44 +14,54 @@ interface DielineItem {
 
 const DIELINES: DielineItem[] = [
   {
-    id: 'dieline-gold-foil-wall',
-    title: '24K Gold Foil Wall Calendar Dieline',
-    format: '15 × 20 in & 17 × 27 in (Rigid Kappa Board)',
+    id: 'dieline-pet-foil-wall',
+    title: 'Gold / Silver PET Foil Calendar Dieline',
+    format: '15 × 20 in & 17 × 27 in (Rigid Kappa Board + PET Film)',
     bleed: '3.0 mm external bleed on all 4 sides',
     safeZone: '8.0 mm internal text safety margin',
     bindingAllowance: '25 mm top margin reserved for tin plate clamping & brass hanger loop',
-    colorSpace: 'CMYK + Separate Vector Layer for Hot Brass Foil Die',
+    colorSpace: 'CMYK + Separate Vector Layer for Mirror Gold & Silver Foil Die',
     formats: ['PDF Template', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
   },
   {
-    id: 'dieline-daily-sheet',
-    title: 'Daily Sheet Panchangam Header & Leaf Dieline',
-    format: 'Jumbo 9 × 11.5 in / Super Deluxe 10 × 15 in',
-    bleed: '3.0 mm bleed on header mount board',
-    safeZone: '5.0 mm text safe zone',
-    bindingAllowance: '18 mm top clamping margin with micro-perforation knife line',
-    colorSpace: 'CMYK Offset + Black/Red 2-Color Leaf',
-    formats: ['PDF Template', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    id: 'dieline-custom-5d',
+    title: 'Custom 5D Holographic Calendar Dieline',
+    format: '12 × 18 in & 16 × 24 in (75 LPI Lenticular)',
+    bleed: '4.0 mm bleed margin with optical lens pitch alignment marks',
+    safeZone: '6.0 mm internal safety margin',
+    bindingAllowance: '20 mm perimeter for carved synthetic frame mounting cleat',
+    colorSpace: 'Interlaced PSD / Multi-layer Phase A + Phase B Vector Masks',
+    formats: ['Interlaced PSD', 'Adobe Illustrator (.AI)', 'PDF Specs']
   },
   {
-    id: 'dieline-monthly-12-sheet',
-    title: '12-Sheet Monthly Wire-O Wall Dieline',
-    format: '15 × 20 in / 11 × 18 in (Art Paper)',
-    bleed: '3.0 mm external bleed margin',
-    safeZone: '6.0 mm internal margin',
-    bindingAllowance: '12 mm top margin for 3:1 pitch wire-o punches and half-moon thumbcut',
-    colorSpace: 'CMYK FOGRA39 / ISO Coated v2',
-    formats: ['PDF Template', 'Adobe Illustrator (.AI)', 'InDesign (.INDD)']
+    id: 'dieline-stone-art',
+    title: 'Stone Art Sculptural Frame Dieline',
+    format: '14 × 20 in & 18 × 24 in Carved Frame Mount',
+    bleed: '5.0 mm bleed on relief border frame',
+    safeZone: '10.0 mm relief clearance zone',
+    bindingAllowance: 'Carved synthetic wood moulding allowance with bottom daily block slit',
+    colorSpace: '3D Heightmap Displacement Map + CMYK Antique Color Wash',
+    formats: ['CAD Dieline (.DXF)', 'Adobe Illustrator (.AI)', 'PDF Template']
   },
   {
-    id: 'dieline-tabletop-desk',
-    title: 'Executive Tabletop Desk Easel Dieline',
-    format: '8.5 × 6 in Landscape (Rigid Triangular Easel)',
-    bleed: '3.0 mm external bleed margin',
-    safeZone: '4.0 mm internal text safety margin',
-    bindingAllowance: '10 mm top margin for twin wire-o spiral punches',
-    colorSpace: 'CMYK FOGRA39 / Spot UV Gloss Layer',
-    formats: ['PDF Template', 'Adobe Illustrator (.AI)', 'InDesign (.INDD)']
+    id: 'dieline-hand-fan',
+    title: 'Promotional Advertising Hand Fan Contour Dieline',
+    format: 'Standard 8 × 8 in / Round & Custom Die-Cut Shapes',
+    bleed: '3.0 mm external bleed contour cutting line',
+    safeZone: '5.0 mm text safe zone from fan blade edge',
+    bindingAllowance: 'Handle slot rivet holes with reinforced safety rib zone',
+    colorSpace: 'Double-Sided CMYK Offset / Screen Print Spot Colors',
+    formats: ['Die-Cut Vector (.EPS)', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+  },
+  {
+    id: 'dieline-special-products',
+    title: 'Special Products & Executive Gift Sets Dieline',
+    format: 'Custom Tailored Dimensions (Acrylic LED, Boxes, Desk Sets)',
+    bleed: '3.5 mm bleed margin across clamshell and magnetic flaps',
+    safeZone: '6.0 mm branding area margins',
+    bindingAllowance: 'Groove creasing and magnet inset placement notches',
+    colorSpace: 'CMYK + Spot UV Vector + Laser Etch Cut Lines',
+    formats: ['Packaging CAD (.ARD)', 'Adobe Illustrator (.AI)', 'Vector PDF']
   }
 ];
 

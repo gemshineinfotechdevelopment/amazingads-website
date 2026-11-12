@@ -2,67 +2,76 @@ import { useState } from 'react';
 
 const PAPERS = [
   {
-    name: 'Virgin Kappa Board (Rigid Core)',
+    name: 'Rigid Kappa Board & Imported PET Foil',
     weight: '400 to 600 GSM',
     origin: 'Sivakasi Works',
-    desc: 'Heavyweight rigid unbending kappa board backing engineered specifically for high-temperature brass foil die stamping and hydraulic relief embossing. Guaranteed zero-curl throughout the full calendar year.',
-    idealFor: '24K Gold Foil Wall Calendars & Kundan Stone Luxury Frames',
-    accentColor: '#d6c8b2',
-    tag: 'Flagship Core'
+    desc: 'Heavyweight rigid unbending kappa board backing bonded with imported mirror metallic PET film. Engineered for high-temperature foil stamping, tear-proof longevity, and water resistance.',
+    idealFor: 'Gold / Silver PET Foil Calendar',
+    accentColor: '#d4af37',
+    tag: 'PET Foil Core'
   },
   {
-    name: '75 LPI Optical Lenticular PET',
-    weight: '0.45mm Lenticular Sheet',
-    origin: 'High-Precision Optical Extrusion',
-    desc: 'Precision micro-lenticular lens sheet that produces realistic 3D spatial depth and dual-angle image morphing without 3D glasses. Shatter-proof and moisture resistant.',
-    idealFor: '3D & 5D Motion Wall Calendars',
-    accentColor: '#c5d3e8',
-    tag: '3D Optical'
+    name: '75 LPI Optical Lenticular 5D Sheet',
+    weight: '0.45mm Optical Sheet',
+    origin: 'High-Precision Micro-Extrusion',
+    desc: 'Precision micro-lenticular lens sheet that produces realistic 5D spatial depth and dual-angle image morphing without 3D glasses. Shatter-proof and moisture resistant.',
+    idealFor: 'Custom 5D Calendars',
+    accentColor: '#3b82f6',
+    tag: '5D Optical'
   },
   {
-    name: 'Bilt Royal Gloss & Matte Art Paper',
-    weight: '170 to 300 GSM',
-    origin: 'Bilt Royal Mills',
-    desc: 'Double-blade coated art paper delivering ultra-crisp offset image definition, high dot reproduction, and vibrant color saturation. Paired with thermal gloss or soft-touch matte lamination.',
-    idealFor: '12-Sheet Multi-Page Wall & Executive Desk Calendars',
-    accentColor: '#f4f1ea',
-    tag: 'Corporate Prime'
+    name: 'Composite Stone Powder & Sculptural Resin',
+    weight: 'Hand-Moulded Relief',
+    origin: 'Artisan Heritage Studio',
+    desc: 'Natural stone powder and high-density polymer compound forming tactile 3D sculptural reliefs. Hand-finished with stone washes and antique gold accents.',
+    idealFor: 'Stone Art Calendars',
+    accentColor: '#10b981',
+    tag: 'Stone Art'
   },
   {
-    name: 'Smooth Maplitho Daily Leaf',
-    weight: '60 GSM',
-    origin: 'High-Speed Web Offset Mills',
-    desc: 'Ultra-smooth natural shade maplitho engineered for high-speed rotary web printing and crisp micro-perforated tear-off action. Crystal clear daily panchangam and Thirukkural printing.',
-    idealFor: '365-Day Daily Panchangam Tear-Off Blocks',
-    accentColor: '#fbf9f4',
-    tag: 'Daily Volume'
+    name: 'Virgin Polypropylene (PP) Flexible Plastic',
+    weight: '0.6mm PP / 350 GSM Laminated Card',
+    origin: 'High-Speed Precision Die-Cut',
+    desc: 'Unbreakable virgin PP polymer with smooth edge finishing. Water-resistant and ultra-lightweight for continuous breeze generation and outdoor durability.',
+    idealFor: 'Promotional Advertising Hand Fans',
+    accentColor: '#ec4899',
+    tag: 'Hand Fan'
+  },
+  {
+    name: 'Cast Acrylic & Velvet MDF Wood',
+    weight: 'Bespoke Executive Spec',
+    origin: 'Precision CNC & Laser Studio',
+    desc: 'Optical grade cast acrylic panels with laser-etched edge lighting, rich leatherette covers, and velvet-lined luxury gift cases.',
+    idealFor: 'Special Products & Executive Gift Sets',
+    accentColor: '#8b5cf6',
+    tag: 'Special Products'
   }
 ];
 
 const FINISHES = [
   {
-    name: '24K Heated Brass Die Gold Foil',
+    name: 'Mirror Gold & Silver Foil Embossing',
     badge: '130°C Hot Stamping',
-    desc: 'Heated to 130°C under 5 tons of hydraulic tonnage, bonding German metallic gold foil into rigid kappa board for an intense mirror reflection.',
+    desc: 'Heated to 130°C under 5 tons of hydraulic tonnage, bonding German metallic foil into rigid kappa board for an intense mirror reflection.',
     icon: '✦'
   },
   {
-    name: 'High-Tonnage Hydraulic Relief Emboss',
-    badge: '3D Sculpted Depth',
-    desc: 'Multi-level hand-tooled brass counter dies produce elevated relief contours on deities, royal architecture, and corporate insignias.',
-    icon: '◈'
-  },
-  {
-    name: '3D / 5D Lenticular Optical Motion',
+    name: 'Dynamic 5D Holographic Motion',
     badge: 'Dual-Angle Morph',
     desc: 'Micro-optical lenticular lenses refract two distinct visual phases as the viewer moves past the calendar, creating realistic 3D depth.',
     icon: '🌀'
   },
   {
-    name: 'Anti-Rust Tin Plate Mounting',
-    badge: 'Sivakasi Tin Clamping',
-    desc: 'Machine-crimped electroplated tin top band with central galvanized wire loop hanger that holds rigid against wall humidity.',
-    icon: '❖'
+    name: 'Sculpted Antique Stone Wash & Gems',
+    badge: 'Handcrafted Relief',
+    desc: 'Multi-level artisanal stone texturing with hand-studded Kundan gems and rich velvet accents.',
+    icon: '🗿'
+  },
+  {
+    name: 'Double-Sided Offset & Screen Print',
+    badge: 'Vibrant CMYK + Spot UV',
+    desc: 'Full-bleed high-definition color reproduction on PP hand fans and special corporate gift packaging.',
+    icon: '🪭'
   }
 ];
 
