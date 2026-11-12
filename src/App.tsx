@@ -15,8 +15,11 @@ function App() {
   const [backendInfo, setBackendInfo] = useState<BackendInfo | null>(null)
   const [backendLoading, setBackendLoading] = useState(true)
 
+  const apiBase = import.meta.env.VITE_API_BASE_URL || '/api'
+  const appTitle = import.meta.env.VITE_APP_TITLE || 'Amazing Ads'
+
   useEffect(() => {
-    fetch('/api/health')
+    fetch(`${apiBase}/health`)
       .then((res) => res.json())
       .then((data: BackendInfo) => {
         setBackendInfo(data)
@@ -26,7 +29,7 @@ function App() {
         setBackendInfo(null)
         setBackendLoading(false)
       })
-  }, [])
+  }, [apiBase])
 
   return (
     <>
@@ -37,7 +40,7 @@ function App() {
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
         <div>
-          <h1>Get started</h1>
+          <h1>{appTitle}</h1>
           <p>
             Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
           </p>
