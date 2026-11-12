@@ -5,29 +5,130 @@ const router = Router();
 // Authentic Amazing Ads Sivakasi Calendar Catalog & Specifications
 const calendarCatalog = [
   {
-    id: 'gold-foil-wall',
-    name: 'Real 24K Gold Foil Stamped Wall Calendar',
-    subtitle: 'Heated Brass Foil Die Stamping on Heavyweight Kappa Board',
-    category: 'Gold Foil Calendars',
-    tag: 'Flagship Sivakasi Spec',
+    id: 'pet-foil-calendar',
+    name: 'Gold / Silver PET Foil Calendar',
+    subtitle: 'High-Luster Mirror Metallic PET Foil on Heavy Rigid Board',
+    category: 'Gold/Silver PET Foil',
+    tag: 'Flagship Luxury Spec',
     startingPrice: 145,
     currency: '₹',
     minOrder: 100,
-    standardGsm: '400 GSM Rigid Kappa Board Backing + 24K German Foil',
-    binding: 'Heavy-Gauge Tin Mounting with Brass Center Hanger',
+    standardGsm: '400 GSM Rigid Kappa Board Backing + Imported PET Metallic Film',
+    binding: 'Heavy-Gauge Anti-Rust Tin Mounting with Brass Center Hanger',
     dimensions: '15 × 20 inches / 17 × 27 inches',
     leadTime: '4–6 Business Days',
     accentColor: '#d4af37',
-    coverFinish: 'Deep Brass Die Relief Embossing with 24K Gold & Multi-Foil',
-    description: 'Amazing Ads’ signature masterpiece. Features high-temperature metallic foil stamping on rigid virgin kappa board with deep multi-level sculpted embossing. Available with traditional devotional themes (Tirupati Balaji, Murugan, Lakshmi Kubera, Mecca, Jesus) or custom corporate branding.',
+    coverFinish: 'Mirror-Finish Gold & Silver Hot Stamped Foil with Multi-Stage Embossing',
+    description: 'Amazing Ads’ signature masterpiece. Features high-temperature metallic gold & silver foil stamping on tear-proof, moisture-resistant PET film with deep sculpted relief embossing. Premium luxury finish for corporate New Year gifting and temple trusts.',
     features: [
-      'Multi-Color Metallic Foil Stamping (Gold, Silver, Copper, Holographic)',
+      'Gleaming Gold & Silver Mirror Metallic PET Foil',
       'High-Tonnage Hydraulic Relief Embossing for 3D tactile depth',
-      'Anti-Rust Gold/Silver Tin Plate Mounting with Heavy Loop Hanger',
+      'Water-proof & tear-resistant surface that never fades',
       'Spacious Top & Bottom Header Area for Corporate Branding / Logo / Phone',
       'Individual Corrugated Protection Box for Safe All-India Shipping'
     ],
     mockupImg: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 'custom-5d-calendar',
+    name: 'Custom 5D Calendars',
+    subtitle: 'Dynamic Holographic Optical Depth & Animated Angle-Morphing View',
+    category: 'Custom 5D Calendars',
+    tag: 'Trending 5D Tech',
+    startingPrice: 220,
+    currency: '₹',
+    minOrder: 50,
+    standardGsm: '75 LPI Optical Lenticular 5D Sheet mounted on Rigid Kappa Board',
+    binding: 'Deluxe Moulded Golden Synthetic Frame with Wall Mount Cleat',
+    dimensions: '12 × 18 inches / 16 × 24 inches',
+    leadTime: '5–7 Business Days',
+    accentColor: '#7209b7',
+    coverFinish: 'True 5D Lenticular Optical Depth Perception & Dual-Angle Image Morph',
+    description: 'Sivakasi’s high-tech specialty 5D calendar. Utilizes micro-optical lenticular lenses to produce realistic three-dimensional depth and animated motion without 3D glasses. Images visually transform as the viewer walks past the calendar.',
+    features: [
+      'Stunning 5D Optical Depth with dynamic 2-phase or 3-phase motion flip',
+      'Shatter-proof optical PET lens surface resistant to dust and moisture',
+      'Deluxe synthetic wood-finish golden frame with glass-like luster',
+      'Tear-off daily panchangam block or 12-month card slot at base',
+      'High-retention corporate gift guaranteed to remain on wall for years'
+    ],
+    mockupImg: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 'stone-art-calendar',
+    name: 'Stone Art Calendars',
+    subtitle: 'Sculptural Textured Relief with Handcrafted Stone-Finish Elegance',
+    category: 'Stone Art Calendars',
+    tag: 'Artisan Heritage Craft',
+    startingPrice: 280,
+    currency: '₹',
+    minOrder: 50,
+    standardGsm: 'Composite Stone Powder & High-Density Resin on Heavy Board',
+    binding: 'Carved Royal Teak/Gold Finish Moulded Synthetic Frame',
+    dimensions: '14 × 20 inches / 18 × 24 inches',
+    leadTime: '6–8 Business Days',
+    accentColor: '#9b2226',
+    coverFinish: 'Hand-Brushed Antique Stone Texture, Kundan Gems & German Gold Work',
+    description: 'A luxurious heirloom decorative calendar simulating sculpted temple stone carvings and royal heritage motifs. Tactile relief textures with hand-finished stone washes and antique gold brushing.',
+    features: [
+      'Authentic 3D sculpted stone-relief texture with tactile detailing',
+      'Hand-crafted stone wash & metallic antique highlights',
+      'Deep multi-stage relief embossing with German hot foil accents',
+      'Fitted with daily tear-off panchangam pad or 12-month sliding sheet',
+      'Premium wedding, housewarming, and New Year VIP executive gift'
+    ],
+    mockupImg: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 'hand-fan',
+    name: 'Promotional Hand Fan',
+    tagline: 'Mass Advertising with High Everyday Utility',
+    subtitle: 'Virgin PP Plastic & Laminated Duplex Custom Advertising Hand Fans',
+    category: 'Hand Fan',
+    tag: 'High ROI Bulk Promo',
+    startingPrice: 28,
+    currency: '₹',
+    minOrder: 500,
+    standardGsm: 'Virgin Polypropylene (PP) / 350 GSM Water-Proof Laminated Board',
+    binding: 'Ergonomic Sturdy Plastic Grip Handle with Child-Safe Edges',
+    dimensions: 'Standard 8 × 8 inches / Custom Die-Cut Shapes',
+    leadTime: '3–5 Business Days',
+    accentColor: '#ec4899',
+    coverFinish: 'Both-Side Full Color Offset & Screen Print with Gloss Lamination',
+    description: 'The ultimate mass-reach promotional advertising tool. Unbreakable PP plastic and heavy laminated board hand fans engineered for massive brand visibility at outdoor events, rallies, temple festivals, and summer marketing campaigns.',
+    features: [
+      'Durable virgin PP plastic or waterproof laminated duplex card',
+      'Vibrant double-sided 4-color offset printing with gloss or matte finish',
+      'Sturdy ergonomic handle that never snaps under continuous breeze waving',
+      'Custom contour die-cut shapes available (Round, Leaf, Brand Mascot)',
+      'High retention and viral brand exposure across crowd gatherings'
+    ],
+    mockupImg: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 'special-products',
+    name: 'Special Products',
+    subtitle: 'Bespoke Executive Desk Gifts, Acrylic LED Calendars & Gift Hampers',
+    category: 'Special Products',
+    tag: 'Bespoke Made-to-Order',
+    startingPrice: 195,
+    currency: '₹',
+    minOrder: 100,
+    standardGsm: 'Imported Cast Acrylic, MDF Wood, Leatherette & Rigid Board',
+    binding: 'Custom Magnetic Rigid Box / Laser Cut Desktop Stand',
+    dimensions: 'Custom Tailored Client Dimensions',
+    leadTime: '5–8 Business Days',
+    accentColor: '#8b5cf6',
+    coverFinish: 'Laser Engraved, Spot UV, Warm LED Backlit & Metallic Embellished',
+    description: 'Tailor-made promotional creations for prestigious corporate accounts. Includes illuminated acrylic LED desk calendars, bespoke leatherette planner diaries, luxury wooden organizers, and customized multi-utility VIP executive gift boxes.',
+    features: [
+      '100% custom prototyping adhering to corporate brand guidelines',
+      'Precision laser cutting, UV spot varnishing & foil stamping',
+      'All-in-one VIP gift sets with pen, diary, bottle & desk calendar',
+      'Custom rigid box packaging with magnetic closure and satin lining',
+      'Dedicated branding plate with laser engraved company emblem'
+    ],
+    mockupImg: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 'daily-panchangam',
@@ -232,12 +333,14 @@ router.post('/quote-calculator', (req, res) => {
 
   // Real Sivakasi base pricing per unit
   let baseUnitPrice = 110;
-  if (format === 'Real 24K Gold Foil Wall' || format?.includes('Gold Foil')) baseUnitPrice = 145;
+  if (format?.includes('PET Foil') || format?.includes('Gold Foil')) baseUnitPrice = 145;
+  else if (format?.includes('5D') || format?.includes('3D')) baseUnitPrice = 220;
+  else if (format?.includes('Stone Art') || format?.includes('Kundan')) baseUnitPrice = 280;
+  else if (format?.includes('Hand Fan')) baseUnitPrice = 28;
+  else if (format?.includes('Special Products') || format?.includes('Special')) baseUnitPrice = 195;
   else if (format === 'Traditional Daily Sheet' || format?.includes('Daily Sheet')) baseUnitPrice = 65;
   else if (format === '12-Sheet Monthly Wall' || format?.includes('Monthly Wall')) baseUnitPrice = 110;
-  else if (format === '3D / 5D Lenticular Motion' || format?.includes('3D')) baseUnitPrice = 220;
   else if (format === 'Executive Tabletop Desk' || format?.includes('Tabletop') || format?.includes('Desk')) baseUnitPrice = 95;
-  else if (format === 'Kundan Stone Embossed' || format?.includes('Kundan')) baseUnitPrice = 280;
   else if (format === '24K Gold Foil Photo Frame' || format?.includes('Photo Frame') || format?.includes('Frame')) baseUnitPrice = 180;
 
   // Finish extras

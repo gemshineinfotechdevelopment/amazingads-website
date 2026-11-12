@@ -43,7 +43,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 letterSpacing: '-0.035em'
               }}
             >
-              Precision <span className="gold-gradient-text">Calendar Press</span>.
+              Precision <span className="gold-gradient-text">Calendar & Promo Press</span>.
             </h1>
 
             <p
@@ -51,12 +51,39 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 fontSize: '1.15rem',
                 lineHeight: '1.6',
                 color: 'var(--text-secondary)',
-                maxWidth: '520px',
-                marginBottom: '32px'
+                maxWidth: '560px',
+                marginBottom: '20px'
               }}
             >
-              Direct wholesale press: Real 24K gold foil stamped wall calendars, 3D lenticular motion, and traditional daily panchangam.
+              India’s premier manufacturing atelier for Gold/Silver PET Foil Calendars, Custom 5D Holographic Calendars, Stone Art Calendars, Hand Fans & Special Products.
             </p>
+
+            {/* Product Quick-Tag Highlights */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px' }}>
+              {[
+                'Gold/Silver PET Foil',
+                'Custom 5D Calendars',
+                'Stone Art Calendars',
+                'Hand Fan',
+                'Special Products'
+              ].map((item) => (
+                <span
+                  key={item}
+                  style={{
+                    background: 'rgba(207, 168, 78, 0.1)',
+                    border: '1px solid rgba(207, 168, 78, 0.3)',
+                    color: 'var(--accent-gold-bright)',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.02em'
+                  }}
+                >
+                  ✦ {item}
+                </span>
+              ))}
+            </div>
 
             {/* CTAs */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '44px' }}>

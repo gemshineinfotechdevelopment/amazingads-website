@@ -7,11 +7,13 @@ interface ProductCatalogProps {
 
 const CATEGORIES = [
   'All',
-  'Gold Foil Calendars',
-  'Gold Foil Photo Frames',
+  'Gold/Silver PET Foil',
+  'Custom 5D Calendars',
+  'Stone Art Calendars',
+  'Hand Fan',
+  'Special Products',
   'Daily Calendars',
   'Monthly Wall Calendars',
-  '3D & Specialty Calendars',
   'Tabletop & Desk'
 ];
 
