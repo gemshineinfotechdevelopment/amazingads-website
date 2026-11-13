@@ -72,7 +72,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+          <div className="advantages-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
             <div style={advantageCardStyle}>
               <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🏭</span>
               <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Wholesale Factory Direct</h3>
@@ -123,7 +123,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+          <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             {[
               { step: '01', title: 'Choose Model', desc: 'Select from 24K Gold Foil Wall, Daily Panchangam, Desk Easel, or Devotional Frame.' },
               { step: '02', title: 'Send Branding', desc: 'Share your company name, logo, phone, and address via WhatsApp or online quote.' },
@@ -166,7 +166,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {[
               {
                 client: 'Tata Motors & Titan',
@@ -232,6 +232,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       <section style={{ padding: '80px 0', position: 'relative' }}>
         <div className="container">
           <div
+            className="about-banner-card"
             style={{
               background: 'linear-gradient(145deg, #131720 0%, #0c0f15 100%)',
               border: '1px solid var(--border-gold)',
@@ -371,6 +372,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       <section style={{ padding: '80px 0 0' }}>
         <div className="container">
           <div
+            className="swatch-banner-card"
             style={{
               background: 'linear-gradient(145deg, #1f190e 0%, #12151c 100%)',
               border: '1px solid var(--border-gold)',
@@ -417,6 +419,18 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           .about-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .advantages-grid, .steps-grid, .clients-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .about-banner-card, .swatch-banner-card {
+            padding: 24px 18px !important;
+          }
+          .swatch-banner-card button {
+            width: 100% !important;
           }
         }
         @media (max-width: 600px) {

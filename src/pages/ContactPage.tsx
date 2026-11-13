@@ -69,15 +69,17 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
         {/* Contact Grid */}
         <div
+          className="contact-main-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '36px',
             marginBottom: '60px'
           }}
         >
           {/* Left Column: Direct Factory & Hub Info */}
           <div
+            className="contact-card"
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-card)',
@@ -179,6 +181,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
           {/* Right Column: Direct Message / Inquiry Form */}
           <div
+            className="contact-card"
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-card)',
@@ -223,7 +226,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="contact-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
                       Your Name *
@@ -255,7 +258,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="contact-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
                       Email Address
@@ -332,6 +335,24 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .contact-main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          .contact-card {
+            padding: 22px 16px !important;
+          }
+        }
+        @media (max-width: 540px) {
+          .contact-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

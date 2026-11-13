@@ -554,12 +554,15 @@ export const CalendarCustomizer = () => {
           onClick={() => !calculating && setIsModalOpen(false)}
         >
           <div
+            className="customizer-modal-card"
             style={{
               background: 'var(--bg-secondary)',
               border: '1px solid var(--border-gold)',
               borderRadius: 'var(--radius-lg)',
               maxWidth: '520px',
               width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
               padding: '36px',
               boxShadow: 'var(--shadow-lg), 0 0 40px rgba(207, 168, 78, 0.2)',
               position: 'relative'
@@ -752,6 +755,15 @@ export const CalendarCustomizer = () => {
         @media (max-width: 960px) {
           .customizer-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .config-card {
+            padding: 18px 14px !important;
+          }
+          .customizer-modal-card {
+            padding: 22px 16px !important;
+            border-radius: 16px !important;
           }
         }
       `}</style>

@@ -162,6 +162,7 @@ export const DielinesPage = () => {
                 </div>
 
                 <div
+                  className="dieline-info-box"
                   style={{
                     background: 'var(--bg-input)',
                     borderRadius: 'var(--radius-sm)',
@@ -212,6 +213,7 @@ export const DielinesPage = () => {
           {/* Right Column: Pre-Flight Artwork Inspector */}
           <div style={{ position: 'sticky', top: '90px' }}>
             <div
+              className="preflight-card"
               style={{
                 background: 'linear-gradient(155deg, #181d26 0%, #11141b 100%)',
                 border: '1px solid var(--border-gold)',
@@ -314,6 +316,20 @@ export const DielinesPage = () => {
         @media (max-width: 960px) {
           .dieline-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .dieline-card {
+            padding: 20px 16px !important;
+          }
+          .preflight-card {
+            padding: 20px 16px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .dieline-info-box {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
           }
         }
       `}</style>

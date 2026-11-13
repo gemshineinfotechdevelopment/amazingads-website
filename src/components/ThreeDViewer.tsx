@@ -215,14 +215,14 @@ export const ThreeDViewer = () => {
 
   return (
     <div style={{ width: '100%', padding: '10px 0 30px' }}>
-      {/* 1. Main Calendar Model Category Tabs */}
+      {/* 1. Main Calendar Model Category Tabs (Horizontally Scrollable on Mobile) */}
       <div
+        className="scroll-pills-row threed-tabs-wrapper"
         style={{
           display: 'flex',
-          justifyContent: 'center',
           gap: '8px',
-          flexWrap: 'wrap',
-          marginBottom: '16px'
+          marginBottom: '16px',
+          justifyContent: 'center'
         }}
       >
         {[
@@ -249,7 +249,8 @@ export const ThreeDViewer = () => {
               alignItems: 'center',
               gap: '6px',
               transition: 'all 0.2s ease',
-              boxShadow: activeMode === tab.id ? '0 0 16px rgba(207, 168, 78, 0.35)' : 'none'
+              boxShadow: activeMode === tab.id ? '0 0 16px rgba(207, 168, 78, 0.35)' : 'none',
+              flexShrink: 0
             }}
           >
             <span>{tab.icon}</span>
@@ -258,8 +259,9 @@ export const ThreeDViewer = () => {
         ))}
       </div>
 
-      {/* 2. Interactive Deity Quick Switcher (முருகன் / ஐயப்பன் / சிவன் / மகாலட்சுமி / பாலாஜி / விநாயகர்) */}
+      {/* 2. Interactive Deity Quick Switcher (Horizontally Scrollable on Mobile) */}
       <div
+        className="threed-gods-bar"
         style={{
           maxWidth: '720px',
           margin: '0 auto 16px',
@@ -270,43 +272,46 @@ export const ThreeDViewer = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '8px',
-          flexWrap: 'wrap'
+          gap: '8px'
         }}
       >
-        <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-gold)', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
           ✦ தெய்வத் திருவுருவம் தேர்வு:
         </span>
-        {[
-          { key: 'murugan', label: '🦚 முருகன்' },
-          { key: 'ayyappan', label: '🛕 ஐயப்பன்' },
-          { key: 'sivan', label: '🔱 சிவன்' },
-          { key: 'mahalakshmi', label: '🌸 மகாலட்சுமி' },
-          { key: 'balaji', label: '👑 பாலாஜி' },
-          { key: 'ganesha', label: '🐘 விநாயகர்' }
-        ].map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setSelectedGod(item.key as GodKey)}
-            style={{
-              padding: '5px 12px',
-              borderRadius: '20px',
-              background: selectedGod === item.key ? 'linear-gradient(135deg, #cfa84e, #8c6e26)' : 'transparent',
-              color: selectedGod === item.key ? '#000' : 'var(--text-secondary)',
-              border: `1px solid ${selectedGod === item.key ? '#ffd700' : 'rgba(255,255,255,0.1)'}`,
-              fontSize: '0.74rem',
-              fontWeight: selectedGod === item.key ? 800 : 600,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
+        <div className="scroll-pills-row" style={{ display: 'flex', gap: '6px', padding: 0 }}>
+          {[
+            { key: 'murugan', label: '🦚 முருகன்' },
+            { key: 'ayyappan', label: '🛕 ஐயப்பன்' },
+            { key: 'sivan', label: '🔱 சிவன்' },
+            { key: 'mahalakshmi', label: '🌸 மகாலட்சுமி' },
+            { key: 'balaji', label: '👑 பாலாஜி' },
+            { key: 'ganesha', label: '🐘 விநாயகர்' }
+          ].map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setSelectedGod(item.key as GodKey)}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '20px',
+                background: selectedGod === item.key ? 'linear-gradient(135deg, #cfa84e, #8c6e26)' : 'transparent',
+                color: selectedGod === item.key ? '#000' : 'var(--text-secondary)',
+                border: `1px solid ${selectedGod === item.key ? '#ffd700' : 'rgba(255,255,255,0.1)'}`,
+                fontSize: '0.74rem',
+                fontWeight: selectedGod === item.key ? 800 : 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                flexShrink: 0
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 3. Interactive Imprint Customizer Bar */}
       <div
+        className="threed-imprint-bar"
         style={{
           maxWidth: '560px',
           margin: '0 auto 20px',
@@ -319,8 +324,8 @@ export const ThreeDViewer = () => {
           border: '1px solid var(--border-subtle)'
         }}
       >
-        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap' }}>
-          ✦ உங்கள் கடை பெயர் (Live Foil):
+        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          ✦ உங்கள் கடை பெயர்:
         </span>
         <input
           type="text"
@@ -346,9 +351,9 @@ export const ThreeDViewer = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          perspective: '1200px',
+          perspective: '1000px',
           padding: '10px 0',
-          minHeight: '620px'
+          minHeight: '560px'
         }}
       >
         <div
@@ -359,8 +364,8 @@ export const ThreeDViewer = () => {
           onMouseLeave={handleMouseLeave}
           style={{
             width: '100%',
-            maxWidth: '410px',
-            minHeight: '580px',
+            maxWidth: '390px',
+            minHeight: '540px',
             background: 'var(--bg-card)',
             borderRadius: 'var(--radius-xl)',
             border: '2.5px solid var(--border-gold)',
@@ -374,7 +379,8 @@ export const ThreeDViewer = () => {
             cursor: 'grab',
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            touchAction: 'pan-y'
           }}
         >
           {/* Dynamic Metallic Light Glare / Specular Layer */}
@@ -1352,6 +1358,27 @@ export const ThreeDViewer = () => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .threed-tabs-wrapper {
+            justify-content: flex-start !important;
+            padding: 4px 6px 10px !important;
+          }
+          .threed-gods-bar {
+            border-radius: 16px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 10px 12px !important;
+          }
+          .threed-imprint-bar {
+            border-radius: 14px !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 6px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

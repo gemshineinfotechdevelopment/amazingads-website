@@ -185,10 +185,10 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
       <div className="container">
 
         {/* Top Controls Bar: Categories & Floating Cart Button */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
+        <div className="catalog-top-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
           
           {/* Category Filter Tabs */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="scroll-pills-row catalog-category-pills" style={{ display: 'flex', gap: '8px' }}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -203,7 +203,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                   fontWeight: 600,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  letterSpacing: '0.02em'
+                  letterSpacing: '0.02em',
+                  flexShrink: 0
                 }}
               >
                 {cat}
@@ -266,6 +267,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
         {/* Clean E-Commerce Product Grid */}
         <div
+          className="catalog-products-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
@@ -829,6 +831,28 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           padding: 24px;
           border-top: 1px solid var(--border-subtle);
           background: var(--bg-primary);
+        }
+
+        @media (max-width: 768px) {
+          .catalog-top-bar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 24px !important;
+          }
+          .cart-trigger-pill {
+            justify-content: center !important;
+            width: 100% !important;
+          }
+          .catalog-products-grid {
+            grid-template-columns: 1fr !important;
+            gap: 18px !important;
+          }
+          .cart-drawer-panel {
+            max-width: 100% !important;
+            width: 100% !important;
+            border-left: none !important;
+          }
         }
       `}</style>
     </section>

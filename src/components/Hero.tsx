@@ -86,7 +86,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             </div>
 
             {/* CTAs */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '44px' }}>
+            <div className="hero-cta-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '44px' }}>
               <button
                 onClick={onScrollToCustomizer}
                 className="btn-gold"
@@ -109,6 +109,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
 
             {/* Micro Credential Badges */}
             <div
+              className="hero-badges-row"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
@@ -279,7 +280,20 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
         @media (max-width: 960px) {
           .hero-grid {
             grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            gap: 36px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .hero-cta-group {
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
+          .hero-cta-group button {
+            width: 100% !important;
+          }
+          .hero-badges-row {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px !important;
           }
         }
       `}</style>

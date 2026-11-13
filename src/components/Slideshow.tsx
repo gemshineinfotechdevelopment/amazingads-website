@@ -569,21 +569,21 @@ export const Slideshow = () => {
         /* Responsive Breakpoints */
         @media (max-width: 768px) {
           .slideshow-frame {
-            min-height: 420px;
+            min-height: 400px;
           }
           .slideshow-caption {
-            padding: 24px 20px 20px;
+            padding: 24px 18px 18px;
           }
           .slideshow-indicators {
-            left: 20px;
-            right: 20px;
+            left: 16px;
+            right: 16px;
             top: 14px;
           }
           .slideshow-nav-arrow {
             display: none; /* Mobile users swipe naturally */
           }
           .slide-headline {
-            font-size: 1.45rem;
+            font-size: 1.35rem;
           }
           .slide-description {
             font-size: 0.85rem;
@@ -595,6 +595,21 @@ export const Slideshow = () => {
           .slide-spec-strip {
             font-size: 0.72rem;
             padding: 6px 10px;
+          }
+          .slideshow-pills-nav {
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 6px;
+            margin-top: 12px;
+          }
+          .slideshow-pills-nav::-webkit-scrollbar {
+            display: none;
+          }
+          .slide-thumb-pill {
+            flex-shrink: 0;
+            white-space: nowrap;
           }
         }
       `}</style>

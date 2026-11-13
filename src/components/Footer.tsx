@@ -129,6 +129,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
 
         {/* Bottom Bar */}
         <div
+          className="footer-bottom-bar"
           style={{
             borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             paddingTop: '24px',
@@ -166,6 +167,12 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
         @media (max-width: 600px) {
           .footer-grid {
             grid-template-columns: 1fr !important;
+            gap: 28px !important;
+          }
+          .footer-bottom-bar {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 14px !important;
           }
         }
       `}</style>

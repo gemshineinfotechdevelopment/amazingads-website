@@ -249,6 +249,15 @@ export const CorporateInquiry = () => {
             grid-template-columns: 1fr !important;
           }
         }
+        @media (max-width: 600px) {
+          .corporate-grid {
+            padding: 22px 16px !important;
+            gap: 24px !important;
+          }
+          .corporate-grid > div:last-child {
+            padding: 20px 16px !important;
+          }
+        }
       `}</style>
     </section>
   );

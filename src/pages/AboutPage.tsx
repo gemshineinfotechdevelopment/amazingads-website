@@ -32,6 +32,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
 
         {/* Story Section */}
         <div
+          className="about-story-card"
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-card)',
@@ -42,9 +43,10 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
           }}
         >
           <div
+            className="about-story-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '40px',
               alignItems: 'center'
             }}
@@ -77,6 +79,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
 
             {/* Quick Stats Grid */}
             <div
+              className="about-stats-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
@@ -123,6 +126,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
         </div>
 
         <div
+          className="about-capabilities-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -169,6 +173,28 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .about-story-card {
+            padding: 24px 16px !important;
+          }
+          .about-story-grid {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
+          }
+          .about-capabilities-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .about-stats-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
