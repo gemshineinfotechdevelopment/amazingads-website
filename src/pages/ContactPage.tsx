@@ -122,9 +122,12 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
                   <span style={{ fontSize: '1.4rem' }}>📞</span>
                   <div>
-                    <strong style={{ color: '#fff', display: 'block' }}>Direct Phone & WhatsApp:</strong>
+                    <strong style={{ color: '#fff', display: 'block' }}>Direct Factory Hotline & WhatsApp:</strong>
                     <span style={{ color: 'var(--accent-gold-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                      +91 94431 XXXXX / +91 98421 XXXXX
+                      +91 97904 72767 / +91 97904 27670
+                    </span>
+                    <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      Management: +91 98400 55220
                     </span>
                   </div>
                 </div>
@@ -134,7 +137,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
                   <div>
                     <strong style={{ color: '#fff', display: 'block' }}>Email Support:</strong>
                     <span style={{ color: 'var(--text-secondary)' }}>
-                      sales@amazingads.in / press@amazingads.in
+                      aamazingads@gmail.com • www.amazingads.in
                     </span>
                   </div>
                 </div>

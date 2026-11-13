@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCalendarProducts, type CalendarProduct } from '../services/api';
+import { getCalendarProducts, SIVAKASI_CATALOG, type CalendarProduct } from '../services/api';
 
 interface ProductCatalogProps {
   onSelectProduct: (productName: string) => void;
@@ -7,27 +7,28 @@ interface ProductCatalogProps {
 
 const CATEGORIES = [
   'All',
-  'Gold/Silver PET Foil Calendar',
-  'Special Products',
+  'Gold/Silver PET Foil',
   'Custom 5D Calendars',
   'Stone Art Calendars',
-  'Hand Fan'
+  'Hand Fan',
+  'Special Products'
 ];
 
 export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const [activeCategory, setActiveCategory] = useState('All');
-  const [products, setProducts] = useState<CalendarProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<CalendarProduct[]>(SIVAKASI_CATALOG);
 
   useEffect(() => {
-    setLoading(true);
     getCalendarProducts(activeCategory)
       .then((data) => {
         setProducts(data);
-        setLoading(false);
       })
       .catch(() => {
-        setLoading(false);
+        if (activeCategory === 'All') {
+          setProducts(SIVAKASI_CATALOG);
+        } else {
+          setProducts(SIVAKASI_CATALOG.filter(p => p.category === activeCategory));
+        }
       });
   }, [activeCategory]);
 
@@ -67,19 +68,14 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
         </div>
 
         {/* Product Grid */}
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-            <p>Accessing Press Archive...</p>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-              gap: '32px'
-            }}
-          >
-            {products.map((item) => (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+            gap: '32px'
+          }}
+        >
+          {products.map((item) => (
               <div
                 key={item.id}
                 style={{
@@ -201,7 +197,6 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
               </div>
             ))}
           </div>
-        )}
       </div>
 
       <style>{`

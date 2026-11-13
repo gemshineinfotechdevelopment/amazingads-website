@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getBackendHealth } from '../services/api';
 import { useRouter, type PageRoute } from '../context/RouterContext';
 
 interface NavbarProps {
@@ -8,22 +7,10 @@ interface NavbarProps {
 
 export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   const { currentPage, navigate } = useRouter();
-  const [backendStatus, setBackendStatus] = useState<{ online: boolean; port?: number | string }>({
-    online: false
-  });
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check backend connection
-    getBackendHealth()
-      .then((data) => {
-        setBackendStatus({ online: true, port: data.port });
-      })
-      .catch(() => {
-        setBackendStatus({ online: false });
-      });
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
     };
@@ -34,10 +21,11 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
 
   const navItems: { id: PageRoute; label: string }[] = [
     { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About' },
     { id: 'collections', label: 'Products' },
-    { id: 'proofing', label: 'Virtual Proofing' },
-    { id: 'corporate', label: 'Corporate Bulk' },
+    { id: 'calculator', label: 'Instant Pricing' },
+    { id: 'proofing', label: '3D Proofing' },
+    { id: 'corporate', label: 'Corporate' },
+    { id: 'about', label: 'About' },
     { id: 'contact', label: 'Contact' }
   ];
 
@@ -106,21 +94,22 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Action Controls & Backend Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          {/* Live Engine Status Indicator */}
+        {/* Action Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Authentic Sivakasi Trust Badge */}
           <div
-            title={backendStatus.online ? `Press Backend Engine online on port ${backendStatus.port}` : 'Backend offline or connecting'}
+            className="sivakasi-trust-badge"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              background: backendStatus.online ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-              border: `1px solid ${backendStatus.online ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-              padding: '5px 12px',
+              background: 'rgba(207, 168, 78, 0.1)',
+              border: '1px solid rgba(207, 168, 78, 0.28)',
+              padding: '6px 12px',
               borderRadius: '20px',
               fontSize: '0.72rem',
-              fontWeight: 500
+              fontWeight: 600,
+              color: 'var(--accent-gold-bright)'
             }}
           >
             <span
@@ -128,32 +117,40 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
                 width: '7px',
                 height: '7px',
                 borderRadius: '50%',
-                backgroundColor: backendStatus.online ? '#10b981' : '#ef4444',
-                boxShadow: backendStatus.online ? '0 0 8px #10b981' : 'none'
+                backgroundColor: '#10b981',
+                boxShadow: '0 0 8px #10b981'
               }}
             />
-            <span style={{ color: backendStatus.online ? '#34d399' : '#f87171' }}>
-              {backendStatus.online ? `Press Engine :${backendStatus.port}` : 'Press Offline'}
-            </span>
+            <span>Sivakasi Direct Press</span>
           </div>
 
           {/* Sample Kit Order Button */}
           <button
             onClick={onOpenSampleKit}
             className="btn-outline-gold"
-            style={{ padding: '8px 16px', fontSize: '0.82rem' }}
+            style={{ padding: '8px 14px', fontSize: '0.8rem' }}
           >
-            Free Swatch Kit
+            Sample Kit
           </button>
 
-          {/* Instant Quote CTA */}
-          <button
-            onClick={() => navigate('calculator')}
+          {/* Direct WhatsApp Callout */}
+          <a
+            href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote"
+            target="_blank"
+            rel="noreferrer"
             className="btn-gold"
-            style={{ padding: '9px 18px', fontSize: '0.82rem' }}
+            style={{
+              padding: '8px 16px',
+              fontSize: '0.82rem',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
           >
-            Instant Quote
-          </button>
+            <span>💬</span>
+            <span>WhatsApp</span>
+          </a>
 
           {/* Mobile Menu Toggle */}
           <button
