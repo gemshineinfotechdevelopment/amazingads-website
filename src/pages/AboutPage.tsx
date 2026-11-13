@@ -172,3 +172,4 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
     </div>
   );
 };
+
