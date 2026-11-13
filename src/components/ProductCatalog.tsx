@@ -95,6 +95,9 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                   <img
                     src={item.mockupImg}
                     alt={item.name}
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/gods/mahalakshmi.jpg';
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',

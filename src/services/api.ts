@@ -115,11 +115,11 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Spacious Top & Bottom Header Area for Corporate Branding / Logo / Phone',
       'Individual Corrugated Protection Box for Safe All-India Shipping'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/gods/mahalakshmi.jpg'
   },
   {
     id: 'custom-5d-calendar',
-    name: 'Custom 5D Calendars',
+    name: 'Custom 5D Calendars (அருள்மிகு முருகன்)',
     subtitle: 'Dynamic Holographic Optical Depth & Animated Angle-Morphing View',
     category: 'Custom 5D Calendars',
     tag: 'Trending 5D Tech',
@@ -140,11 +140,11 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Tear-off daily panchangam block or 12-month card slot at base',
       'High-retention corporate gift guaranteed to remain on wall for years'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/gods/murugan.jpg'
   },
   {
     id: 'stone-art-calendar',
-    name: 'Stone Art Calendars',
+    name: 'Stone Art Calendars (சிவபெருமான்)',
     subtitle: 'Sculptural Textured Relief with Handcrafted Stone-Finish Elegance',
     category: 'Stone Art Calendars',
     tag: 'Artisan Heritage Craft',
@@ -165,11 +165,11 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Fitted with daily tear-off panchangam pad or 12-month sliding sheet',
       'Premium wedding, housewarming, and New Year VIP executive gift'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/gods/sivan.jpg'
   },
   {
     id: 'hand-fan',
-    name: 'Promotional Hand Fan',
+    name: 'Promotional Hand Fan (ஸ்ரீ மகா கணபதி)',
     subtitle: 'Virgin PP Plastic & Laminated Duplex Custom Advertising Hand Fans',
     category: 'Hand Fan',
     tag: 'High ROI Bulk Promo',
@@ -190,11 +190,11 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Custom contour die-cut shapes available (Round, Leaf, Brand Mascot)',
       'High retention and viral brand exposure across crowd gatherings'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/gods/ganesha.jpg'
   },
   {
     id: 'special-products',
-    name: 'Special Products',
+    name: '24K Devotional Gold Foil Frame (சுவாமி ஐயப்பன்)',
     subtitle: 'Bespoke Executive Desk Gifts, Acrylic LED Calendars & Gift Hampers',
     category: 'Special Products',
     tag: 'Bespoke Made-to-Order',
@@ -215,7 +215,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Custom rigid box packaging with magnetic closure and satin lining',
       'Dedicated branding plate with laser engraved company emblem'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/gods/ayyappan.jpg'
   }
 ];
 
