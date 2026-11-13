@@ -185,10 +185,10 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
       <div className="container">
 
         {/* Top Controls Bar: Categories & Floating Cart Button */}
-        <div className="catalog-top-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
+        <div className="catalog-top-bar catalog-controls-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
           
           {/* Category Filter Tabs */}
-          <div className="scroll-pills-row catalog-category-pills" style={{ display: 'flex', gap: '8px' }}>
+          <div className="scroll-pills-row catalog-category-pills catalog-tabs-wrap" style={{ display: 'flex', gap: '8px' }}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -267,11 +267,11 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
         {/* Clean E-Commerce Product Grid */}
         <div
-          className="catalog-products-grid"
+          className="catalog-products-grid catalog-product-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '28px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+            gap: '24px'
           }}
         >
           {products.map((item) => {
@@ -834,17 +834,17 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
         }
 
         @media (max-width: 768px) {
-          .catalog-top-bar {
+          .catalog-top-bar, .catalog-controls-bar {
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 12px !important;
             margin-bottom: 24px !important;
           }
           .cart-trigger-pill {
-            justify-content: center !important;
             width: 100% !important;
+            justify-content: center !important;
           }
-          .catalog-products-grid {
+          .catalog-products-grid, .catalog-product-grid {
             grid-template-columns: 1fr !important;
             gap: 18px !important;
           }
@@ -852,6 +852,32 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
             max-width: 100% !important;
             width: 100% !important;
             border-left: none !important;
+          }
+          .catalog-category-pills, .catalog-tabs-wrap {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            padding-bottom: 8px !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+          }
+          .catalog-category-pills::-webkit-scrollbar, .catalog-tabs-wrap::-webkit-scrollbar {
+            display: none !important;
+          }
+          .catalog-category-pills button, .catalog-tabs-wrap button {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            padding: 7px 15px !important;
+            font-size: 0.8rem !important;
+          }
+          .cart-drawer-body {
+            padding: 16px !important;
+          }
+          .cart-drawer-header, .cart-drawer-footer {
+            padding: 16px !important;
+          }
+          .product-image-container {
+            height: 240px !important;
+          }
           }
         }
       `}</style>

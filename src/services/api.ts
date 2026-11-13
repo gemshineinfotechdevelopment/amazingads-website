@@ -119,7 +119,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
   },
   {
     id: 'custom-5d-calendar',
-    name: 'Custom 5D Calendars (அருள்மிகு முருகன்)',
+    name: 'Custom 5D Calendars (Lord Murugan Edition)',
     subtitle: 'Dynamic Holographic Optical Depth & Animated Angle-Morphing View',
     category: 'Custom 5D Calendars',
     tag: 'Trending 5D Tech',
@@ -144,7 +144,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
   },
   {
     id: 'stone-art-calendar',
-    name: 'Stone Art Calendars (சிவபெருமான்)',
+    name: 'Stone Art Calendars (Lord Shiva Edition)',
     subtitle: 'Sculptural Textured Relief with Handcrafted Stone-Finish Elegance',
     category: 'Stone Art Calendars',
     tag: 'Artisan Heritage Craft',
@@ -169,7 +169,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
   },
   {
     id: 'hand-fan',
-    name: 'Promotional Hand Fan (ஸ்ரீ மகா கணபதி)',
+    name: 'Promotional Hand Fan (Lord Ganesha Edition)',
     subtitle: 'Virgin PP Plastic & Laminated Duplex Custom Advertising Hand Fans',
     category: 'Hand Fan',
     tag: 'High ROI Bulk Promo',
@@ -194,7 +194,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
   },
   {
     id: 'special-products',
-    name: '24K Devotional Gold Foil Frame (சுவாமி ஐயப்பன்)',
+    name: '24K Devotional Gold Foil Frame (Lord Ayyappan Edition)',
     subtitle: 'Bespoke Executive Desk Gifts, Acrylic LED Calendars & Gift Hampers',
     category: 'Special Products',
     tag: 'Bespoke Made-to-Order',

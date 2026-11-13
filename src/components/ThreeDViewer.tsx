@@ -23,54 +23,54 @@ const GOD_PROFILES: Record<
   }
 > = {
   mahalakshmi: {
-    nameTamil: 'ஸ்ரீ கஜலக்ஷ்மி தாயார்',
+    nameTamil: 'Goddess Sri Gajalakshmi',
     nameEnglish: 'SRI GAJALAKSHMI DEVI',
-    subtitle: 'மங்கள அஷ்டலக்ஷ்மி • பொற்காசுகள் & யானைகள் அபிஷேகம்',
+    subtitle: 'Ashtalakshmi Blessings • Gold Coins & Sacred Elephant Abhishekam',
     img: '/images/gods/mahalakshmi.jpg',
     fallback: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Gaja_Lakshmi.jpg',
     accent: '#d4af37',
     badge: '✦ 24K GOLD FOIL EMBOSSED'
   },
   murugan: {
-    nameTamil: 'அருள்மிகு பழனி & திருச்செந்தூர் முருகன்',
+    nameTamil: 'Lord Murugan (Karthikeya)',
     nameEnglish: 'LORD MURUGAN (KARTIKEYA)',
-    subtitle: 'தங்க வேல் • மயில் வாகனம் • வெற்றி வடிவேலன் அலங்காரம்',
+    subtitle: 'Golden Vel • Mayil Vahanam • Divine Victory Ornamentation',
     img: '/images/gods/murugan.jpg',
     fallback: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Murugan%2C_print_c._1930.jpg',
     accent: '#f59e0b',
     badge: '🌀 5D LENTICULAR MOTION'
   },
   ayyappan: {
-    nameTamil: 'சுவாமி ஐயப்பன் (சபரிமலை நன்னாள்)',
+    nameTamil: 'Swami Ayyappan (Sabarimala)',
     nameEnglish: 'SWAMI AYYAPPAN (SABARIMALA)',
-    subtitle: '18 பொன் படிகள் • யோக சின் முத்திரை • ஹரிவராசனம் பொற்காட்சி',
+    subtitle: '18 Sacred Steps • Yoga Chin Mudra • Harivarasanam Glory',
     img: '/images/gods/ayyappan.jpg',
     fallback: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Ayyappa_Swamy_bazaar_art%2C_c.1950%27s.jpg',
     accent: '#ec4899',
     badge: '🖼️ 24K DEVOTIONAL FRAME'
   },
   sivan: {
-    nameTamil: 'ஸ்ரீ கைலாசநாதர் சிவபெருமான்',
+    nameTamil: 'Lord Shiva (Kailasanathar)',
     nameEnglish: 'LORD SHIVA (PARAMESHWARAN)',
-    subtitle: 'அர்த்தநாரீஸ்வரர் • நந்தி பெருமான் • கங்கை & திரிசூலம்',
+    subtitle: 'Ardhanarishvara • Nandi Deva • Sacred Ganga & Trishula',
     img: '/images/gods/sivan.jpg',
     fallback: 'https://upload.wikimedia.org/wikipedia/commons/1/1d/An_Oleograph_of_Shiva%2C_Parvati_and_Nandi_by_Raja_Ravi_Varma.jpg',
     accent: '#10b981',
     badge: '🗿 STONE ART RELIEF'
   },
   balaji: {
-    nameTamil: 'திருப்பதி ஸ்ரீ வெங்கடாசலபதி',
+    nameTamil: 'Lord Sri Venkateswara (Tirupati Balaji)',
     nameEnglish: 'LORD SRI VENKATESWARA SWAMY',
-    subtitle: 'தஞ்சாவூர் 24K பொற்கிரீடம் • வைர மாலை & சங்கு சக்கரம்',
+    subtitle: 'Thanjavur 24K Gold Crown • Diamond Garland & Shankha Chakra',
     img: '/images/gods/balaji.jpg',
     fallback: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Tanjore_Paintings_Venkateshwara.jpg',
     accent: '#fbbf24',
     badge: '✦ 24K TANJORE GOLD'
   },
   ganesha: {
-    nameTamil: 'ஸ்ரீ மகா கணபதி துணை',
+    nameTamil: 'Lord Sri Maha Ganapati',
     nameEnglish: 'LORD SRI MAHA GANAPATI',
-    subtitle: 'முழுமுதற் கடவுள் • மோதகம் & வெற்றி ஆசீர்வாதம்',
+    subtitle: 'First-Worshiped God • Sacred Modak & Victory Blessings',
     img: '/images/gods/ganesha.jpg',
     fallback: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Ganapati1.jpg',
     accent: '#ef4444',
@@ -81,44 +81,44 @@ const GOD_PROFILES: Record<
 const DAILY_LEAVES = [
   {
     date: 14,
-    tamilMonth: 'தை திங்கள் 1 ஆம் நாள்',
-    dayName: 'வெள்ளிக்கிழமை (FRIDAY)',
-    festival: '★ தைப்பொங்கல் சுப திருநாள் (THAI PONGAL) ★',
+    tamilMonth: 'Month of Thai - Day 1',
+    dayName: 'FRIDAY',
+    festival: '★ THAI PONGAL AUSPICIOUS FESTIVAL ★',
     festBg: '#b45309',
-    nallaNeram: '09:15 - 10:15 மு.ப',
-    rahuKaalam: '10:30 - 12:00 பிற்பகல்',
-    yamagandam: '03:00 - 04:30 பிற்பகல்',
-    thithi: 'வளர்பிறை சதுர்த்தி',
-    star: 'உத்திராடம்',
-    kural: 'அன்பிலார் எல்லாம் தமக்குரியர் அன்புடையார் என்பும் உரியர் பிறர்க்கு.',
+    nallaNeram: '09:15 - 10:15 AM',
+    rahuKaalam: '10:30 - 12:00 PM',
+    yamagandam: '03:00 - 04:30 PM',
+    thithi: 'Shukla Paksha Chaturthi',
+    star: 'Uttiradam',
+    kural: 'True love makes the soul selfless and bound to all humanity.',
     kuralMeaning: 'Love makes the soul selfless and bound to all humanity.'
   },
   {
     date: 15,
-    tamilMonth: 'தை திங்கள் 2 ஆம் நாள்',
-    dayName: 'சனிக்கிழமை (SATURDAY)',
-    festival: '★ மாட்டுப் பொங்கல் நன்னாள் (MATTU PONGAL) ★',
+    tamilMonth: 'Month of Thai - Day 2',
+    dayName: 'SATURDAY',
+    festival: '★ MATTU PONGAL HARVEST FESTIVAL ★',
     festBg: '#047857',
-    nallaNeram: '07:30 - 08:30 மு.ப',
-    rahuKaalam: '09:00 - 10:30 மு.ப',
-    yamagandam: '01:30 - 03:00 பிற்பகல்',
-    thithi: 'வளர்பிறை பஞ்சமி',
-    star: 'திருவோணம்',
-    kural: 'செல்வத்துள் செல்வம் செவிச்செல்வம் அச்செல்வம் செல்வத்துள் எல்லாம் தலை.',
+    nallaNeram: '07:30 - 08:30 AM',
+    rahuKaalam: '09:00 - 10:30 AM',
+    yamagandam: '01:30 - 03:00 PM',
+    thithi: 'Shukla Paksha Panchami',
+    star: 'Tiruvonam',
+    kural: 'The wealth gained through wise listening is the crowning treasure.',
     kuralMeaning: 'The wealth gained through wise listening is the crowning treasure.'
   },
   {
     date: 16,
-    tamilMonth: 'தை திங்கள் 3 ஆம் நாள்',
-    dayName: 'ஞாயிற்றுக்கிழமை (SUNDAY)',
-    festival: '★ காணும் பொங்கல் & உழவர் திருநாள் ★',
+    tamilMonth: 'Month of Thai - Day 3',
+    dayName: 'SUNDAY',
+    festival: '★ KAANUM PONGAL & FARMERS DAY ★',
     festBg: '#6d28d9',
-    nallaNeram: '06:45 - 07:45 மு.ப',
-    rahuKaalam: '04:30 - 06:00 பிற்பகல்',
-    yamagandam: '12:00 - 01:30 பிற்பகல்',
-    thithi: 'வளர்பிறை சஷ்டி',
-    star: 'அவிட்டம்',
-    kural: 'உழுதுண்டு வாழ்வாரே வாழ்வார்மற் றெல்லாம் தொழுதுண்டு பின்செல்பவர்.',
+    nallaNeram: '06:45 - 07:45 AM',
+    rahuKaalam: '04:30 - 06:00 PM',
+    yamagandam: '12:00 - 01:30 PM',
+    thithi: 'Shukla Paksha Sashti',
+    star: 'Avittam',
+    kural: 'They alone live truly who till the soil; all others follow in homage.',
     kuralMeaning: 'They alone live truly who till the soil; all others follow in homage.'
   }
 ];
@@ -184,11 +184,15 @@ export const ThreeDViewer = () => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotX = -((y - centerY) / centerY) * 11;
-    const rotY = ((x - centerX) / centerX) * 11;
+    const rotX = -((y - centerY) / centerY) * 12;
+    const rotY = ((x - centerX) / centerX) * 12;
 
     setRotateX(rotX);
     setRotateY(rotY);
+
+    const glareX = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    const glareY = Math.max(0, Math.min(100, (y / rect.height) * 100));
+    setGlarePos({ x: glareX, y: glareY });
 
     if (activeMode === 'murugan-5d') {
       setLenticularPhase(rotY > 0 ? 'B' : 'A');
@@ -217,7 +221,7 @@ export const ThreeDViewer = () => {
     <div style={{ width: '100%', padding: '10px 0 30px' }}>
       {/* 1. Main Calendar Model Category Tabs (Horizontally Scrollable on Mobile) */}
       <div
-        className="scroll-pills-row threed-tabs-wrapper"
+className="scroll-pills-row threed-tabs-wrapper threed-tabs-nav"
         style={{
           display: 'flex',
           gap: '8px',
@@ -226,12 +230,12 @@ export const ThreeDViewer = () => {
         }}
       >
         {[
-          { id: 'pet-foil', label: '✦ 24K Gold Foil (மகாலட்சுமி)', icon: '🌸' },
-          { id: 'murugan-5d', label: '🌀 5D Lenticular (முருகன் ↔ ஐயப்பன்)', icon: '🦚' },
-          { id: 'ayyappan-frame', label: '🛕 சுவாமி ஐயப்பன் (24K சட்ட வடிவம்)', icon: '✨' },
-          { id: 'sivan-stone', label: '🔱 சிவபெருமான் (கல் சிற்பக் கலை)', icon: '🕉️' },
-          { id: 'daily-panchangam', label: '📅 தினசரி பஞ்சாங்கம் (Tear-Off Leaves)', icon: '📜' },
-          { id: 'hand-fan', label: '🪭 கோவில் விளம்பர விசிறி (விநாயகர்)', icon: '🪭' }
+          { id: 'pet-foil', label: '✦ 24K Gold Foil (Mahalakshmi)', icon: '🌸' },
+          { id: 'murugan-5d', label: '🌀 5D Lenticular (Murugan ↔ Ayyappan)', icon: '🦚' },
+          { id: 'ayyappan-frame', label: '🛕 Swami Ayyappan (24K Gold Frame)', icon: '✨' },
+          { id: 'sivan-stone', label: '🔱 Lord Shiva (Stone Art Relief)', icon: '🕉️' },
+          { id: 'daily-panchangam', label: '📅 Daily Calendar (Tear-Off Leaves)', icon: '📜' },
+          { id: 'hand-fan', label: '🪭 Temple Promo Hand Fan (Ganesha)', icon: '🪭' }
         ].map((tab) => (
           <button
             key={tab.id}
@@ -242,7 +246,7 @@ export const ThreeDViewer = () => {
               background: activeMode === tab.id ? 'var(--accent-gold)' : 'var(--bg-input)',
               color: activeMode === tab.id ? '#0b0c0e' : 'var(--text-secondary)',
               border: `1.5px solid ${activeMode === tab.id ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-              fontSize: '0.82rem',
+              fontSize: '0.8rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
@@ -259,7 +263,7 @@ export const ThreeDViewer = () => {
         ))}
       </div>
 
-      {/* 2. Interactive Deity Quick Switcher (Horizontally Scrollable on Mobile) */}
+{/* 2. Interactive Deity Quick Switcher (Murugan / Ayyappan / Shiva / Mahalakshmi / Balaji / Ganesha) */}
       <div
         className="threed-gods-bar"
         style={{
@@ -275,17 +279,17 @@ export const ThreeDViewer = () => {
           gap: '8px'
         }}
       >
-        <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-          ✦ தெய்வத் திருவுருவம் தேர்வு:
+<span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          ✦ Select Divine Artwork:
         </span>
         <div className="scroll-pills-row" style={{ display: 'flex', gap: '6px', padding: 0 }}>
           {[
-            { key: 'murugan', label: '🦚 முருகன்' },
-            { key: 'ayyappan', label: '🛕 ஐயப்பன்' },
-            { key: 'sivan', label: '🔱 சிவன்' },
-            { key: 'mahalakshmi', label: '🌸 மகாலட்சுமி' },
-            { key: 'balaji', label: '👑 பாலாஜி' },
-            { key: 'ganesha', label: '🐘 விநாயகர்' }
+            { key: 'murugan', label: '🦚 Lord Murugan' },
+            { key: 'ayyappan', label: '🛕 Swami Ayyappan' },
+            { key: 'sivan', label: '🔱 Lord Shiva' },
+            { key: 'mahalakshmi', label: '🌸 Mahalakshmi' },
+            { key: 'balaji', label: '👑 Tirupati Balaji' },
+            { key: 'ganesha', label: '🐘 Lord Ganesha' }
           ].map((item) => (
             <button
               key={item.key}
@@ -324,8 +328,8 @@ export const ThreeDViewer = () => {
           border: '1px solid var(--border-subtle)'
         }}
       >
-        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-          ✦ உங்கள் கடை பெயர்:
+<span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          ✦ Custom Branding Imprint (Live Foil):
         </span>
         <input
           type="text"
@@ -362,6 +366,9 @@ export const ThreeDViewer = () => {
           onTouchMove={handleTouchMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={handleMouseLeave}
+          onTouchStart={() => setIsHovered(true)}
+          onTouchEnd={handleMouseLeave}
+          className="threed-card-container"
           style={{
             width: '100%',
             maxWidth: '390px',
@@ -380,7 +387,7 @@ export const ThreeDViewer = () => {
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            touchAction: 'pan-y'
+touchAction: 'pan-y'
           }}
         >
           {/* Dynamic Metallic Light Glare / Specular Layer */}
@@ -552,13 +559,13 @@ export const ThreeDViewer = () => {
                       JANUARY 2027
                     </span>
                     <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#451a03' }}>
-                      மார்கழி - தை
+                      2027 CALENDAR
                     </span>
                   </div>
 
                   {/* 7-Col Date Grid Preview */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', gap: '2px', fontSize: '0.62rem', fontWeight: 600 }}>
-                    {['ஞா', 'தி', 'செ', 'பு', 'வி', 'வெ', 'ச'].map((d, i) => (
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
                       <span key={i} style={{ color: i === 0 ? '#dc2626' : '#57534e', fontSize: '0.6rem', fontWeight: 800 }}>
                         {d}
                       </span>
@@ -583,7 +590,7 @@ export const ThreeDViewer = () => {
                     ))}
                   </div>
                   <div style={{ textAlign: 'center', marginTop: '4px', fontSize: '0.58rem', color: '#b45309', fontWeight: 700 }}>
-                    ✦ தை 1 (Jan 14): தைப் பொங்கல் நன்னாள் • சுபமுகூர்த்தம்
+                    ✦ Jan 14: Thai Pongal Harvest Festival • Auspicious Muhurtham
                   </div>
                 </div>
 
@@ -608,7 +615,7 @@ export const ThreeDViewer = () => {
             )}
 
             {/* ========================================================= */}
-            {/* 2. 5D LENTICULAR CALENDAR (முருகன் ↔ ஐயப்பன் / பாலாஜி)      */}
+            {/* 2. 5D LENTICULAR CALENDAR (Lord Murugan ↔ Swami Ayyappan) */}
             {/* ========================================================= */}
             {activeMode === 'murugan-5d' && (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
@@ -694,7 +701,7 @@ export const ThreeDViewer = () => {
                         zIndex: 7
                       }}
                     >
-                      {lenticularPhase === 'A' ? '✦ VIEW A: அருள்மிகு முருகன்' : '✦ VIEW B: சுவாமி ஐயப்பன்'}
+                      {lenticularPhase === 'A' ? '✦ VIEW A: Lord Murugan' : '✦ VIEW B: Swami Ayyappan'}
                     </div>
 
                     {/* Live Tilt Angle Badge */}
@@ -730,7 +737,7 @@ export const ThreeDViewer = () => {
                       }}
                     >
                       <h4 style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800, letterSpacing: '0.04em' }}>
-                        {lenticularPhase === 'A' ? 'அருள்மிகு பழனி & திருச்செந்தூர் முருகன்' : 'சபரிமலை ஸ்ரீ தர்ம சாஸ்தா சுவாமி ஐயப்பன்'}
+                        {lenticularPhase === 'A' ? 'Lord Murugan (Palani & Tiruchendur)' : 'Sabarimala Swami Ayyappan (Dharma Sastha)'}
                       </h4>
                       <p style={{ fontSize: '0.6rem', color: '#ffd700', fontWeight: 600 }}>
                         75 LPI Lenticular Optical Sheet • Tilt mouse left / right to morph
@@ -755,7 +762,7 @@ export const ThreeDViewer = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      View A: அருள்மிகு முருகன்
+                      View A: Lord Murugan
                     </button>
                     <button
                       type="button"
@@ -772,7 +779,7 @@ export const ThreeDViewer = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      View B: சுவாமி ஐயப்பன்
+                      View B: Swami Ayyappan
                     </button>
                   </div>
                 </div>
@@ -799,7 +806,7 @@ export const ThreeDViewer = () => {
             )}
 
             {/* ========================================================= */}
-            {/* 3. AYYAPPAN FRAME (சுவாமி ஐயப்பன் - 24K Devotional Frame)   */}
+            {/* 3. AYYAPPAN FRAME (Swami Ayyappan - 24K Devotional Frame)   */}
             {/* ========================================================= */}
             {activeMode === 'ayyappan-frame' && (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
@@ -871,10 +878,10 @@ export const ThreeDViewer = () => {
                         }}
                       >
                         <h4 style={{ fontSize: '0.86rem', color: '#ffe58f', fontWeight: 800 }}>
-                          சுவாமி ஐயப்பன் • 24K DEVOTIONAL FRAME
+                          SWAMI AYYAPPAN • 24K DEVOTIONAL FRAME
                         </h4>
                         <p style={{ fontSize: '0.58rem', color: '#e5c366' }}>
-                          18 பொன் படிகள் • Carved Teak Frame • Unbreakable Glass
+                          18 Sacred Steps • Carved Teak Frame • Unbreakable Glass
                         </p>
                       </div>
                     </div>
@@ -923,7 +930,7 @@ export const ThreeDViewer = () => {
             )}
 
             {/* ========================================================= */}
-            {/* 4. SIVAN STONE ART (சிவபெருமான் - கல் சிற்பக் கலை)          */}
+            {/* 4. SIVAN STONE ART (Lord Shiva - Stone Art Relief)         */}
             {/* ========================================================= */}
             {activeMode === 'sivan-stone' && (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
@@ -1001,10 +1008,10 @@ export const ThreeDViewer = () => {
                       }}
                     >
                       <h4 style={{ fontSize: '0.88rem', color: '#a7f3d0', fontWeight: 800, letterSpacing: '0.04em' }}>
-                        ஸ்ரீ கைலாசநாதர் சிவபெருமான் • STONE ART
+                        LORD SHIVA (KAILASANATHAR) • STONE ART
                       </h4>
                       <p style={{ fontSize: '0.6rem', color: '#6ee7b7' }}>
-                        நந்தி பெருமான் • அர்த்தநாரீஸ்வரர் • Hand-Finished Patina
+                        Nandi Deva • Ardhanarishvara • Hand-Finished Patina
                       </p>
                     </div>
                   </div>
@@ -1079,10 +1086,10 @@ export const ThreeDViewer = () => {
                     />
                     <div style={{ flex: 1 }}>
                       <h4 style={{ fontSize: '0.8rem', color: '#fef08a', fontWeight: 800 }}>
-                        அருள்மிகு முருகன் துணை • 2027
+                        LORD MURUGAN BLESSINGS • 2027
                       </h4>
                       <p style={{ fontSize: '0.62rem', color: '#ca8a04', fontWeight: 700 }}>
-                        சிவகாசி ஒரிஜினல் தினசரி காலண்டர் • SIVAKASI PRESS
+                        SIVAKASI ORIGINAL DAILY CALENDAR • SIVAKASI PRESS
                       </p>
                     </div>
                   </div>
@@ -1178,10 +1185,10 @@ export const ThreeDViewer = () => {
                       border: '1px solid #e7e0ce'
                     }}
                   >
-                    <div><strong>நல்ல நேரம்:</strong> {activeLeaf.nallaNeram}</div>
-                    <div><strong>இராகு காலம்:</strong> {activeLeaf.rahuKaalam}</div>
-                    <div><strong>எமகண்டம்:</strong> {activeLeaf.yamagandam}</div>
-                    <div><strong>திதி/நட்சத்திரம்:</strong> {activeLeaf.thithi}</div>
+                    <div><strong>Auspicious Time:</strong> {activeLeaf.nallaNeram}</div>
+                    <div><strong>Rahu Kaalam:</strong> {activeLeaf.rahuKaalam}</div>
+                    <div><strong>Yamagandam:</strong> {activeLeaf.yamagandam}</div>
+                    <div><strong>Tithi / Star:</strong> {activeLeaf.thithi} • {activeLeaf.star}</div>
                   </div>
 
                   {/* Thirukkural Daily Quote */}
@@ -1216,7 +1223,7 @@ export const ThreeDViewer = () => {
                     }}
                   >
                     <span>✂️</span>
-                    <span>Tear Sheet (அடுத்த நாள் கிழிக்க)</span>
+                    <span>Tear Sheet (Next Day Preview)</span>
                   </button>
                 </div>
               </div>
@@ -1287,7 +1294,7 @@ export const ThreeDViewer = () => {
                     }}
                   >
                     <p style={{ fontSize: '0.62rem', fontWeight: 800, color: '#fef08a' }}>
-                      ஸ்ரீ மகா கணபதி துணை • விளம்பர விசிறி
+                      LORD GANESHA BLESSINGS • PROMOTIONAL HAND FAN
                     </p>
                   </div>
 
@@ -1360,10 +1367,21 @@ export const ThreeDViewer = () => {
       </div>
 
       <style>{`
-        @media (max-width: 640px) {
-          .threed-tabs-wrapper {
+@media (max-width: 768px) {
+          .threed-tabs-wrapper, .threed-tabs-nav {
             justify-content: flex-start !important;
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
             padding: 4px 6px 10px !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+          }
+          .threed-tabs-wrapper::-webkit-scrollbar, .threed-tabs-nav::-webkit-scrollbar {
+            display: none !important;
+          }
+          .threed-tabs-wrapper button, .threed-tabs-nav button {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
           }
           .threed-gods-bar {
             border-radius: 16px !important;
@@ -1377,6 +1395,7 @@ export const ThreeDViewer = () => {
             align-items: stretch !important;
             gap: 6px !important;
           }
+        }
         }
       `}</style>
     </div>

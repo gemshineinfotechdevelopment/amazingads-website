@@ -154,9 +154,9 @@ export const DielinesPage = () => {
                 }}
                 className="dieline-card"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <h4 style={{ fontSize: '1.2rem', color: '#fff' }}>{d.title}</h4>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '1.15rem', color: '#fff' }}>{d.title}</h4>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
                     {d.format}
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export const DielinesPage = () => {
           </div>
 
           {/* Right Column: Pre-Flight Artwork Inspector */}
-          <div style={{ position: 'sticky', top: '90px' }}>
+          <div className="dieline-sidebar" style={{ position: 'sticky', top: '90px' }}>
             <div
               className="preflight-card"
               style={{
@@ -316,6 +316,15 @@ export const DielinesPage = () => {
         @media (max-width: 960px) {
           .dieline-grid {
             grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          .dieline-sidebar {
+            position: static !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .dieline-card {
+            padding: 20px 16px !important;
           }
         }
         @media (max-width: 768px) {

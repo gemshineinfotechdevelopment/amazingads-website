@@ -69,7 +69,7 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
       onClick={() => !submitting && onClose()}
     >
       <div
-        className="sample-kit-card"
+className="sample-kit-card sample-kit-box"
         style={{
           background: 'var(--bg-secondary)',
           border: '1px solid var(--border-gold)',
@@ -296,9 +296,10 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
 
       <style>{`
         @media (max-width: 600px) {
-          .sample-kit-card {
+.sample-kit-card, .sample-kit-box {
             padding: 22px 16px !important;
             border-radius: 16px !important;
+          }
           }
           .modal-input-grid {
             grid-template-columns: 1fr !important;

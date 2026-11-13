@@ -69,17 +69,17 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
         {/* Contact Grid */}
         <div
-          className="contact-main-grid"
+className="contact-main-grid contact-layout-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '36px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gap: '32px',
             marginBottom: '60px'
           }}
         >
           {/* Left Column: Direct Factory & Hub Info */}
           <div
-            className="contact-card"
+className="contact-card contact-box"
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-card)',
@@ -181,7 +181,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
           {/* Right Column: Direct Message / Inquiry Form */}
           <div
-            className="contact-card"
+className="contact-card contact-box"
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-card)',
@@ -337,12 +337,12 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          .contact-main-grid {
+@media (max-width: 768px) {
+          .contact-main-grid, .contact-layout-grid {
             grid-template-columns: 1fr !important;
             gap: 24px !important;
           }
-          .contact-card {
+          .contact-card, .contact-box {
             padding: 22px 16px !important;
           }
         }

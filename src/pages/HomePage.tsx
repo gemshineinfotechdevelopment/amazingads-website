@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
-import { Slideshow } from '../components/Slideshow';
 import { ThreeDViewer } from '../components/ThreeDViewer';
 import { ProductCatalog } from '../components/ProductCatalog';
 
@@ -15,9 +14,6 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         onScrollToCustomizer={() => navigate('calculator')}
         onOpenSampleKit={onOpenSampleKit}
       />
-
-      {/* Featured Master Editions Visual Slideshow */}
-      <Slideshow />
 
       {/* 3D Interactive Model Showcase */}
       <section style={{ padding: '20px 0 60px' }}>
@@ -166,7 +162,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+<div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
             {[
               {
                 client: 'Tata Motors & Titan',
@@ -229,10 +225,10 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       </section>
 
       {/* About Amazing Ads Sivakasi Works Section */}
-      <section style={{ padding: '80px 0', position: 'relative' }}>
+      <section style={{ padding: '60px 0', position: 'relative' }}>
         <div className="container">
           <div
-            className="about-banner-card"
+className="about-banner-card home-about-box"
             style={{
               background: 'linear-gradient(145deg, #131720 0%, #0c0f15 100%)',
               border: '1px solid var(--border-gold)',
@@ -369,10 +365,10 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       </section>
 
       {/* Swatch Box Callout Section */}
-      <section style={{ padding: '80px 0 0' }}>
+      <section style={{ padding: '60px 0 0' }}>
         <div className="container">
           <div
-            className="swatch-banner-card"
+className="swatch-banner-card home-swatch-box"
             style={{
               background: 'linear-gradient(145deg, #1f190e 0%, #12151c 100%)',
               border: '1px solid var(--border-gold)',
@@ -422,14 +418,14 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           }
         }
         @media (max-width: 768px) {
-          .advantages-grid, .steps-grid, .clients-grid {
+.advantages-grid, .steps-grid, .clients-grid {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
-          .about-banner-card, .swatch-banner-card {
+          .about-banner-card, .home-about-box, .swatch-banner-card, .home-swatch-box {
             padding: 24px 18px !important;
           }
-          .swatch-banner-card button {
+          .swatch-banner-card button, .home-swatch-box button {
             width: 100% !important;
           }
         }

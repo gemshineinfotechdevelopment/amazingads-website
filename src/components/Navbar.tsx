@@ -35,47 +35,49 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        backgroundColor: scrolled ? 'rgba(10, 12, 16, 0.96)' : 'rgba(10, 12, 16, 0.88)',
+        backgroundColor: scrolled ? 'rgba(10, 12, 16, 0.96)' : 'rgba(10, 12, 16, 0.90)',
         backdropFilter: 'blur(18px)',
         borderBottom: `1px solid ${scrolled ? 'var(--border-gold)' : 'var(--border-subtle)'}`,
         transition: 'all 0.3s ease',
-        padding: scrolled ? '12px 0' : '18px 0',
+        padding: scrolled ? '10px 0' : '15px 0',
         width: '100%'
       }}
     >
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         {/* Brand Crest */}
         <div 
           onClick={() => navigate('home')}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '14px' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}
         >
           <div
+            className="navbar-brand-logo"
             style={{
-              width: '42px',
-              height: '42px',
+              width: '38px',
+              height: '38px',
               borderRadius: '8px',
               background: 'linear-gradient(135deg, #2a2210 0%, #151821 100%)',
               border: '1px solid var(--accent-gold)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(207, 168, 78, 0.25)'
+              boxShadow: '0 0 15px rgba(207, 168, 78, 0.25)',
+              flexShrink: 0
             }}
           >
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', color: 'var(--accent-gold-bright)', fontWeight: 800 }}>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '16px', color: 'var(--accent-gold-bright)', fontWeight: 800 }}>
               AA
             </span>
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
+              <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff', whiteSpace: 'nowrap' }}>
                 AMAZING ADS
               </span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--accent-gold)', letterSpacing: '0.08em', fontWeight: 700, background: 'rgba(207, 168, 78, 0.1)', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(207, 168, 78, 0.3)' }}>
+              <span style={{ fontSize: '0.68rem', color: 'var(--accent-gold)', letterSpacing: '0.08em', fontWeight: 700, background: 'rgba(207, 168, 78, 0.1)', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(207, 168, 78, 0.3)', whiteSpace: 'nowrap' }}>
                 SIVAKASI
               </span>
             </div>
-            <p className="navbar-tagline" style={{ fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '1px' }}>
+            <p className="navbar-tagline navbar-brand-sub" style={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Gold Foil & Calendar Manufacturing Hub
             </p>
           </div>
@@ -95,29 +97,29 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         </nav>
 
         {/* Mobile Menu Toggle Button */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="mobile-toggle"
             style={{
-              background: mobileMenuOpen ? 'rgba(207, 168, 78, 0.15)' : 'transparent',
+              background: mobileMenuOpen ? 'rgba(207, 168, 78, 0.15)' : 'rgba(255, 255, 255, 0.05)',
               border: `1px solid ${mobileMenuOpen ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
               borderRadius: '8px',
               color: mobileMenuOpen ? 'var(--accent-gold-bright)' : 'var(--text-primary)',
               cursor: 'pointer',
               display: 'none',
-              padding: '8px',
+              padding: '8px 10px',
               transition: 'all 0.2s ease'
             }}
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             ) : (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -130,6 +132,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div
+          className="mobile-menu-drawer"
           style={{
             background: 'rgba(13, 16, 22, 0.98)',
             backdropFilter: 'blur(20px)',
@@ -139,7 +142,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
             flexDirection: 'column',
             gap: '8px',
             boxShadow: '0 25px 50px rgba(0,0,0,0.9)',
-            animation: 'pageFadeIn 0.2s ease'
+            animation: 'slideDownMobile 0.25s ease'
           }}
         >
           {navItems.map((item) => (
@@ -189,9 +192,8 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
                 flex: 1,
                 padding: '11px',
                 borderRadius: '8px',
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
-                color: '#34d399',
+                background: '#25D366',
+                color: '#fff',
                 textDecoration: 'none',
                 fontSize: '0.85rem',
                 fontWeight: 700,
@@ -217,12 +219,24 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
       )}
 
       <style>{`
+        @keyframes slideDownMobile {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         @media (max-width: 1040px) {
           .desktop-nav { display: none !important; }
           .mobile-toggle { display: flex !important; align-items: center; justify-content: center; }
         }
         @media (max-width: 480px) {
           .navbar-tagline { display: none; }
+        }
+        @media (max-width: 480px) {
+          .navbar-brand-title {
+            font-size: 1rem !important;
+          }
+          .navbar-brand-sub {
+            display: none !important;
+          }
         }
       `}</style>
     </header>
