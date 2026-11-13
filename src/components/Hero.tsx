@@ -202,122 +202,42 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 style={{
                   marginTop: '16px',
                   borderRadius: 'var(--radius-md)',
-                  background: '#fcfbfa',
-                  color: '#1a1816',
-                  padding: '28px 24px',
-                  boxShadow: 'inset 0 0 40px rgba(0, 0, 0, 0.05)',
+                  overflow: 'hidden',
                   position: 'relative',
-                  border: '1px solid #e0dacf'
+                  border: '1px solid var(--border-gold)',
+                  boxShadow: '0 16px 36px rgba(0, 0, 0, 0.65)',
+                  background: '#0d1017'
                 }}
               >
-                {/* Gold Foil Header in the Mockup */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                  <div>
-                    <p style={{ fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8c7d6e', fontWeight: 600 }}>
-                      AMAZING ADS SIVAKASI • MMXXVII
-                    </p>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#161412', marginTop: '4px' }}>
-                      JANUARY
-                    </h3>
-                  </div>
-                  <div
-                    style={{
-                      background: 'linear-gradient(135deg, #d4af37 0%, #aa8528 100%)',
-                      color: '#fff',
-                      padding: '4px 10px',
-                      borderRadius: '4px',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em'
-                    }}
-                  >
-                    HOT FOIL 24K
-                  </div>
-                </div>
+                <img
+                  src="/images/luxury-scenic-calendar-2026.jpg"
+                  alt="November 2026 Luxury Scenic Wall Calendar - Amazing Ads Sivakasi"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    objectFit: 'cover'
+                  }}
+                />
 
-                {/* Day of Week Minimal Grid */}
+                {/* Floating 24K Hot Foil Tag */}
                 <div
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(7, 1fr)',
-                    textAlign: 'center',
-                    gap: '6px',
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    background: 'linear-gradient(135deg, #d4af37 0%, #aa8528 100%)',
+                    color: '#fff',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
                     fontSize: '0.68rem',
                     fontWeight: 700,
-                    color: '#8c7d6e',
-                    borderBottom: '1px solid #ebe5dc',
-                    paddingBottom: '8px',
-                    marginBottom: '10px'
+                    letterSpacing: '0.08em',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.6)',
+                    backdropFilter: 'blur(6px)'
                   }}
                 >
-                  <span>MON</span>
-                  <span>TUE</span>
-                  <span>WED</span>
-                  <span>THU</span>
-                  <span>FRI</span>
-                  <span style={{ color: '#c76f50' }}>SAT</span>
-                  <span style={{ color: '#c76f50' }}>SUN</span>
-                </div>
-
-                {/* Sample Date Matrix */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(7, 1fr)',
-                    textAlign: 'center',
-                    gap: '6px',
-                    fontSize: '0.8rem',
-                    fontFamily: 'var(--font-mono)',
-                    color: '#2d2823'
-                  }}
-                >
-                  <span style={{ opacity: 0.3 }}>29</span>
-                  <span style={{ opacity: 0.3 }}>30</span>
-                  <span style={{ opacity: 0.3 }}>31</span>
-                  <span>1</span>
-                  <span>2</span>
-                  <span style={{ color: '#c76f50', fontWeight: 600 }}>3</span>
-                  <span style={{ color: '#c76f50', fontWeight: 600 }}>4</span>
-
-                  <span>5</span>
-                  <span>6</span>
-                  <span>7</span>
-                  <span style={{ 
-                    background: 'rgba(207, 168, 78, 0.2)', 
-                    color: '#806114', 
-                    fontWeight: 700, 
-                    borderRadius: '4px' 
-                  }}>8</span>
-                  <span>9</span>
-                  <span style={{ color: '#c76f50', fontWeight: 600 }}>10</span>
-                  <span style={{ color: '#c76f50', fontWeight: 600 }}>11</span>
-
-                  <span>12</span>
-                  <span>13</span>
-                  <span>14</span>
-                  <span>15</span>
-                  <span>16</span>
-                  <span style={{ color: '#c76f50', fontWeight: 600 }}>17</span>
-                  <span style={{ color: '#c76f50', fontWeight: 600 }}>18</span>
-                </div>
-
-                {/* Subtle Corporate Logo Placeholder */}
-                <div
-                  style={{
-                    marginTop: '20px',
-                    paddingTop: '14px',
-                    borderTop: '1px dashed #dcd5ca',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    fontSize: '0.7rem',
-                    color: '#85786a'
-                  }}
-                >
-                  <span>ARCHIVAL COTTON PRESS</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: '#b38d38', fontWeight: 600 }}>
-                    AMAZING ADS BRANDED
-                  </span>
+                  NOVEMBER 2026 EDITION
                 </div>
               </div>
 
