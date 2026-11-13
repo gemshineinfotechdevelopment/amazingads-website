@@ -1,4 +1,8 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
+import { Quote } from '../models/Quote.js';
+import { SampleKit } from '../models/SampleKit.js';
+import { Inquiry } from '../models/Inquiry.js';
 
 const router = Router();
 
@@ -138,9 +142,16 @@ let corporateInquiries = [];
 
 // 1. Health & Server Status
 router.get('/health', (req, res) => {
+  const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  const dbState = dbStates[mongoose.connection.readyState] || 'unknown';
   res.json({
     status: 'online',
     system: 'Amazing Ads Sivakasi - Master Printing Press Engine',
+    database: {
+      provider: 'MongoDB Atlas',
+      state: dbState,
+      connected: mongoose.connection.readyState === 1
+    },
     port: process.env.PORT || 5000,
     hub: 'Sivakasi, Tamil Nadu (Printing Capital of India)',
     version: '3.0.0',
@@ -165,7 +176,7 @@ router.get('/calendar-products', (req, res) => {
 });
 
 // 3. Dynamic Quote Calculator Engine for Amazing Ads Sivakasi
-router.post('/quote-calculator', (req, res) => {
+router.post('/quote-calculator', async (req, res) => {
   const {
     productId,
     format,
@@ -251,6 +262,16 @@ router.post('/quote-calculator', (req, res) => {
 
   quoteRequests.push(quoteSummary);
 
+  // Persist to MongoDB Atlas
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await Quote.create(quoteSummary);
+      console.log(`[MongoDB] Quote ${quoteId} saved to Atlas database.`);
+    }
+  } catch (err) {
+    console.error(`[MongoDB] Failed to persist quote: ${err.message}`);
+  }
+
   res.status(200).json({
     success: true,
     message: `Official Amazing Ads Sivakasi Quote ${quoteId} generated successfully.`,
@@ -259,7 +280,7 @@ router.post('/quote-calculator', (req, res) => {
 });
 
 // 4. Sample Kit Request Endpoint
-router.post('/sample-kit', (req, res) => {
+router.post('/sample-kit', async (req, res) => {
   const { name, email, company, phone, shippingAddress, preferredStyles } = req.body;
 
   if (!name || !email || !shippingAddress) {
@@ -291,6 +312,16 @@ router.post('/sample-kit', (req, res) => {
 
   sampleKitRequests.push(sampleOrder);
 
+  // Persist to MongoDB Atlas
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await SampleKit.create(sampleOrder);
+      console.log(`[MongoDB] Sample Kit ${sampleOrder.sampleId} saved to Atlas database.`);
+    }
+  } catch (err) {
+    console.error(`[MongoDB] Failed to persist sample kit: ${err.message}`);
+  }
+
   console.log(`[Amazing Ads Sample Kit] Dispatched to ${sampleOrder.name} (${sampleOrder.company}) at ${sampleOrder.shippingAddress}`);
 
   res.status(201).json({
@@ -301,7 +332,7 @@ router.post('/sample-kit', (req, res) => {
 });
 
 // 5. Corporate Bespoke Consultation / Contact
-router.post('/contact', (req, res) => {
+router.post('/contact', async (req, res) => {
   const { name, email, company, quantityNeeded, targetDate, message, specs } = req.body;
 
   if (!name || !email || !message) {
@@ -326,6 +357,16 @@ router.post('/contact', (req, res) => {
 
   corporateInquiries.push(inquiry);
 
+  // Persist to MongoDB Atlas
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await Inquiry.create(inquiry);
+      console.log(`[MongoDB] Inquiry ${inquiry.inquiryId} saved to Atlas database.`);
+    }
+  } catch (err) {
+    console.error(`[MongoDB] Failed to persist inquiry: ${err.message}`);
+  }
+
   console.log(`[Amazing Ads Sivakasi Inquiry] ${inquiry.company} - ${inquiry.name}: ${inquiry.message}`);
 
   res.status(201).json({
@@ -349,9 +390,49 @@ router.get('/stats', (req, res) => {
       pressHQ: '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189',
       factoryPhone: '+91 97904 72767 / +91 97904 27670',
       hotlinePhone: '+91 98400 55220',
-      factoryEmail: 'aamazingads@gmail.com'
+      factoryEmail: 'aamazingads@gmail.com',
+      dispatchPartners: ['BlueDart Express', 'VRL Logistics', 'ST Courier', 'Professional Courier']
     }
   });
+});
+
+// 7. Get Recent Inquiries from MongoDB / In-Memory (Admin)
+router.get('/inquiries', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const dbInquiries = await Inquiry.find().sort({ createdAt: -1 }).limit(100);
+      return res.json({ success: true, count: dbInquiries.length, data: dbInquiries });
+    }
+    res.json({ success: true, count: corporateInquiries.length, data: corporateInquiries });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 8. Get Recent Sample Kit Requests from MongoDB / In-Memory (Admin)
+router.get('/sample-kits', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const dbKits = await SampleKit.find().sort({ createdAt: -1 }).limit(100);
+      return res.json({ success: true, count: dbKits.length, data: dbKits });
+    }
+    res.json({ success: true, count: sampleKitRequests.length, data: sampleKitRequests });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9. Get Recent Quotes from MongoDB / In-Memory (Admin)
+router.get('/quotes', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const dbQuotes = await Quote.find().sort({ createdAt: -1 }).limit(100);
+      return res.json({ success: true, count: dbQuotes.length, data: dbQuotes });
+    }
+    res.json({ success: true, count: quoteRequests.length, data: quoteRequests });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // 7. Vector Dielines & Template Archive

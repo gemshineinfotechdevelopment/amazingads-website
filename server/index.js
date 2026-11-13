@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import apiRoutes from './routes/api.js';
+import { connectDB } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,13 +29,17 @@ app.get('/', (req, res) => {
     message: 'Welcome to Amazing Ads Backend Server API',
     endpoints: {
       health: '/api/health',
-      ads: '/api/ads'
+      catalog: '/api/catalog',
+      quote: '/api/quote (POST)',
+      sampleKit: '/api/sample-kit (POST)',
+      contact: '/api/contact (POST)'
     }
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`[Backend] Server is running on port ${PORT} (http://localhost:${PORT})`);
+// Connect to MongoDB Atlas and start server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`[Backend] Server is running on port ${PORT} (http://localhost:${PORT})`);
+  });
 });
-
