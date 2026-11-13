@@ -21,10 +21,11 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
 
   const navItems: { id: PageRoute; label: string }[] = [
     { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About' },
     { id: 'collections', label: 'Products' },
-    { id: 'proofing', label: 'Virtual Proofing' },
-    { id: 'corporate', label: 'Corporate Bulk' },
+    { id: 'calculator', label: 'Instant Pricing' },
+    { id: 'proofing', label: '3D Proofing' },
+    { id: 'corporate', label: 'Corporate' },
+    { id: 'about', label: 'About' },
     { id: 'contact', label: 'Contact' }
   ];
 

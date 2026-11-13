@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
 import { ThreeDViewer } from '../components/ThreeDViewer';
+import { ProductCatalog } from '../components/ProductCatalog';
 
 export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) => {
   const { navigate } = useRouter();
@@ -33,141 +34,115 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         </div>
       </section>
 
-      {/* Atelier Departments Quick Access Grid */}
-      <section style={{ padding: '40px 0 70px' }}>
+      {/* Signature 2027 Calendar Collection */}
+      <section style={{ padding: '30px 0 50px' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 36px' }}>
+          <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 36px' }}>
             <span className="foil-badge" style={{ marginBottom: '10px' }}>
-              ✦ PRESS STUDIO
+              ✦ 2027 SIVAKASI PRESS EDITIONS
             </span>
             <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
-              Press <span className="gold-gradient-text">Departments</span>
+              Signature <span className="gold-gradient-text">Calendar Models</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              Bespoke calendar editions, real-time pricing, and tactile paper swatches.
+              Direct factory wholesale pricing. Real 24K gold foil stamping, daily panchangam, and tabletop desk easels.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '24px'
-            }}
-          >
-            {/* Department 1: Collections */}
-            <div
-              onClick={() => navigate('collections')}
-              style={deptCardStyle}
-              className="dept-card"
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '1.8rem' }}>🖼️</span>
-                <span className="foil-badge">5 PRODUCTS</span>
-              </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>The Collections</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                Gold/Silver PET Foil Calendar, Special Products, Custom 5D Calendars, Stone Art Calendars, and Hand Fan.
+          <ProductCatalog onSelectProduct={(productName) => navigate('calculator', { product: productName })} />
+        </div>
+      </section>
+
+      {/* Why Choose Amazing Ads Sivakasi Works - 4 Key Advantages */}
+      <section style={{ padding: '60px 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 40px' }}>
+            <span className="foil-badge" style={{ marginBottom: '10px' }}>
+              ✦ MANUFACTURING ADVANTAGE
+            </span>
+            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
+              Why Order Direct from <span className="gold-gradient-text">Sivakasi Works</span>
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
+              Direct factory production with zero intermediaries and complete quality control.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+            <div style={advantageCardStyle}>
+              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🏭</span>
+              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Wholesale Factory Direct</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Save 30% to 42% by purchasing direct from the Sivakasi manufacturing press. No middleman commissions.
               </p>
-              <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
-                View Editions →
-              </span>
             </div>
 
-            {/* Department 2: Quote Configurator */}
-            <div
-              onClick={() => navigate('calculator')}
-              style={deptCardStyle}
-              className="dept-card"
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '1.8rem' }}>🎛️</span>
-                <span className="foil-badge">PRICING ENGINE</span>
-              </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>Quote Calculator</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                Configure size, GSM paper weight, foil stamping, and volume tier discounts.
+            <div style={advantageCardStyle}>
+              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>👑</span>
+              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>24K Hot Foil & 5-Color Offset</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                130°C heated brass foil die stamping and Heidelberg presses ensure razor-sharp registration on virgin board.
               </p>
-              <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
-                Calculate Price →
-              </span>
             </div>
 
-            {/* Department 3: Virtual Proofing */}
-            <div
-              onClick={() => navigate('proofing')}
-              style={deptCardStyle}
-              className="dept-card"
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '1.8rem' }}>🔍</span>
-                <span className="foil-badge">DIGITAL PROOF</span>
-              </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>Virtual Proof Studio</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                Flip through 12 months, toggle 24k gold foil sheen, and test your brand watermark.
+            <div style={advantageCardStyle}>
+              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🔍</span>
+              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Free Digital Proofing</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                We generate a 3D digital proof with your corporate branding and advertisement details before going to press.
               </p>
-              <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
-                Open Proof Studio →
-              </span>
             </div>
 
-            {/* Department 4: Paper & Craft */}
-            <div
-              onClick={() => navigate('craft')}
-              style={deptCardStyle}
-              className="dept-card"
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '1.8rem' }}>📜</span>
-                <span className="foil-badge">ARCHIVAL</span>
-              </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>Paper & Foils</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                400 GSM Rigid Kappa Board, 60 GSM Maplitho, 210 GSM Bilt Royal Art Paper, and 24K Hot Foil Swatches.
+            <div style={advantageCardStyle}>
+              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🚚</span>
+              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Safe All-India Transport</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Corrugated master box packing with direct delivery via VRL, BlueDart, and ST Courier across India.
               </p>
-              <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
-                Inspect Swatches →
-              </span>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Department 5: Corporate Bulk */}
-            <div
-              onClick={() => navigate('corporate')}
-              style={deptCardStyle}
-              className="dept-card"
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '1.8rem' }}>🏢</span>
-                <span className="foil-badge">B2B CONCIERGE</span>
-              </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>Corporate Bulk</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                Turnkey procurement for 500 to 50,000+ units, custom boxes, and multi-address delivery.
-              </p>
-              <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
-                Enterprise Quotes →
-              </span>
-            </div>
+      {/* Simple 4-Step Order Workflow */}
+      <section style={{ padding: '70px 0' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 40px' }}>
+            <span className="foil-badge" style={{ marginBottom: '10px' }}>
+              ✦ SIMPLE ORDERING
+            </span>
+            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
+              How It <span className="gold-gradient-text">Works</span>
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
+              From model selection to doorstep delivery in 4 simple steps.
+            </p>
+          </div>
 
-            {/* Department 6: Dielines */}
-            <div
-              onClick={() => navigate('dielines')}
-              style={deptCardStyle}
-              className="dept-card"
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '1.8rem' }}>📐</span>
-                <span className="foil-badge">TEMPLATES</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+            {[
+              { step: '01', title: 'Choose Model', desc: 'Select from 24K Gold Foil Wall, Daily Panchangam, Desk Easel, or Devotional Frame.' },
+              { step: '02', title: 'Send Branding', desc: 'Share your company name, logo, phone, and address via WhatsApp or online quote.' },
+              { step: '03', title: 'Approve Proof', desc: 'Review the complimentary digital color proof with exact text positioning.' },
+              { step: '04', title: 'Fast Dispatch', desc: 'Pressed on high-speed lines in Sivakasi and dispatched safely to your location.' }
+            ].map((s, idx) => (
+              <div
+                key={idx}
+                style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '28px 24px',
+                  position: 'relative'
+                }}
+              >
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-gold-bright)', opacity: 0.8, marginBottom: '10px' }}>
+                  {s.step}
+                </div>
+                <h4 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>{s.title}</h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{s.desc}</p>
               </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '6px' }}>Vector Dielines</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-                Download Adobe Illustrator, InDesign, and PDF templates with pre-flight guidelines.
-              </p>
-              <span style={{ fontSize: '0.85rem', color: 'var(--accent-gold-bright)', fontWeight: 600 }}>
-                Download Assets →
-              </span>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -450,14 +425,12 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
   );
 };
 
-const deptCardStyle: CSSProperties = {
+const advantageCardStyle: CSSProperties = {
   background: 'var(--bg-card)',
   border: '1px solid var(--border-card)',
   borderRadius: 'var(--radius-lg)',
-  padding: '30px',
-  cursor: 'pointer',
+  padding: '30px 24px',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
   boxShadow: 'var(--shadow-md)'
 };

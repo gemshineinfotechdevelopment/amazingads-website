@@ -60,7 +60,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* WhatsApp Link */}
             <a
-              href="https://wa.me/919790427670?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote"
+              href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote"
               target="_blank"
               rel="noreferrer"
               style={{
@@ -79,12 +79,12 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
               }}
             >
               <span>💬</span>
-              <span>WhatsApp Sivakasi Works</span>
+              <span>WhatsApp: +91 97904 72767</span>
             </a>
 
             {/* Direct Phone Call */}
             <a
-              href="tel:+919790427670"
+              href="tel:+919790472767"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -100,7 +100,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
               }}
             >
               <span>📞</span>
-              <span>Call Factory: +91 97904 27670</span>
+              <span>Call Factory: +91 97904 72767</span>
             </a>
 
             {/* Quick Quote */}

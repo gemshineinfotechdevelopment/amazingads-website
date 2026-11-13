@@ -23,10 +23,10 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
             ✦ SIVAKASI PRINT HERITAGE
           </span>
           <h1 style={{ fontSize: 'clamp(2.4rem, 4.5vw, 3.8rem)', color: '#fff', marginBottom: '12px' }}>
-            Mastering the Art of <span className="gold-gradient-text">Print & Promotional Craft</span>
+            About <span className="gold-gradient-text">Amazing Ads</span>
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto', lineHeight: '1.7' }}>
-            Rooted in Sivakasi — the printing capital of India — Amazing Ads transforms calendar publishing and corporate advertising into heirloom artistry.
+            Direct manufacturer based in Sivakasi — the printing capital of India. Producing 24K Gold Foil Calendars, Daily Panchangam, and Luxury Photo Frames since 2008.
           </p>
         </div>
 
@@ -57,15 +57,15 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                 Direct Wholesale Press from India's Premier Printing Capital
               </h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', marginBottom: '16px', fontSize: '0.95rem' }}>
-                Founded with a passion for uncompromising tactile quality, Amazing Ads has grown into one of South India's foremost specialized manufacturing presses. We produce high-impact Gold/Silver PET Foil calendars, custom 5D lenticular visual prints, artisanal stone relief creations, high-durability advertising hand fans, and bespoke corporate promotional merchandise.
+                Operating from Sivakasi, Tamil Nadu, <strong>Amazing Ads</strong> is an established printing and manufacturing company specializing in Real 24K Gold Foil Stamped Wall Calendars, Traditional Daily Sheet Panchangam (Tamil/English with Nalla Neram, Rahu Kalam, Thirukkural), 12-Sheet Monthly Art Calendars, 3D Lenticular Motion Displays, and Devotional Gold Foil Photo Frames.
               </p>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', marginBottom: '24px', fontSize: '0.95rem' }}>
-                Unlike brokers, every calendar and merchandise item is pressed, die-stamped, folded, and bound in-house under stringent quality checks with German foils, FSC-certified boards, and high-precision hydraulic tonnage.
+                Every calendar is pressed, die-stamped, and tin-mounted in-house under stringent quality checks using Heidelberg offset presses, German metallic foils, and virgin kappa board for guaranteed flat hanging throughout the year.
               </p>
 
               <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <button onClick={() => navigate('collections')} className="btn-gold">
-                  Explore 5 Signature Products →
+                  Explore Calendar Collection →
                 </button>
                 {onOpenSampleKit && (
                   <button onClick={onOpenSampleKit} className="btn-outline-gold">
