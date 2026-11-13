@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getBackendHealth } from '../services/api';
 import { useRouter, type PageRoute } from '../context/RouterContext';
 
 interface NavbarProps {
@@ -8,22 +7,10 @@ interface NavbarProps {
 
 export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   const { currentPage, navigate } = useRouter();
-  const [backendStatus, setBackendStatus] = useState<{ online: boolean; port?: number | string }>({
-    online: false
-  });
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check backend connection
-    getBackendHealth()
-      .then((data) => {
-        setBackendStatus({ online: true, port: data.port });
-      })
-      .catch(() => {
-        setBackendStatus({ online: false });
-      });
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
     };
@@ -106,56 +93,8 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Action Controls & Backend Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          {/* Live Engine Status Indicator */}
-          <div
-            title={backendStatus.online ? `Press Backend Engine online on port ${backendStatus.port}` : 'Backend offline or connecting'}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: backendStatus.online ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-              border: `1px solid ${backendStatus.online ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-              padding: '5px 12px',
-              borderRadius: '20px',
-              fontSize: '0.72rem',
-              fontWeight: 500
-            }}
-          >
-            <span
-              style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                backgroundColor: backendStatus.online ? '#10b981' : '#ef4444',
-                boxShadow: backendStatus.online ? '0 0 8px #10b981' : 'none'
-              }}
-            />
-            <span style={{ color: backendStatus.online ? '#34d399' : '#f87171' }}>
-              {backendStatus.online ? `Press Engine :${backendStatus.port}` : 'Press Offline'}
-            </span>
-          </div>
-
-          {/* Sample Kit Order Button */}
-          <button
-            onClick={onOpenSampleKit}
-            className="btn-outline-gold"
-            style={{ padding: '8px 16px', fontSize: '0.82rem' }}
-          >
-            Free Swatch Kit
-          </button>
-
-          {/* Instant Quote CTA */}
-          <button
-            onClick={() => navigate('calculator')}
-            className="btn-gold"
-            style={{ padding: '9px 18px', fontSize: '0.82rem' }}
-          >
-            Instant Quote
-          </button>
-
-          {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="mobile-toggle"
@@ -167,6 +106,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
               display: 'none',
               padding: '6px'
             }}
+            aria-label="Toggle navigation menu"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="3" y1="12" x2="21" y2="12"></line>
