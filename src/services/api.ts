@@ -115,7 +115,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Spacious Top & Bottom Header Area for Corporate Branding / Logo / Phone',
       'Individual Corrugated Protection Box for Safe All-India Shipping'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/luxury-scenic-calendar-2026.jpg'
   },
   {
     id: 'custom-5d-calendar',
