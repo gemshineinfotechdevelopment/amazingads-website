@@ -287,6 +287,9 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                     src={item.mockupImg}
                     alt={item.name}
                     className="product-display-img"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/gods/mahalakshmi.jpg';
+                    }}
                   />
                   {/* Category Pill Tag */}
                   <span className="product-tag-badge">

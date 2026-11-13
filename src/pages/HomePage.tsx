@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
-import { Slideshow } from '../components/Slideshow';
 import { ThreeDViewer } from '../components/ThreeDViewer';
 import { ProductCatalog } from '../components/ProductCatalog';
 
@@ -15,9 +14,6 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         onScrollToCustomizer={() => navigate('calculator')}
         onOpenSampleKit={onOpenSampleKit}
       />
-
-      {/* Featured Master Editions Visual Slideshow */}
-      <Slideshow />
 
       {/* 3D Interactive Model Showcase */}
       <section style={{ padding: '20px 0 60px' }}>
