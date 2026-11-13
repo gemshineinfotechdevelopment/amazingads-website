@@ -11,6 +11,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
 
   return (
     <div
+      className="floating-concierge-wrap"
       style={{
         position: 'fixed',
         bottom: '24px',
@@ -21,11 +22,12 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
       {/* Expanded Quick Action Popover */}
       {isOpen && (
         <div
+          className="floating-concierge-popover"
           style={{
             position: 'absolute',
             bottom: '64px',
             right: '0',
-            width: '320px',
+            width: 'min(320px, calc(100vw - 32px))',
             background: 'var(--bg-secondary)',
             border: '1px solid var(--border-gold)',
             borderRadius: 'var(--radius-lg)',
@@ -175,6 +177,20 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
         .floating-btn:hover {
           transform: translateY(-3px) scale(1.03);
           box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(207, 168, 78, 0.45) !important;
+        }
+        @media (max-width: 640px) {
+          .floating-concierge-wrap {
+            bottom: 16px !important;
+            right: 16px !important;
+          }
+          .floating-concierge-popover {
+            width: calc(100vw - 32px) !important;
+            padding: 20px 16px !important;
+          }
+          .floating-btn {
+            padding: 10px 16px !important;
+            font-size: 0.8rem !important;
+          }
         }
       `}</style>
     </div>

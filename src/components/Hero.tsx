@@ -5,13 +5,7 @@ interface HeroProps {
 
 export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
   return (
-    <section
-      style={{
-        position: 'relative',
-        padding: '80px 0 100px',
-        overflow: 'hidden'
-      }}
-    >
+    <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
       <div className="container">
         <div
           style={{
@@ -24,7 +18,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
         >
           {/* Left Column: Editorial Headline & Copy */}
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <span className="foil-badge">
                 ✦ 2026 / 2027 EDITIONS
               </span>
@@ -34,12 +28,13 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             </div>
 
             <h1
+              className="hero-headline"
               style={{
-                fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
-                lineHeight: '1.02',
+                fontSize: 'clamp(2.1rem, 5.2vw, 4.4rem)',
+                lineHeight: '1.05',
                 color: '#ffffff',
                 fontWeight: 800,
-                marginBottom: '20px',
+                marginBottom: '18px',
                 letterSpacing: '-0.035em'
               }}
             >
@@ -47,8 +42,9 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             </h1>
 
             <p
+              className="hero-subtext"
               style={{
-                fontSize: '1.15rem',
+                fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
                 lineHeight: '1.6',
                 color: 'var(--text-secondary)',
                 maxWidth: '560px',
@@ -59,7 +55,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             </p>
 
             {/* Product Quick-Tag Highlights */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
               {[
                 'Gold/Silver PET Foil',
                 'Custom 5D Calendars',
@@ -75,7 +71,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                     color: 'var(--accent-gold-bright)',
                     padding: '4px 12px',
                     borderRadius: '20px',
-                    fontSize: '0.78rem',
+                    fontSize: '0.75rem',
                     fontWeight: 600,
                     letterSpacing: '0.02em'
                   }}
@@ -86,7 +82,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             </div>
 
             {/* CTAs */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '44px' }}>
+            <div className="hero-cta-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '36px' }}>
               <button
                 onClick={onScrollToCustomizer}
                 className="btn-gold"
@@ -109,46 +105,47 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
 
             {/* Micro Credential Badges */}
             <div
+              className="hero-stats-grid"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                gap: '20px',
-                paddingTop: '28px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+                gap: '16px',
+                paddingTop: '24px',
                 borderTop: '1px solid var(--border-subtle)'
               }}
             >
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
                   1.4M+
                 </p>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Calendars Pressed
                 </p>
               </div>
 
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 700, color: '#fff' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: '#fff' }}>
                   0.05mm
                 </p>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Foil Registration
                 </p>
               </div>
 
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
                   100%
                 </p>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   FSC Archival Stock
                 </p>
               </div>
 
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 700, color: '#fff' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: '#fff' }}>
                   99.8%
                 </p>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   On-Time Dispatch
                 </p>
               </div>
@@ -158,6 +155,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
           {/* Right Column: Layered Tactile Mockup Preview Showcase */}
           <div style={{ position: 'relative' }}>
             <div
+              className="hero-preview-box"
               style={{
                 position: 'relative',
                 background: 'linear-gradient(145deg, #181c25 0%, #0e1117 100%)',
@@ -276,10 +274,37 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
       </div>
 
       <style>{`
+        .hero-section {
+          padding: 80px 0 100px;
+        }
+
         @media (max-width: 960px) {
+          .hero-section {
+            padding: 40px 0 60px;
+          }
           .hero-grid {
             grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            gap: 36px !important;
+          }
+        }
+
+        @media (max-width: 580px) {
+          .hero-section {
+            padding: 28px 0 44px;
+          }
+          .hero-stats-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
+          }
+          .hero-cta-group {
+            flex-direction: column !important;
+            width: 100% !important;
+          }
+          .hero-cta-group button {
+            width: 100% !important;
+          }
+          .hero-preview-box {
+            padding: 16px !important;
           }
         }
       `}</style>

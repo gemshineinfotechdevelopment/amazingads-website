@@ -115,7 +115,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Spacious Top & Bottom Header Area for Corporate Branding / Logo / Phone',
       'Individual Corrugated Protection Box for Safe All-India Shipping'
     ],
-    mockupImg: '/images/luxury-scenic-calendar-2026.jpg'
+    mockupImg: '/images/pet-foil-calendar-real.jpg'
   },
   {
     id: 'custom-5d-calendar',
@@ -140,7 +140,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Tear-off daily panchangam block or 12-month card slot at base',
       'High-retention corporate gift guaranteed to remain on wall for years'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/custom-5d-calendar-real.jpg'
   },
   {
     id: 'stone-art-calendar',
@@ -165,7 +165,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Fitted with daily tear-off panchangam pad or 12-month sliding sheet',
       'Premium wedding, housewarming, and New Year VIP executive gift'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/stone-art-calendar-real.jpg'
   },
   {
     id: 'hand-fan',
@@ -190,7 +190,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Custom contour die-cut shapes available (Round, Leaf, Brand Mascot)',
       'High retention and viral brand exposure across crowd gatherings'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/hand-fan-promo-real.jpg'
   },
   {
     id: 'special-products',
@@ -215,7 +215,7 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Custom rigid box packaging with magnetic closure and satin lining',
       'Dedicated branding plate with laser engraved company emblem'
     ],
-    mockupImg: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=900&q=80'
+    mockupImg: '/images/special-products-gift-real.jpg'
   }
 ];
 

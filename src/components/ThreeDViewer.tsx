@@ -38,6 +38,31 @@ export const ThreeDViewer = () => {
     }
   };
 
+  // Touch move 3D tilt tracking for smartphones & tablets
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!cardRef.current || !e.touches[0]) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotX = -((y - centerY) / centerY) * 14;
+    const rotY = ((x - centerX) / centerX) * 14;
+
+    setRotateX(rotX);
+    setRotateY(rotY);
+
+    const glareX = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    const glareY = Math.max(0, Math.min(100, (y / rect.height) * 100));
+    setGlarePos({ x: glareX, y: glareY });
+
+    if (activeMode === 'custom-5d') {
+      setLenticularPhase(rotY > 0 ? 'B' : 'A');
+    }
+  };
+
   const handleMouseLeave = () => {
     setIsHovered(false);
     setRotateX(0);
@@ -47,39 +72,40 @@ export const ThreeDViewer = () => {
   };
 
   return (
-    <div style={{ width: '100%', padding: '20px 0' }}>
+    <div style={{ width: '100%', padding: '10px 0' }}>
       {/* 3D Mode Switcher Tabs for 5 Products */}
       <div
+        className="threed-tabs-nav"
         style={{
           display: 'flex',
           justifyContent: 'center',
           gap: '10px',
           flexWrap: 'wrap',
-          marginBottom: '28px'
+          marginBottom: '24px'
         }}
       >
         {[
-          { id: 'pet-foil', label: '✦ Gold/Silver PET Foil Calendar', icon: '👑' },
+          { id: 'pet-foil', label: '✦ Gold/Silver PET Foil', icon: '👑' },
           { id: 'special-products', label: '🎁 Special Products', icon: '✨' },
-          { id: 'custom-5d', label: '🌀 Custom 5D Calendars', icon: '🔮' },
-          { id: 'stone-art', label: '🗿 Stone Art Calendars', icon: '🪨' },
+          { id: 'custom-5d', label: '🌀 Custom 5D Holographic', icon: '🔮' },
+          { id: 'stone-art', label: '🗿 Stone Art Sculptural', icon: '🪨' },
           { id: 'hand-fan', label: '🪭 Hand Fan', icon: '🪭' }
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveMode(tab.id as ThreeDMode)}
             style={{
-              padding: '9px 18px',
+              padding: '8px 16px',
               borderRadius: '24px',
               background: activeMode === tab.id ? 'var(--accent-gold)' : 'var(--bg-input)',
               color: activeMode === tab.id ? '#0b0c0e' : 'var(--text-secondary)',
               border: `1.5px solid ${activeMode === tab.id ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-              fontSize: '0.82rem',
+              fontSize: '0.8rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '6px',
               transition: 'all 0.25s ease'
             }}
           >
@@ -96,8 +122,8 @@ export const ThreeDViewer = () => {
           justifyContent: 'center',
           alignItems: 'center',
           perspective: '1200px',
-          padding: '20px 0 10px',
-          minHeight: '520px'
+          padding: '10px 0',
+          minHeight: '440px'
         }}
       >
         <div
@@ -105,9 +131,13 @@ export const ThreeDViewer = () => {
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={handleMouseLeave}
+          onTouchStart={() => setIsHovered(true)}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleMouseLeave}
+          className="threed-card-container"
           style={{
-            width: '380px',
-            minHeight: '480px',
+            width: 'min(380px, calc(100vw - 32px))',
+            minHeight: '460px',
             background: 'var(--bg-card)',
             borderRadius: 'var(--radius-xl)',
             border: '2px solid var(--border-gold)',
@@ -119,7 +149,8 @@ export const ThreeDViewer = () => {
             cursor: 'grab',
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            touchAction: 'none'
           }}
         >
           {/* Dynamic Metallic Light Glare / Specular Layer */}
@@ -448,10 +479,30 @@ export const ThreeDViewer = () => {
               borderTop: '1px solid rgba(255,255,255,0.08)'
             }}
           >
-            ✦ INTERACTIVE 3D GYRO SIMULATOR • MOVE CURSOR TO TILT
+            ✦ INTERACTIVE 3D SIMULATOR • TILT TO TEST FOIL & DEPTH
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .threed-tabs-nav {
+            justify-content: flex-start !important;
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            padding-bottom: 8px !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+          }
+          .threed-tabs-nav::-webkit-scrollbar {
+            display: none !important;
+          }
+          .threed-tabs-nav button {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

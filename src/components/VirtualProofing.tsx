@@ -42,6 +42,7 @@ export const VirtualProofing = () => {
         >
           {/* Left Column: Proofing Controls */}
           <div
+            className="proofing-controls-box"
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-card)',
@@ -208,6 +209,7 @@ export const VirtualProofing = () => {
 
             {/* The Actual Calendar Sheet Canvas */}
             <div
+              className="proofing-canvas-sheet"
               style={{
                 background: paperTexture === 'kraft' ? '#d5c2a5' : paperTexture === 'cotton' ? '#f5f2e9' : '#faf8f2',
                 color: '#1a1815',
@@ -380,6 +382,16 @@ export const VirtualProofing = () => {
         @media (max-width: 960px) {
           .proofing-grid {
             grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .proofing-controls-box {
+            padding: 20px 16px !important;
+          }
+          .proofing-canvas-sheet {
+            padding: 24px 16px !important;
+            min-height: 400px !important;
           }
         }
       `}</style>

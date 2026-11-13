@@ -185,10 +185,10 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
       <div className="container">
 
         {/* Top Controls Bar: Categories & Floating Cart Button */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
+        <div className="catalog-controls-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
           
           {/* Category Filter Tabs */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="catalog-tabs-wrap" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -266,10 +266,11 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
         {/* Clean E-Commerce Product Grid */}
         <div
+          className="catalog-product-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '28px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+            gap: '24px'
           }}
         >
           {products.map((item) => {
@@ -826,6 +827,52 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           padding: 24px;
           border-top: 1px solid var(--border-subtle);
           background: var(--bg-primary);
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+          .catalog-controls-bar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 24px !important;
+          }
+          .catalog-tabs-wrap {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            padding-bottom: 8px !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+          }
+          .catalog-tabs-wrap::-webkit-scrollbar {
+            display: none !important;
+          }
+          .catalog-tabs-wrap button {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            padding: 7px 15px !important;
+            font-size: 0.8rem !important;
+          }
+          .cart-trigger-pill {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .catalog-product-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .cart-drawer-panel {
+            max-width: 100% !important;
+          }
+          .cart-drawer-body {
+            padding: 16px !important;
+          }
+          .cart-drawer-header, .cart-drawer-footer {
+            padding: 16px !important;
+          }
+          .product-image-container {
+            height: 240px !important;
+          }
         }
       `}</style>
     </section>

@@ -32,6 +32,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
 
         {/* Story Section */}
         <div
+          className="about-story-box"
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-card)',
@@ -44,8 +45,8 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '40px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+              gap: '36px',
               alignItems: 'center'
             }}
           >
@@ -63,7 +64,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                 Every calendar is pressed, die-stamped, and tin-mounted in-house under stringent quality checks using Heidelberg offset presses, German metallic foils, and virgin kappa board for guaranteed flat hanging throughout the year.
               </p>
 
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
                 <button onClick={() => navigate('collections')} className="btn-gold">
                   Explore Calendar Collection →
                 </button>
@@ -77,10 +78,11 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
 
             {/* Quick Stats Grid */}
             <div
+              className="about-stats-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gap: '20px'
+                gap: '16px'
               }}
             >
               {[
@@ -95,15 +97,15 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: 'var(--radius-lg)',
-                    padding: '24px 20px',
+                    padding: '20px 16px',
                     textAlign: 'center'
                   }}
                 >
-                  <span style={{ fontSize: '1.8rem', display: 'block', marginBottom: '8px' }}>{item.icon}</span>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-gold-bright)' }}>
+                  <span style={{ fontSize: '1.6rem', display: 'block', marginBottom: '6px' }}>{item.icon}</span>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.6rem', fontWeight: 800, color: 'var(--accent-gold-bright)' }}>
                     {item.stat}
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     {item.label}
                   </div>
                 </div>
@@ -125,8 +127,8 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+            gap: '20px',
             marginBottom: '40px'
           }}
         >
@@ -158,7 +160,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                 background: 'var(--bg-card)',
                 border: '1px solid var(--border-card)',
                 borderRadius: 'var(--radius-lg)',
-                padding: '28px',
+                padding: '24px 20px',
                 transition: 'all 0.3s ease'
               }}
             >
@@ -169,6 +171,18 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .about-story-box {
+            padding: 24px 18px !important;
+          }
+          .about-stats-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

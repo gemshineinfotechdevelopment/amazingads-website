@@ -14,14 +14,14 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    id: 'scenic-november-2026',
-    category: '2026 Signature Wall Edition',
-    badge: 'Santorini & Eiffel Sunset Edition',
-    title: 'November 2026 World Heritage Architectural Wall Calendar',
-    subtitle: 'Vibrant Mediterranean Santorini domes & Parisian Eiffel Tower at sunset, highlighted with gold foil wave embossing and frosted date matrix.',
-    spec: '350 GSM Heavy Board • Gold Foil Wave Trim • Frosted Glass Date Grid • Wire-O',
-    image: '/images/luxury-scenic-calendar-2026.jpg',
-    productTarget: 'Gold / Silver PET Foil Calendar'
+    id: 'executive-desk-calendar',
+    category: 'Executive Desk Calendar Edition',
+    badge: 'Twin-Loop Wire-O Tent Calendar',
+    title: 'Alpine Lake Landscape Executive Desk Calendar',
+    subtitle: 'High-definition landscape mountain lake panorama with dynamic curved wave layout, crisp monthly date matrix, and corporate branding footer.',
+    spec: '300 GSM Royal Art Card • Twin-Loop Wire-O Binding • Rigid Triangle Tent Stand • Custom Foil Stamping',
+    image: '/images/executive-desk-calendar.jpg',
+    productTarget: 'Special Products'
   },
   {
     id: 'pet-foil',
@@ -30,7 +30,7 @@ const SLIDES: Slide[] = [
     title: 'High-Luster Mirror Metallic PET Foil',
     subtitle: 'High-temperature brass die foil stamping on tear-proof metallic PET film with deep sculptural relief embossing.',
     spec: '400 GSM Rigid Kappa Board • Anti-Rust Tin Mount • 15×20 / 17×27 in',
-    image: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=1600&q=85',
+    image: '/images/pet-foil-calendar-real.jpg',
     productTarget: 'Gold / Silver PET Foil Calendar'
   },
   {
@@ -40,7 +40,7 @@ const SLIDES: Slide[] = [
     title: 'Dynamic 5D Depth & Dual-Angle Morphing',
     subtitle: 'Images visually transform and move as you walk past without 3D glasses. Moisture-proof optical PET lens surface.',
     spec: 'Deluxe Moulded Golden Frame • 12×18 / 16×24 in • 365 Daily Panchangam Slot',
-    image: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=1600&q=85',
+    image: '/images/custom-5d-calendar-real.jpg',
     productTarget: 'Custom 5D Calendars'
   },
   {
@@ -50,7 +50,7 @@ const SLIDES: Slide[] = [
     title: 'Handcrafted Heritage Temple Stone Relief',
     subtitle: 'Simulating sacred temple stone carvings with tactile multi-level embossing, antique stone washes, and 24K gold foil.',
     spec: 'High-Density Resin Board • Carved Teak Synthetic Frame • 14×20 / 18×24 in',
-    image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1600&q=85',
+    image: '/images/stone-art-calendar-real.jpg',
     productTarget: 'Stone Art Calendars'
   },
   {
@@ -60,7 +60,7 @@ const SLIDES: Slide[] = [
     title: 'High-Visibility Mass Brand Promotion',
     subtitle: 'Unbreakable double-sided offset printed hand fans engineered for mass-reach exposure at outdoor events and festivals.',
     spec: 'Ergonomic Grip Handle • Water-Proof Lamination • Custom Contour Die-Cut',
-    image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1600&q=85',
+    image: '/images/hand-fan-promo-real.jpg',
     productTarget: 'Promotional Hand Fan'
   },
   {
@@ -70,7 +70,7 @@ const SLIDES: Slide[] = [
     title: 'Bespoke Executive Gift Hampers & LED Easels',
     subtitle: 'Custom tailored corporate gifts including warm LED acrylic desk calendars, leatherette organizer diaries, and rigid magnetic gift boxes.',
     spec: 'Cast Acrylic & MDF Wood • Spot UV Varnish • Custom Client Dimensions',
-    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1600&q=85',
+    image: '/images/special-products-gift-real.jpg',
     productTarget: 'Special Products'
   }
 ];
@@ -147,73 +147,49 @@ export const Slideshow = () => {
           </h2>
         </div>
 
-        {/* Main Cinematic Slideshow Frame */}
+        {/* Main Cinematic Slideshow Frame with Perfect Screen Size Fit */}
         <div 
           className="slideshow-frame"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Layered Slide Backgrounds with Smooth Crossfade */}
+          {/* Layered Slide Backgrounds with Ambient Glow + Contained Crisp Product Image */}
           {SLIDES.map((slide, idx) => {
             const isActive = idx === currentIndex;
             return (
               <div
                 key={slide.id}
-                className={`slide-backdrop ${isActive ? 'active' : ''}`}
-                style={{
-                  backgroundImage: `url(${slide.image})`
-                }}
+                className={`slide-viewport ${isActive ? 'active' : ''}`}
                 aria-hidden={!isActive}
-              />
+              >
+                {/* Atmospheric ambient glow matching the slide image */}
+                <div 
+                  className="slide-ambient-glow" 
+                  style={{ backgroundImage: `url(${slide.image})` }}
+                />
+
+                {/* Main contained image - 100% full view, zero cropping, fits screen size */}
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="slide-product-img"
+                  loading={idx === 0 ? 'eager' : 'lazy'}
+                />
+              </div>
             );
           })}
 
-          {/* Soft Luxury Vignette Overlay - Keeps text calm, clear and legible */}
-          <div className="slideshow-vignette" />
-
-          {/* Slide Content Caption */}
-          <div className="slideshow-caption">
-            <div className="caption-meta">
-              <span className="slide-counter">
-                0{currentIndex + 1} / 0{SLIDES.length}
-              </span>
-              <span className="slide-category-badge">
-                {currentSlide.category}
-              </span>
-              <span className="slide-feature-pill">
-                ✦ {currentSlide.badge}
-              </span>
-            </div>
-
-            <h3 className="slide-headline">
-              {currentSlide.title}
-            </h3>
-
-            <p className="slide-description">
-              {currentSlide.subtitle}
-            </p>
-
-            <div className="slide-spec-strip">
-              <span style={{ color: 'var(--accent-gold-bright)', fontWeight: 600 }}>SPEC:</span> {currentSlide.spec}
-            </div>
-
-            {/* Quick Action Button */}
-            <div style={{ display: 'flex', gap: '12px', marginTop: '18px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => navigate('calculator', currentSlide.productTarget ? { product: currentSlide.productTarget } : undefined)}
-                className="btn-gold"
-                style={{ padding: '11px 22px', fontSize: '0.85rem' }}
-              >
-                Instant Pricing & Quote →
-              </button>
-              <button
-                onClick={() => navigate('proofing')}
-                className="btn-outline-gold"
-                style={{ padding: '11px 18px', fontSize: '0.85rem' }}
-              >
-                3D Proofing View
-              </button>
-            </div>
+          {/* Clean Top Meta Status Strip (Counter & Badges) */}
+          <div className="slide-top-meta">
+            <span className="slide-counter">
+              0{currentIndex + 1} / 0{SLIDES.length}
+            </span>
+            <span className="slide-category-badge">
+              {currentSlide.category}
+            </span>
+            <span className="slide-feature-pill">
+              ✦ {currentSlide.badge}
+            </span>
           </div>
 
           {/* Clean Glassmorphic Navigation Arrows */}
@@ -234,7 +210,7 @@ export const Slideshow = () => {
             ›
           </button>
 
-          {/* Minimalist Segmented Progress Bar Indicators */}
+          {/* Minimalist Segmented Progress Bar Indicators at top */}
           <div className="slideshow-indicators" role="tablist">
             {SLIDES.map((s, idx) => {
               const isActive = idx === currentIndex;
@@ -261,7 +237,38 @@ export const Slideshow = () => {
               );
             })}
           </div>
+        </div>
 
+        {/* Clean Info & Action Panel Positioned Directly Underneath - 100% Unobscured Image */}
+        <div className="slideshow-info-card">
+          <div className="slideshow-info-left">
+            <h3 className="slide-headline">
+              {currentSlide.title}
+            </h3>
+            <p className="slide-description">
+              {currentSlide.subtitle}
+            </p>
+            <div className="slide-spec-strip">
+              <span style={{ color: 'var(--accent-gold-bright)', fontWeight: 600 }}>SPEC:</span> {currentSlide.spec}
+            </div>
+          </div>
+
+          <div className="slideshow-info-right">
+            <button
+              onClick={() => navigate('calculator', currentSlide.productTarget ? { product: currentSlide.productTarget } : undefined)}
+              className="btn-gold"
+              style={{ padding: '12px 24px', fontSize: '0.9rem', width: '100%', justifyContent: 'center' }}
+            >
+              Instant Pricing & Quote →
+            </button>
+            <button
+              onClick={() => navigate('proofing')}
+              className="btn-outline-gold"
+              style={{ padding: '11px 20px', fontSize: '0.88rem', width: '100%', justifyContent: 'center' }}
+            >
+              3D Proofing View
+            </button>
+          </div>
         </div>
 
         {/* Thumbnail Selector Pills Beneath Frame - Clean & Non-intrusive */}
@@ -282,97 +289,102 @@ export const Slideshow = () => {
 
       <style>{`
         .slideshow-section {
-          padding: 30px 0 60px;
+          padding: 24px 0 50px;
           position: relative;
         }
 
+        /* 16:9 Screen Fit Frame */
         .slideshow-frame {
           position: relative;
           width: 100%;
-          min-height: 480px;
+          max-width: 1200px;
+          margin: 0 auto;
+          aspect-ratio: 16 / 9;
+          max-height: 680px;
           border-radius: var(--radius-xl);
           border: 1px solid var(--border-gold);
           overflow: hidden;
-          background: #0d1017;
+          background: #080a0f;
           box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 30px rgba(207, 168, 78, 0.12);
-          display: flex;
-          align-items: flex-end;
         }
 
-        /* Slide Backdrop with Smooth Crossfade & Calm Ken Burns Drift */
-        .slide-backdrop {
+        .slide-viewport {
           position: absolute;
           inset: 0;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+
+        .slide-viewport.active {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        /* Ambient Glow behind image */
+        .slide-ambient-glow {
+          position: absolute;
+          inset: -30px;
           background-size: cover;
           background-position: center;
-          opacity: 0;
-          transform: scale(1.02);
-          transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-          z-index: 1;
-        }
-
-        .slide-backdrop.active {
-          opacity: 1;
-          transform: scale(1);
-          animation: calmKenBurns 18s ease-out infinite alternate;
-        }
-
-        @keyframes calmKenBurns {
-          0% { transform: scale(1) translate(0, 0); }
-          100% { transform: scale(1.04) translate(-1%, -1%); }
-        }
-
-        /* Soft Vignette Overlay: Darkened base and subtle warm lighting */
-        .slideshow-vignette {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            180deg, 
-            rgba(10, 12, 16, 0.25) 0%, 
-            rgba(10, 12, 16, 0.55) 45%, 
-            rgba(10, 12, 16, 0.94) 100%
-          ),
-          radial-gradient(circle at 10% 50%, rgba(207, 168, 78, 0.08) 0%, transparent 60%);
-          z-index: 2;
+          filter: blur(40px) brightness(0.35);
+          opacity: 0.6;
+          transform: scale(1.1);
           pointer-events: none;
         }
 
-        /* Caption Container */
-        .slideshow-caption {
+        /* The Main Image - 100% visible, fully fitted, zero cropping */
+        .slide-product-img {
           position: relative;
-          z-index: 3;
-          padding: 40px;
-          max-width: 820px;
-          animation: captionFade 0.5s ease;
+          z-index: 2;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: center;
+          display: block;
         }
 
-        @keyframes captionFade {
+        .slide-viewport.active .slide-product-img {
+          animation: subtlePop 0.5s ease-out;
+        }
+
+        @keyframes subtlePop {
           from {
-            opacity: 0;
-            transform: translateY(10px);
+            opacity: 0.85;
+            transform: scale(0.985);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1);
           }
         }
 
-        .caption-meta {
+        /* Top Meta floating bar inside frame */
+        .slide-top-meta {
+          position: absolute;
+          top: 24px;
+          left: 24px;
+          z-index: 5;
           display: flex;
           align-items: center;
           gap: 10px;
           flex-wrap: wrap;
-          margin-bottom: 12px;
+          pointer-events: none;
         }
 
         .slide-counter {
           font-family: var(--font-mono);
           font-size: 0.76rem;
           color: var(--accent-gold-bright);
-          background: rgba(0, 0, 0, 0.5);
-          border: 1px solid rgba(207, 168, 78, 0.3);
-          padding: 3px 8px;
-          border-radius: 4px;
+          background: rgba(8, 10, 15, 0.75);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(207, 168, 78, 0.4);
+          padding: 4px 10px;
+          border-radius: 6px;
           font-weight: 700;
         }
 
@@ -382,49 +394,82 @@ export const Slideshow = () => {
           text-transform: uppercase;
           letter-spacing: 0.08em;
           color: #fff;
-          background: rgba(207, 168, 78, 0.18);
+          background: rgba(207, 168, 78, 0.22);
+          backdrop-filter: blur(8px);
           border: 1px solid var(--accent-gold);
-          padding: 3px 10px;
+          padding: 4px 12px;
           border-radius: 20px;
         }
 
         .slide-feature-pill {
           font-size: 0.74rem;
           color: var(--text-secondary);
-          background: rgba(0, 0, 0, 0.4);
-          padding: 3px 10px;
+          background: rgba(8, 10, 15, 0.75);
+          backdrop-filter: blur(8px);
+          padding: 4px 12px;
           border-radius: 20px;
           border: 1px solid var(--border-subtle);
         }
 
+        /* Info Card Directly Below Frame */
+        .slideshow-info-card {
+          max-width: 1200px;
+          margin: 16px auto 0;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
+          border-radius: var(--radius-lg);
+          padding: 24px 30px;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 30px;
+          align-items: center;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          animation: infoCardFade 0.4s ease;
+        }
+
+        @keyframes infoCardFade {
+          from { opacity: 0.6; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slideshow-info-left {
+          min-width: 0;
+        }
+
+        .slideshow-info-right {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          min-width: 230px;
+        }
+
         .slide-headline {
-          font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+          font-size: clamp(1.3rem, 2.2vw, 1.8rem);
           color: #ffffff;
           font-weight: 800;
-          line-height: 1.15;
-          margin-bottom: 10px;
+          line-height: 1.2;
+          margin-bottom: 8px;
           letter-spacing: -0.02em;
-          text-shadow: 0 2px 10px rgba(0,0,0,0.7);
         }
 
         .slide-description {
-          font-size: 0.95rem;
-          color: #d1d5db;
+          font-size: 0.92rem;
+          color: var(--text-secondary);
           line-height: 1.6;
-          margin-bottom: 14px;
-          max-width: 680px;
-          text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+          margin-bottom: 12px;
         }
 
         .slide-spec-strip {
           font-size: 0.8rem;
           color: var(--text-secondary);
-          background: rgba(0, 0, 0, 0.45);
-          backdrop-filter: blur(8px);
+          background: rgba(0, 0, 0, 0.35);
           border: 1px solid rgba(255, 255, 255, 0.08);
           padding: 8px 14px;
           border-radius: 8px;
           display: inline-block;
+          max-width: 100%;
+          white-space: normal;
+          word-break: break-word;
         }
 
         /* Nav Arrows */
@@ -432,11 +477,11 @@ export const Slideshow = () => {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          z-index: 4;
+          z-index: 6;
           width: 44px;
           height: 44px;
           border-radius: 50%;
-          background: rgba(10, 12, 16, 0.65);
+          background: rgba(8, 10, 15, 0.75);
           backdrop-filter: blur(10px);
           border: 1px solid var(--border-gold);
           color: var(--accent-gold-bright);
@@ -451,7 +496,7 @@ export const Slideshow = () => {
         }
 
         .slideshow-nav-arrow:hover {
-          background: rgba(207, 168, 78, 0.25);
+          background: rgba(207, 168, 78, 0.3);
           color: #fff;
           transform: translateY(-50%) scale(1.08);
         }
@@ -464,23 +509,24 @@ export const Slideshow = () => {
           right: 18px;
         }
 
-        /* Segmented Progress Bar Indicators at top/bottom of frame */
+        /* Top Progress Bar Indicators */
         .slideshow-indicators {
           position: absolute;
-          top: 20px;
-          left: 40px;
-          right: 40px;
-          z-index: 4;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 6;
           display: flex;
-          gap: 8px;
+          gap: 4px;
+          padding: 0;
         }
 
         .progress-bar-segment {
           flex: 1;
-          height: 16px;
+          height: 4px;
           background: none;
           border: none;
-          padding: 6px 0;
+          padding: 0;
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -488,9 +534,8 @@ export const Slideshow = () => {
 
         .segment-track {
           width: 100%;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.18);
-          border-radius: 2px;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.14);
           overflow: hidden;
           position: relative;
           transition: background 0.3s ease;
@@ -505,7 +550,6 @@ export const Slideshow = () => {
           height: 100%;
           width: 0;
           background: var(--accent-gold);
-          border-radius: 2px;
         }
 
         .progress-bar-segment.active .segment-fill {
@@ -517,7 +561,7 @@ export const Slideshow = () => {
           to { width: 100%; }
         }
 
-        /* Pill Tabs beneath the frame */
+        /* Pill Tabs beneath */
         .slideshow-pills-nav {
           display: flex;
           justify-content: center;
@@ -567,34 +611,76 @@ export const Slideshow = () => {
         }
 
         /* Responsive Breakpoints */
-        @media (max-width: 768px) {
+        @media (max-width: 860px) {
+          .slideshow-info-card {
+            grid-template-columns: 1fr;
+            gap: 18px;
+            padding: 20px;
+          }
+          .slideshow-info-right {
+            flex-direction: row;
+            min-width: 100%;
+          }
+          .slideshow-info-right button {
+            flex: 1;
+          }
+        }
+
+        @media (max-width: 640px) {
           .slideshow-frame {
-            min-height: 420px;
+            aspect-ratio: 16 / 9;
+            border-radius: var(--radius-lg);
           }
-          .slideshow-caption {
-            padding: 24px 20px 20px;
+          .slide-top-meta {
+            top: 12px;
+            left: 12px;
+            gap: 6px;
           }
-          .slideshow-indicators {
-            left: 20px;
-            right: 20px;
-            top: 14px;
+          .slide-feature-pill {
+            display: none; /* Keep clean on small screens */
           }
           .slideshow-nav-arrow {
-            display: none; /* Mobile users swipe naturally */
+            width: 36px;
+            height: 36px;
+            font-size: 1.3rem;
+          }
+          .slideshow-nav-arrow.prev { left: 8px; }
+          .slideshow-nav-arrow.next { right: 8px; }
+
+          .slideshow-info-card {
+            padding: 16px;
+            margin-top: 12px;
           }
           .slide-headline {
-            font-size: 1.45rem;
+            font-size: 1.15rem;
           }
           .slide-description {
-            font-size: 0.85rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 0.82rem;
+            margin-bottom: 10px;
           }
           .slide-spec-strip {
             font-size: 0.72rem;
             padding: 6px 10px;
+          }
+          .slideshow-info-right {
+            flex-direction: column;
+          }
+          .slideshow-pills-nav {
+            justify-content: flex-start;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .slideshow-pills-nav::-webkit-scrollbar {
+            display: none;
+          }
+          .slide-thumb-pill {
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding: 6px 12px;
+            font-size: 0.75rem;
           }
         }
       `}</style>

@@ -83,6 +83,7 @@ export const Craftsmanship = () => {
       <div className="container">
         {/* Paper Swatches Interactive Exploration */}
         <div
+          className="craft-paper-box"
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-card)',
@@ -103,7 +104,7 @@ export const Craftsmanship = () => {
           </div>
 
           {/* Swatch Navigation Tabs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '28px' }}>
             {PAPERS.map((p, idx) => {
               const active = activePaperIdx === idx;
               return (
@@ -253,6 +254,11 @@ export const Craftsmanship = () => {
         @media (max-width: 840px) {
           .paper-detail-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .craft-paper-box {
+            padding: 22px 16px !important;
           }
         }
       `}</style>

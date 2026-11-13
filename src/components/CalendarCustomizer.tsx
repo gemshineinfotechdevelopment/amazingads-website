@@ -2,28 +2,108 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { calculateQuote, type QuotePayload, type QuoteResult } from '../services/api';
 import { useRouter } from '../context/RouterContext';
 
-const FORMAT_OPTIONS = [
-  { id: 'Gold / Silver PET Foil Calendar', label: 'Gold / Silver PET Foil Calendar', size: '17 × 27 in / 15 × 20 in', icon: '👑', popular: true, base: 145 },
-  { id: 'Special Products', label: 'Special Products (LED / Gifts / Sets)', size: 'Bespoke Executive Spec', icon: '🎁', popular: true, base: 195 },
-  { id: 'Custom 5D Calendars', label: 'Custom 5D Holographic Calendars', size: '12 × 18 in (75 LPI 5D Lens)', icon: '🌀', popular: true, base: 220 },
-  { id: 'Stone Art Calendars', label: 'Stone Art Sculptural Calendars', size: '14 × 20 in Frame', icon: '🗿', popular: false, base: 280 },
-  { id: 'Hand Fan', label: 'Promotional Advertising Hand Fan', size: 'Standard 8 × 8 in with Handle', icon: '🪭', popular: false, base: 28 }
+export interface FormatOption {
+  id: string;
+  label: string;
+  fullName: string;
+  size: string;
+  icon: string;
+  popular: boolean;
+  base: number;
+  tag: string;
+  img: string;
+  defaultPaper: string;
+  defaultFinish: string;
+  defaultBinding: string;
+}
+
+const FORMAT_OPTIONS: FormatOption[] = [
+  {
+    id: 'Gold / Silver PET Foil Calendar',
+    label: 'Gold / Silver PET Foil',
+    fullName: 'Gold / Silver PET Foil Calendar',
+    size: '15 × 20 in / 17 × 27 in',
+    icon: '👑',
+    popular: true,
+    base: 145,
+    tag: 'Flagship Luxury Spec',
+    img: '/images/pet-foil-calendar-real.jpg',
+    defaultPaper: '400 GSM Rigid Board',
+    defaultFinish: 'Mirror Gold & Silver Foil Emboss',
+    defaultBinding: 'Heavy-Gauge Anti-Rust Tin Plate'
+  },
+  {
+    id: 'Custom 5D Calendars',
+    label: 'Custom 5D Holographic',
+    fullName: 'Custom 5D Holographic Calendars',
+    size: '12 × 18 in (75 LPI 5D Lens)',
+    icon: '🌀',
+    popular: true,
+    base: 220,
+    tag: 'Trending 5D Tech',
+    img: '/images/custom-5d-calendar-real.jpg',
+    defaultPaper: '75 LPI Lenticular PET',
+    defaultFinish: '5D Optical Depth Lenticular',
+    defaultBinding: 'Deluxe Moulded Synthetic Gold Frame'
+  },
+  {
+    id: 'Stone Art Calendars',
+    label: 'Stone Art Sculptural',
+    fullName: 'Stone Art Sculptural Calendars',
+    size: '14 × 20 in Frame',
+    icon: '🗿',
+    popular: false,
+    base: 280,
+    tag: 'Artisan Heritage Craft',
+    img: '/images/stone-art-calendar-real.jpg',
+    defaultPaper: 'Composite Stone Resin Board',
+    defaultFinish: 'Antique Stone Wash & Kundan Work',
+    defaultBinding: 'Deluxe Moulded Synthetic Gold Frame'
+  },
+  {
+    id: 'Hand Fan',
+    label: 'Promotional Hand Fan',
+    fullName: 'Promotional Advertising Hand Fan',
+    size: 'Standard 8 × 8 in with Handle',
+    icon: '🪭',
+    popular: false,
+    base: 28,
+    tag: 'High ROI Bulk Promo',
+    img: '/images/hand-fan-promo-real.jpg',
+    defaultPaper: 'Virgin PP Plastic (0.6mm)',
+    defaultFinish: 'Double-Sided UV Gloss Lamination',
+    defaultBinding: 'Ergonomic Safety Plastic Handle'
+  },
+  {
+    id: 'Special Products',
+    label: 'Special Products',
+    fullName: 'Special Products (LED / Gifts / Sets)',
+    size: 'Bespoke Executive Spec',
+    icon: '🎁',
+    popular: true,
+    base: 195,
+    tag: 'Bespoke Made-to-Order',
+    img: '/images/special-products-gift-real.jpg',
+    defaultPaper: 'Cast Acrylic & Luxury MDF',
+    defaultFinish: 'Spot UV & Laser Engraving',
+    defaultBinding: 'Custom Luxury Magnetic Rigid Box'
+  }
 ];
 
 const PAPER_OPTIONS = [
-  { id: '400 GSM Rigid Board', label: '400 GSM Rigid Kappa Board + PET Foil', desc: 'Heavyweight rigid backing for Gold/Silver PET foil and metallic stamping', tag: 'PET Foil' },
-  { id: '75 LPI Lenticular PET', label: '75 LPI Optical Lenticular 5D Sheet', desc: 'Precision optical micro-lens sheet for 5D depth and angle motion', tag: 'Custom 5D' },
-  { id: 'Composite Stone Resin Board', label: 'Stone-Infused Composite Resin Mount', desc: 'High-density tactile sculptural texture for stone art frames', tag: 'Stone Art' },
-  { id: 'Virgin PP Plastic (0.6mm)', label: 'Virgin PP Polypropylene Plastic / Card', desc: 'Waterproof, tear-proof, flexible plastic for promotional hand fans', tag: 'Hand Fan' },
-  { id: 'Cast Acrylic & Luxury MDF', label: 'Cast Acrylic & Velvet Wood Mount', desc: 'Illuminated LED calendars & bespoke executive gift organizers', tag: 'Special Products' }
+  { id: '400 GSM Rigid Board', label: '400 GSM Rigid Kappa Board + PET Foil', desc: 'Heavyweight rigid backing for Gold/Silver PET foil and metallic stamping' },
+  { id: '75 LPI Lenticular PET', label: '75 LPI Optical Lenticular 5D Sheet', desc: 'Precision optical micro-lens sheet for 5D depth and angle motion' },
+  { id: 'Composite Stone Resin Board', label: 'Stone-Infused Composite Resin Mount', desc: 'High-density tactile sculptural texture for stone art frames' },
+  { id: 'Virgin PP Plastic (0.6mm)', label: 'Virgin PP Polypropylene Plastic / Card', desc: 'Waterproof, tear-proof, flexible plastic for promotional hand fans' },
+  { id: 'Cast Acrylic & Luxury MDF', label: 'Cast Acrylic & Velvet Wood Mount', desc: 'Illuminated LED calendars & bespoke executive gift organizers' }
 ];
 
 const FINISH_OPTIONS = [
-  { id: 'Mirror Gold & Silver Foil Emboss', label: 'Gold & Silver PET Foil Emboss', desc: 'High-gloss mirror metallic reflection on deities and corporate logo', surcharge: '₹22/unit' },
-  { id: '5D Optical Depth Lenticular', label: '5D Optical Depth & Morphing', desc: 'Dynamic holographic 3D dimensional effect without glasses', surcharge: '₹45/unit' },
-  { id: 'Antique Stone Wash & Kundan Work', label: 'Sculpted Stone Wash & Gems', desc: 'Hand-crafted stone relief textures with antique metallic highlights', surcharge: '₹55/unit' },
-  { id: 'Double-Sided UV Gloss Lamination', label: 'UV Full Color Gloss Protection', desc: 'Vibrant offset print coating for durable outdoor hand fans', surcharge: '₹6/unit' },
-  { id: 'Spot UV & Laser Engraving', label: 'Spot UV & Laser Etched Branding', desc: 'Prestige finish for special corporate gift sets & acrylic LED units', surcharge: '₹35/unit' }
+  { id: 'Mirror Gold & Silver Foil Emboss', label: 'Gold & Silver PET Foil Emboss', surcharge: '+₹22/unit', desc: 'High-gloss mirror metallic reflection on deities and corporate logo' },
+  { id: '5D Optical Depth Lenticular', label: '5D Optical Depth & Morphing', surcharge: '+₹45/unit', desc: 'Dynamic holographic 3D dimensional effect without glasses' },
+  { id: 'Antique Stone Wash & Kundan Work', label: 'Sculpted Stone Wash & Gems', surcharge: '+₹55/unit', desc: 'Hand-crafted stone relief textures with antique metallic highlights' },
+  { id: 'Double-Sided UV Gloss Lamination', label: 'UV Full Color Gloss Protection', surcharge: '+₹6/unit', desc: 'Vibrant offset print coating for durable outdoor hand fans' },
+  { id: 'Spot UV & Laser Engraving', label: 'Spot UV & Laser Etched Branding', surcharge: '+₹35/unit', desc: 'Prestige finish for special corporate gift sets & acrylic LED units' }
 ];
 
 const BINDING_OPTIONS = [
@@ -35,48 +115,44 @@ const BINDING_OPTIONS = [
 
 export const CalendarCustomizer = () => {
   const { pageParams } = useRouter();
-  const [format, setFormat] = useState('Gold / Silver PET Foil Calendar');
-  const [paperGsm, setPaperGsm] = useState('400 GSM Rigid Board');
-  const [finish, setFinish] = useState('Mirror Gold & Silver Foil Emboss');
-  const [binding, setBinding] = useState('Heavy-Gauge Anti-Rust Tin Plate');
+
+  const getInitialProduct = () => {
+    if (pageParams?.product) {
+      const p = pageParams.product.toLowerCase();
+      const matched = FORMAT_OPTIONS.find(opt => 
+        opt.id.toLowerCase().includes(p) || 
+        opt.label.toLowerCase().includes(p) ||
+        p.includes(opt.id.toLowerCase())
+      );
+      if (matched) return matched;
+    }
+    return FORMAT_OPTIONS[0];
+  };
+
+  const initialOpt = getInitialProduct();
+  const [format, setFormat] = useState(initialOpt.id);
+  const [paperGsm, setPaperGsm] = useState(initialOpt.defaultPaper);
+  const [finish, setFinish] = useState(initialOpt.defaultFinish);
+  const [binding, setBinding] = useState(initialOpt.defaultBinding);
   const [quantity, setQuantity] = useState(250);
 
-  // Auto-sync format if passed via router params
+  // Sync format if pageParams changes subsequently
   useEffect(() => {
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
-      if (p.includes('pet') || p.includes('gold') || p.includes('foil')) {
-        setFormat('Gold / Silver PET Foil Calendar');
-        setPaperGsm('400 GSM Rigid Board');
-        setFinish('Mirror Gold & Silver Foil Emboss');
-        setBinding('Heavy-Gauge Anti-Rust Tin Plate');
-      }
-      else if (p.includes('special')) {
-        setFormat('Special Products');
-        setPaperGsm('Cast Acrylic & Luxury MDF');
-        setFinish('Spot UV & Laser Engraving');
-        setBinding('Custom Luxury Magnetic Rigid Box');
-      }
-      else if (p.includes('5d') || p.includes('3d') || p.includes('lenticular')) {
-        setFormat('Custom 5D Calendars');
-        setPaperGsm('75 LPI Lenticular PET');
-        setFinish('5D Optical Depth Lenticular');
-        setBinding('Deluxe Moulded Synthetic Gold Frame');
-      }
-      else if (p.includes('stone')) {
-        setFormat('Stone Art Calendars');
-        setPaperGsm('Composite Stone Resin Board');
-        setFinish('Antique Stone Wash & Kundan Work');
-        setBinding('Deluxe Moulded Synthetic Gold Frame');
-      }
-      else if (p.includes('fan') || p.includes('hand')) {
-        setFormat('Hand Fan');
-        setPaperGsm('Virgin PP Plastic (0.6mm)');
-        setFinish('Double-Sided UV Gloss Lamination');
-        setBinding('Ergonomic Safety Plastic Handle');
+      const matched = FORMAT_OPTIONS.find(opt => 
+        opt.id.toLowerCase().includes(p) || 
+        opt.label.toLowerCase().includes(p) ||
+        p.includes(opt.id.toLowerCase())
+      );
+      if (matched && matched.id !== format) {
+        setFormat(matched.id);
+        setPaperGsm(matched.defaultPaper);
+        setFinish(matched.defaultFinish);
+        setBinding(matched.defaultBinding);
       }
     }
-  }, [pageParams]);
+  }, [pageParams?.product, format]);
 
   // Quote calculation state
   const [quote, setQuote] = useState<QuoteResult | null>(null);
@@ -121,6 +197,35 @@ export const CalendarCustomizer = () => {
     };
   }, [format, paperGsm, finish, binding, quantity]);
 
+  const handleSelectFormat = (opt: FormatOption) => {
+    setFormat(opt.id);
+    setPaperGsm(opt.defaultPaper);
+    setFinish(opt.defaultFinish);
+    setBinding(opt.defaultBinding);
+  };
+
+  const selectedFormatObj = FORMAT_OPTIONS.find(f => f.id === format) || FORMAT_OPTIONS[0];
+  const selectedPaper = PAPER_OPTIONS.find(p => p.id === paperGsm) || PAPER_OPTIONS[0];
+  const selectedFinish = FINISH_OPTIONS.find(f => f.id === finish) || FINISH_OPTIONS[0];
+  const selectedBinding = BINDING_OPTIONS.find(b => b.id === binding) || BINDING_OPTIONS[0];
+
+  // WhatsApp instant order link generator
+  const generateWhatsAppQuoteLink = () => {
+    if (!quote) return '#';
+    const text = `Hello Amazing Ads Sivakasi, I configured an Instant Quote on your website:\n\n` +
+      `• *Product Model:* ${selectedFormatObj.fullName}\n` +
+      `• *Size:* ${selectedFormatObj.size}\n` +
+      `• *Paper / Stock:* ${paperGsm}\n` +
+      `• *Finish / Foil:* ${finish}\n` +
+      `• *Binding:* ${binding}\n` +
+      `• *Quantity:* ${quantity} Units\n` +
+      `• *Unit Price:* ₹${quote.unitPrice}/unit\n` +
+      `• *Estimated Total:* ₹${quote.subtotal.toLocaleString()}\n` +
+      `• *Quote Ref:* ${quote.quoteId}\n\n` +
+      `Please share the final factory approval, proof confirmation schedule, and dispatch timeline.`;
+    return `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
+  };
+
   const handleFinalSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!clientName || !clientEmail) {
@@ -151,294 +256,205 @@ export const CalendarCustomizer = () => {
   };
 
   return (
-    <section id="customizer" style={{ padding: '0 0 50px', position: 'relative' }}>
+    <section id="customizer" style={{ padding: '0 0 60px', position: 'relative' }}>
       <div className="container">
-        {/* Main 2-Column Configurator Layout */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 0.8fr',
-            gap: '36px',
-            alignItems: 'start'
-          }}
-          className="customizer-grid"
-        >
-          {/* Left Column: Interactive Step-by-Step Selectors */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* 1. Format & Dimensions */}
-            <div className="config-card">
-              <div className="config-header">
-                <span className="step-num">01</span>
-                <div>
-                  <h4 style={{ color: '#fff', fontSize: '1.15rem' }}>Calendar Format</h4>
-                </div>
-              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginTop: '16px' }}>
-                {FORMAT_OPTIONS.map((opt) => {
-                  const selected = format === opt.id;
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => setFormat(opt.id)}
-                      style={{
-                        padding: '14px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: selected ? 'rgba(207, 168, 78, 0.12)' : 'var(--bg-input)',
-                        border: `1.5px solid ${selected ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        position: 'relative'
-                      }}
-                    >
-                      {opt.popular && (
-                        <span style={{
-                          position: 'absolute',
-                          top: '8px',
-                          right: '8px',
-                          fontSize: '0.65rem',
-                          background: 'var(--accent-gold-dark)',
-                          color: '#fff',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          fontWeight: 600
-                        }}>POPULAR</span>
-                      )}
-                      <div style={{ fontSize: '1.4rem', marginBottom: '6px' }}>{opt.icon}</div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: selected ? '#fff' : 'var(--text-primary)' }}>{opt.label}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{opt.size}</div>
+        {/* 1. Format Selection: Clean, Visual Cards */}
+        <div style={{ marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+            <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="step-badge">1</span> Select Product Model
+            </h3>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              Choose a model to preview live wholesale rates
+            </span>
+          </div>
+
+          <div className="format-cards-grid">
+            {FORMAT_OPTIONS.map((opt) => {
+              const isSelected = format === opt.id;
+              return (
+                <div
+                  key={opt.id}
+                  onClick={() => handleSelectFormat(opt)}
+                  className={`format-card ${isSelected ? 'selected' : ''}`}
+                >
+                  <div className="format-card-img-wrap">
+                    <img src={opt.img} alt={opt.label} className="format-card-img" />
+                    {opt.popular && <span className="format-pill-popular">POPULAR</span>}
+                    {isSelected && <span className="format-pill-selected">✓ Selected</span>}
+                  </div>
+                  <div className="format-card-body">
+                    <div className="format-card-title">{opt.label}</div>
+                    <div className="format-card-size">{opt.size}</div>
+                    <div className="format-card-price">
+                      <span>Starts at</span>
+                      <strong>₹{opt.base}</strong>
+                      <span className="unit">/unit</span>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 2. Paper Stock & Grammage */}
-            <div className="config-card">
-              <div className="config-header">
-                <span className="step-num">02</span>
-                <div>
-                  <h4 style={{ color: '#fff', fontSize: '1.15rem' }}>Paper Stock (GSM)</h4>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
-                {PAPER_OPTIONS.map((opt) => {
-                  const selected = paperGsm === opt.id;
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => setPaperGsm(opt.id)}
-                      style={{
-                        padding: '14px 18px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: selected ? 'rgba(207, 168, 78, 0.12)' : 'var(--bg-input)',
-                        border: `1.5px solid ${selected ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontWeight: 600, color: selected ? '#fff' : 'var(--text-primary)', fontSize: '0.92rem' }}>
-                            {opt.label}
-                          </span>
-                          <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
-                            {opt.tag}
-                          </span>
-                        </div>
-                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                          {opt.desc}
-                        </p>
-                      </div>
-                      <div
-                        style={{
-                          width: '18px',
-                          height: '18px',
-                          borderRadius: '50%',
-                          border: `2px solid ${selected ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        {selected && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-gold)' }} />}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 3. Luxury Embellishments & Foils */}
-            <div className="config-card">
-              <div className="config-header">
-                <span className="step-num">03</span>
-                <div>
-                  <h4 style={{ color: '#fff', fontSize: '1.15rem' }}>Foil Stamping & Finishes</h4>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginTop: '16px' }}>
-                {FINISH_OPTIONS.map((opt) => {
-                  const selected = finish === opt.id;
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => setFinish(opt.id)}
-                      style={{
-                        padding: '14px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: selected ? 'rgba(207, 168, 78, 0.12)' : 'var(--bg-input)',
-                        border: `1.5px solid ${selected ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600, fontSize: '0.88rem', color: selected ? '#fff' : 'var(--text-primary)' }}>
-                          {opt.label}
-                        </span>
-                        <span style={{ fontSize: '0.72rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
-                          {opt.surcharge}
-                        </span>
-                      </div>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        {opt.desc}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 4. Binding Selection */}
-            <div className="config-card">
-              <div className="config-header">
-                <span className="step-num">04</span>
-                <div>
-                  <h4 style={{ color: '#fff', fontSize: '1.15rem' }}>Binding Hardware</h4>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginTop: '16px' }}>
-                {BINDING_OPTIONS.map((opt) => {
-                  const selected = binding === opt.id;
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => setBinding(opt.id)}
-                      style={{
-                        padding: '14px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: selected ? 'rgba(207, 168, 78, 0.12)' : 'var(--bg-input)',
-                        border: `1.5px solid ${selected ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: selected ? '#fff' : 'var(--text-primary)' }}>
-                        {opt.label}
-                      </div>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        {opt.desc}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 5. Quantity Slider */}
-            <div className="config-card">
-              <div className="config-header">
-                <span className="step-num">05</span>
-                <div>
-                  <h4 style={{ color: '#fff', fontSize: '1.15rem' }}>Volume & Bulk Discount</h4>
-                </div>
-              </div>
-
-              <div style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Selected Quantity:</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                      type="number"
-                      min={25}
-                      max={10000}
-                      step={25}
-                      value={quantity}
-                      onChange={(e) => setQuantity(Math.max(25, parseInt(e.target.value) || 25))}
-                      style={{
-                        width: '110px',
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 700,
-                        fontSize: '1.1rem',
-                        textAlign: 'center',
-                        color: 'var(--accent-gold-bright)',
-                        padding: '6px'
-                      }}
-                    />
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Units</span>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        </div>
 
-                <input
-                  type="range"
-                  min={50}
-                  max={2500}
-                  step={25}
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value))}
-                  style={{
-                    width: '100%',
-                    height: '6px',
-                    accentColor: 'var(--accent-gold)',
-                    cursor: 'pointer'
-                  }}
-                />
+        {/* 2. Main 2-Column Area: Left Config Panel + Right Price Card */}
+        <div className="customizer-layout-grid">
+          
+          {/* Left Column: Clean Unified Specs & Quantity */}
+          <div className="specs-unified-panel">
+            <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="step-badge">2</span> Configure Specifications & Quantity
+            </h3>
 
-                {/* Quick select pills */}
-                <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
-                  {[100, 250, 500, 1000, 2000].map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => setQuantity(q)}
-                      style={{
-                        background: quantity === q ? 'var(--accent-gold)' : 'var(--bg-input)',
-                        color: quantity === q ? '#0b0c0e' : 'var(--text-secondary)',
-                        border: '1px solid var(--border-subtle)',
-                        borderRadius: '4px',
-                        padding: '4px 12px',
-                        fontSize: '0.78rem',
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {q} Units
-                    </button>
-                  ))}
+            {/* Selected Product Banner */}
+            <div className="active-format-banner">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <span style={{ fontSize: '2rem' }}>{selectedFormatObj.icon}</span>
+                <div>
+                  <div style={{ fontSize: '1.08rem', fontWeight: 700, color: '#fff' }}>
+                    {selectedFormatObj.fullName}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--accent-gold-bright)', marginTop: '2px' }}>
+                    {selectedFormatObj.tag} • Base Dimensions: {selectedFormatObj.size}
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Specifications Form Grid */}
+            <div className="specs-form-grid">
+              
+              {/* Paper Stock */}
+              <div className="spec-form-group">
+                <label className="spec-label">
+                  <span>Paper / Board Stock (GSM)</span>
+                  <span className="spec-tag">Material</span>
+                </label>
+                <select
+                  value={paperGsm}
+                  onChange={(e) => setPaperGsm(e.target.value)}
+                  className="spec-select"
+                >
+                  {PAPER_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="spec-hint">{selectedPaper?.desc}</p>
+              </div>
+
+              {/* Foil / Finish */}
+              <div className="spec-form-group">
+                <label className="spec-label">
+                  <span>Foil Stamping & Embellishment</span>
+                  <span className="spec-tag" style={{ color: 'var(--accent-gold-bright)' }}>Finish</span>
+                </label>
+                <select
+                  value={finish}
+                  onChange={(e) => setFinish(e.target.value)}
+                  className="spec-select"
+                >
+                  {FINISH_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label} ({opt.surcharge})
+                    </option>
+                  ))}
+                </select>
+                <p className="spec-hint">{selectedFinish?.desc}</p>
+              </div>
+
+              {/* Binding Hardware */}
+              <div className="spec-form-group">
+                <label className="spec-label">
+                  <span>Mounting & Binding</span>
+                  <span className="spec-tag">Hardware</span>
+                </label>
+                <select
+                  value={binding}
+                  onChange={(e) => setBinding(e.target.value)}
+                  className="spec-select"
+                >
+                  {BINDING_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="spec-hint">{selectedBinding?.desc}</p>
+              </div>
+            </div>
+
+            {/* Quantity & Bulk Discount Section */}
+            <div className="quantity-section-box">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <span style={{ fontSize: '0.94rem', color: '#fff', fontWeight: 600 }}>Order Volume</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block' }}>Direct factory wholesale price tiers applied</span>
+                </div>
+                
+                {/* Quantity Stepper */}
+                <div className="customizer-qty-stepper">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(prev => Math.max(25, prev - 25))}
+                    className="customizer-qty-btn"
+                    aria-label="Decrease quantity"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min={25}
+                    max={50000}
+                    step={25}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(25, parseInt(e.target.value, 10) || 25))}
+                    className="customizer-qty-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(prev => prev + 25)}
+                    className="customizer-qty-btn"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Preset Volume Pills */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginRight: '4px' }}>Preset Volumes:</span>
+                {[100, 250, 500, 1000, 2500, 5000].map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => setQuantity(q)}
+                    className={`qty-preset-pill ${quantity === q ? 'active' : ''}`}
+                  >
+                    {q.toLocaleString()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Discount Callout */}
+              {quote && quote.discountPercentage > 0 && (
+                <div className="bulk-tier-banner">
+                  <span>🎉 <strong>{quote.discountPercentage}% Wholesale Tier Discount Applied!</strong></span>
+                  <span className="savings-highlight">You save ₹{quote.totalSavings.toLocaleString()}</span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Right Column: Sticky Summary & Real-Time Price Matrix */}
-          <div style={{ position: 'sticky', top: '90px' }}>
-            <div
-              style={{
-                background: 'linear-gradient(160deg, #181d26 0%, #11141b 100%)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-gold)',
-                padding: '28px',
-                boxShadow: 'var(--shadow-lg), 0 0 25px rgba(207, 168, 78, 0.12)'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <span className="foil-badge">LIVE PRESS ESTIMATE</span>
+          {/* Right Column: Sticky Live Quotation Card */}
+          <div className="live-quote-card-sticky">
+            <div className="live-quote-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <span className="foil-badge">LIVE WHOLESALE QUOTE</span>
                 {quote?.quoteId && (
                   <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
                     REF: {quote.quoteId}
@@ -446,94 +462,87 @@ export const CalendarCustomizer = () => {
                 )}
               </div>
 
-              {/* Price Highlight */}
-              <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '20px', marginBottom: '20px' }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  Unit Press Cost
-                </p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '2.4rem', fontWeight: 800, color: 'var(--accent-gold-bright)' }}>
-                    {quote ? `₹${quote.unitPrice}` : 'Calculating...'}
+              {/* Price Header */}
+              <div className="quote-price-header">
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    Unit Press Rate
                   </span>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ calendar</span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                    Order Total ({quantity} Units):
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>
-                    {quote ? `₹${quote.subtotal.toLocaleString()}` : '—'}
-                  </span>
-                </div>
-
-                {quote && quote.discountPercentage > 0 && (
-                  <div
-                    style={{
-                      marginTop: '12px',
-                      background: 'rgba(16, 185, 129, 0.12)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                      borderRadius: '6px',
-                      padding: '8px 12px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      fontSize: '0.78rem'
-                    }}
-                  >
-                    <span style={{ color: '#34d399', fontWeight: 600 }}>
-                      ✓ Bulk Tier Discount ({quote.discountPercentage}% OFF)
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                    <span className="quote-unit-price">
+                      {calculating ? '...' : (quote ? `₹${quote.unitPrice}` : '...')}
                     </span>
-                    <span style={{ color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                      Save ₹{quote.totalSavings.toLocaleString()}
-                    </span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ unit</span>
                   </div>
-                )}
+                </div>
+
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    Total for {quantity} Units
+                  </span>
+                  <div className="quote-total-price">
+                    {calculating ? '...' : (quote ? `₹${quote.subtotal.toLocaleString()}` : '—')}
+                  </div>
+                </div>
               </div>
 
-              {/* Specifications Snapshot */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.82rem', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                  <span>Format:</span>
-                  <strong style={{ color: '#fff' }}>{format}</strong>
+              {/* Itemized Snapshot */}
+              <div className="quote-spec-summary">
+                <div className="quote-spec-row">
+                  <span className="spec-k">Product:</span>
+                  <span className="spec-v">{selectedFormatObj.label}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                  <span>Paper Stock:</span>
-                  <strong style={{ color: '#fff' }}>{paperGsm}</strong>
+                <div className="quote-spec-row">
+                  <span className="spec-k">Dimensions:</span>
+                  <span className="spec-v">{selectedFormatObj.size}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                  <span>Finish:</span>
-                  <strong style={{ color: 'var(--accent-gold-bright)' }}>{finish}</strong>
+                <div className="quote-spec-row">
+                  <span className="spec-k">Paper Stock:</span>
+                  <span className="spec-v">{paperGsm.split('+')[0].trim()}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                  <span>Binding:</span>
-                  <strong style={{ color: '#fff' }}>{binding}</strong>
+                <div className="quote-spec-row">
+                  <span className="spec-k">Finish:</span>
+                  <span className="spec-v">{finish}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                  <span>Turnaround:</span>
-                  <strong style={{ color: '#34d399' }}>{quote?.estimatedTurnaround || '4–5 Days'}</strong>
+                <div className="quote-spec-row">
+                  <span className="spec-k">Binding:</span>
+                  <span className="spec-v">{binding}</span>
+                </div>
+                <div className="quote-spec-row">
+                  <span className="spec-k">Turnaround:</span>
+                  <span className="spec-v" style={{ color: '#34d399' }}>{quote?.estimatedTurnaround || '4–5 Business Days'}</span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="btn-gold"
-                  style={{ width: '100%', padding: '14px' }}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {/* WhatsApp Direct Order Button */}
+                <a
+                  href={generateWhatsAppQuoteLink()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-whatsapp-quote"
                 >
-                  <span>Lock In Quote & Request PDF</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </button>
+                  <span>💬 Instant WhatsApp Order / Inquiry</span>
+                </a>
 
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: '1.4' }}>
-                  🔒 Official quotation valid for 14 calendar days. Includes complimentary pre-flight digital proofing.
-                </p>
+                {/* Lock Quote / PDF Modal Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="btn-outline-gold"
+                  style={{ width: '100%', padding: '12px', fontSize: '0.88rem' }}
+                >
+                  📄 Request Official PDF Proposal
+                </button>
               </div>
+
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '14px', lineHeight: 1.4 }}>
+                🔒 Direct Sivakasi factory quotation. Free pre-flight digital proof included with your corporate logo.
+              </p>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -723,35 +732,453 @@ export const CalendarCustomizer = () => {
         </div>
       )}
 
+      {/* Scoped CSS for the New Clean Layout */}
       <style>{`
-        .config-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-card);
-          border-radius: var(--radius-md);
-          padding: 24px;
-          transition: border-color 0.2s ease;
-        }
-        .config-card:hover {
-          border-color: var(--border-gold);
-        }
-        .config-header {
-          display: flex;
+        .step-badge {
+          display: inline-flex;
           align-items: center;
-          gap: 16px;
-        }
-        .step-num {
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: rgba(207, 168, 78, 0.15);
+          border: 1px solid var(--border-gold);
+          color: var(--accent-gold-bright);
           font-family: var(--font-mono);
           font-size: 0.85rem;
           font-weight: 700;
-          color: var(--accent-gold-bright);
-          background: rgba(207, 168, 78, 0.12);
-          padding: 6px 10px;
-          border-radius: 6px;
-          border: 1px solid var(--border-gold);
         }
+
+        /* 1. Format Selection Visual Cards Grid */
+        .format-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          gap: 16px;
+        }
+
+        .format-card {
+          background: var(--bg-card);
+          border: 1.5px solid var(--border-card);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .format-card:hover {
+          border-color: var(--accent-gold);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .format-card.selected {
+          border-color: var(--accent-gold);
+          background: rgba(207, 168, 78, 0.08);
+          box-shadow: 0 0 20px rgba(207, 168, 78, 0.2);
+        }
+
+        .format-card-img-wrap {
+          position: relative;
+          width: 100%;
+          height: 120px;
+          overflow: hidden;
+          background: #08090b;
+        }
+
+        .format-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+
+        .format-card:hover .format-card-img {
+          transform: scale(1.05);
+        }
+
+        .format-pill-popular {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          background: rgba(0, 0, 0, 0.75);
+          border: 1px solid var(--accent-gold);
+          color: var(--accent-gold-bright);
+          font-size: 0.65rem;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: 4px;
+          backdrop-filter: blur(4px);
+        }
+
+        .format-pill-selected {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: var(--accent-gold);
+          color: #000;
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .format-card-body {
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+
+        .format-card-title {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #fff;
+          margin-bottom: 2px;
+        }
+
+        .format-card-size {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          margin-bottom: 10px;
+        }
+
+        .format-card-price {
+          margin-top: auto;
+          display: flex;
+          align-items: baseline;
+          gap: 4px;
+          font-size: 0.78rem;
+          color: var(--text-secondary);
+        }
+
+        .format-card-price strong {
+          color: var(--accent-gold-bright);
+          font-family: var(--font-mono);
+          font-size: 1.05rem;
+          font-weight: 800;
+        }
+
+        .format-card-price .unit {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+        }
+
+        /* 2. Main 2-Column Layout */
+        .customizer-layout-grid {
+          display: grid;
+          grid-template-columns: 1.25fr 0.75fr;
+          gap: 32px;
+          align-items: start;
+        }
+
+        /* Unified Specs Panel */
+        .specs-unified-panel {
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
+          border-radius: var(--radius-lg);
+          padding: 28px;
+        }
+
+        .active-format-banner {
+          background: rgba(207, 168, 78, 0.08);
+          border: 1px solid var(--border-gold);
+          border-radius: var(--radius-md);
+          padding: 14px 18px;
+          margin-bottom: 24px;
+        }
+
+        .specs-form-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          margin-bottom: 26px;
+        }
+
+        .spec-form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .spec-label {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.86rem;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        .spec-tag {
+          font-size: 0.7rem;
+          padding: 2px 8px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.06);
+          color: var(--text-muted);
+          font-family: var(--font-mono);
+        }
+
+        .spec-select {
+          background: var(--bg-input);
+          border: 1px solid var(--border-subtle);
+          color: #fff;
+          padding: 12px 14px;
+          border-radius: var(--radius-sm);
+          font-size: 0.92rem;
+          cursor: pointer;
+          transition: border-color 0.2s;
+          outline: none;
+        }
+
+        .spec-select:focus {
+          border-color: var(--accent-gold);
+          box-shadow: 0 0 0 2px rgba(207, 168, 78, 0.2);
+        }
+
+        .spec-hint {
+          font-size: 0.76rem;
+          color: var(--text-muted);
+          margin-top: 2px;
+          line-height: 1.4;
+        }
+
+        /* Quantity Box */
+        .quantity-section-box {
+          border-top: 1px solid var(--border-subtle);
+          padding-top: 20px;
+        }
+
+        .customizer-qty-stepper {
+          display: inline-flex;
+          align-items: center;
+          background: var(--bg-input);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-sm);
+          height: 42px;
+          padding: 2px;
+        }
+
+        .customizer-qty-btn {
+          width: 36px;
+          height: 100%;
+          background: transparent;
+          border: none;
+          color: #fff;
+          font-size: 1.2rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          transition: background 0.2s, color 0.2s;
+          user-select: none;
+        }
+
+        .customizer-qty-btn:hover {
+          background: var(--accent-gold);
+          color: #000;
+        }
+
+        .customizer-qty-input {
+          width: 76px;
+          height: 100%;
+          background: transparent;
+          border: none;
+          color: var(--accent-gold-bright);
+          text-align: center;
+          font-size: 1.05rem;
+          font-family: var(--font-mono);
+          font-weight: 700;
+          padding: 0;
+          outline: none;
+          -moz-appearance: textfield;
+        }
+
+        .customizer-qty-input::-webkit-outer-spin-button,
+        .customizer-qty-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        .qty-preset-pill {
+          background: var(--bg-input);
+          border: 1px solid var(--border-subtle);
+          color: var(--text-secondary);
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .qty-preset-pill:hover {
+          border-color: var(--accent-gold);
+          color: #fff;
+        }
+
+        .qty-preset-pill.active {
+          background: var(--accent-gold);
+          border-color: var(--accent-gold);
+          color: #000;
+          font-weight: 700;
+        }
+
+        .bulk-tier-banner {
+          margin-top: 16px;
+          background: rgba(16, 185, 129, 0.12);
+          border: 1px solid rgba(16, 185, 129, 0.35);
+          border-radius: var(--radius-sm);
+          padding: 10px 14px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.82rem;
+          color: #34d399;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .savings-highlight {
+          font-family: var(--font-mono);
+          font-weight: 700;
+          color: #a7f3d0;
+        }
+
+        /* 3. Live Quote Sticky Card */
+        .live-quote-card-sticky {
+          position: sticky;
+          top: 90px;
+        }
+
+        .live-quote-card {
+          background: linear-gradient(160deg, #181d26 0%, #11141b 100%);
+          border: 1px solid var(--border-gold);
+          border-radius: var(--radius-lg);
+          padding: 26px;
+          box-shadow: var(--shadow-lg), 0 0 25px rgba(207, 168, 78, 0.14);
+        }
+
+        .quote-price-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          border-bottom: 1px solid var(--border-subtle);
+          padding-bottom: 18px;
+          margin-bottom: 18px;
+        }
+
+        .quote-unit-price {
+          font-family: var(--font-mono);
+          font-size: 2.2rem;
+          font-weight: 800;
+          color: var(--accent-gold-bright);
+          line-height: 1;
+        }
+
+        .quote-total-price {
+          font-family: var(--font-mono);
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #fff;
+          line-height: 1.1;
+        }
+
+        .quote-spec-summary {
+          display: flex;
+          flex-direction: column;
+          gap: 9px;
+          font-size: 0.82rem;
+          margin-bottom: 22px;
+        }
+
+        .quote-spec-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .spec-k {
+          color: var(--text-muted);
+        }
+
+        .spec-v {
+          color: #fff;
+          font-weight: 600;
+          text-align: right;
+        }
+
+        .btn-whatsapp-quote {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: #25D366;
+          color: #fff;
+          padding: 13px;
+          border-radius: var(--radius-sm);
+          font-weight: 700;
+          font-size: 0.92rem;
+          text-decoration: none;
+          transition: background 0.2s, transform 0.2s;
+          box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp-quote:hover {
+          background: #1ebc57;
+          transform: translateY(-1px);
+          color: #fff;
+        }
+
         @media (max-width: 960px) {
-          .customizer-grid {
-            grid-template-columns: 1fr !important;
+          .customizer-layout-grid {
+            grid-template-columns: 1fr;
+            gap: 24px;
+          }
+          .live-quote-card-sticky {
+            position: static;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .format-cards-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+          }
+          .format-card-img-wrap {
+            height: 95px !important;
+          }
+          .format-card-body {
+            padding: 10px !important;
+          }
+          .format-card-title {
+            font-size: 0.85rem !important;
+          }
+          .format-card-size {
+            font-size: 0.7rem !important;
+            margin-bottom: 6px !important;
+          }
+          .format-card-price strong {
+            font-size: 0.95rem !important;
+          }
+          .specs-unified-panel {
+            padding: 18px 16px !important;
+          }
+          .active-format-banner {
+            padding: 12px 14px !important;
+          }
+          .live-quote-card {
+            padding: 20px 16px !important;
+          }
+          .quote-unit-price {
+            font-size: 1.8rem !important;
+          }
+          .quote-total-price {
+            font-size: 1.15rem !important;
           }
         }
       `}</style>

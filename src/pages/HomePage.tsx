@@ -166,7 +166,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
             {[
               {
                 client: 'Tata Motors & Titan',
@@ -229,9 +229,10 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       </section>
 
       {/* About Amazing Ads Sivakasi Works Section */}
-      <section style={{ padding: '80px 0', position: 'relative' }}>
+      <section style={{ padding: '60px 0', position: 'relative' }}>
         <div className="container">
           <div
+            className="home-about-box"
             style={{
               background: 'linear-gradient(145deg, #131720 0%, #0c0f15 100%)',
               border: '1px solid var(--border-gold)',
@@ -368,9 +369,10 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       </section>
 
       {/* Swatch Box Callout Section */}
-      <section style={{ padding: '80px 0 0' }}>
+      <section style={{ padding: '60px 0 0' }}>
         <div className="container">
           <div
+            className="home-swatch-box"
             style={{
               background: 'linear-gradient(145deg, #1f190e 0%, #12151c 100%)',
               border: '1px solid var(--border-gold)',
@@ -417,6 +419,14 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           .about-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .home-about-box, .home-swatch-box {
+            padding: 24px 18px !important;
+          }
+          .home-swatch-box button {
+            width: 100% !important;
           }
         }
         @media (max-width: 600px) {

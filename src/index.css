@@ -43,9 +43,15 @@
   padding: 0;
 }
 
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -57,6 +63,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
   background-image: 
     radial-gradient(ellipse at 50% 0%, rgba(207, 168, 78, 0.09) 0%, transparent 65%),
     radial-gradient(circle at 100% 35%, rgba(199, 111, 80, 0.05) 0%, transparent 45%),
@@ -66,14 +74,17 @@ body {
 
 #root {
   width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-primary);
@@ -86,30 +97,40 @@ body {
   background: var(--accent-gold-dark);
 }
 
+/* Hide scrollbar utility for mobile swipe lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Ultra-Modern Display Typography */
 h1, h2, h3, h4, .font-heading {
   font-family: var(--font-heading);
   letter-spacing: -0.03em;
   color: #ffffff;
   line-height: 1.15;
+  word-break: break-word;
 }
 
 h1 {
-  font-size: clamp(2.4rem, 4.8vw, 4.4rem);
-  line-height: 1.05;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 1.08;
   letter-spacing: -0.035em;
   font-weight: 800;
 }
 
 h2 {
-  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
-  line-height: 1.12;
+  font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+  line-height: 1.15;
   letter-spacing: -0.03em;
   font-weight: 700;
 }
 
 h3 {
-  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
   line-height: 1.25;
   letter-spacing: -0.02em;
   font-weight: 700;
@@ -137,17 +158,17 @@ h4 {
   -webkit-text-fill-color: transparent;
 }
 
-/* Expanded Full-Screen Fluid Container */
+/* Fluid Container with safe mobile gutters */
 .container {
   width: 100%;
   max-width: 1560px;
   margin: 0 auto;
-  padding: 0 clamp(20px, 3.5vw, 60px);
+  padding: 0 clamp(16px, 3.5vw, 50px);
 }
 
 .container-fluid {
   width: 100%;
-  padding: 0 clamp(20px, 4vw, 80px);
+  padding: 0 clamp(16px, 4vw, 60px);
 }
 
 /* Page Layout Wrapper */
@@ -332,4 +353,45 @@ label {
   display: block;
   margin-bottom: 6px;
   letter-spacing: 0.02em;
+}
+
+/* Global Mobile Media Queries */
+@media (max-width: 768px) {
+  .page-view {
+    padding: 24px 0 60px;
+    min-height: calc(100vh - 120px);
+  }
+
+  .page-header-banner {
+    margin: 0 auto 30px;
+  }
+
+  .page-header-banner h1 {
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+  }
+
+  .page-header-banner p {
+    font-size: 0.9rem;
+    padding: 0 8px;
+  }
+
+  .btn-gold, .btn-outline-gold {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+
+  input, select, textarea {
+    font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+    padding: 11px 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 14px;
+  }
+
+  .btn-gold, .btn-outline-gold {
+    width: 100%;
+  }
 }
