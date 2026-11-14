@@ -1,18 +1,54 @@
 [
   {
-    "id": "MSG-1001",
-    "name": "Karthik Raja",
-    "phone": "+91 98401 23456",
-    "message": "Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our company name printed at the top.",
-    "createdAt": "2026-11-14T03:43:03.097Z",
+    "id": "MSG-5578",
+    "name": "Kala",
+    "phone": "9857645123",
+    "email": "kala24@gmail.com",
+    "product": "Stone Art Calendars",
+    "size": "15 × 20 in",
+    "quantity": null,
+    "notes": "Trade Customer",
+    "message": "Murugan Image",
+    "createdAt": "2026-11-14T07:09:45.578Z",
     "status": "New"
   },
   {
-    "id": "MSG-1002",
+    "id": "INQ-9021",
+    "name": "Karthik Raja",
+    "phone": "+91 98401 23456",
+    "email": "karthik.raja@senthiltextiles.com",
+    "product": "Stone Art Sculptural Calendars (Lord Balaji Edition)",
+    "size": "15 × 20 in",
+    "quantity": 500,
+    "notes": "Need company foil monogram and address line in Tamil & English. Dispatch to Madurai.",
+    "message": "Customizer Order Inquiry:\n• Product: Stone Art Sculptural Calendars (Lord Balaji Edition)\n• Frame Size: 15 × 20 in (Base Rate: ₹145/unit)\n• Order Volume: 500 units\n• Estimated Total: ₹61,625\n• Client: Karthik Raja (Senthil Textiles)",
+    "createdAt": "2026-11-14T06:30:00.000Z",
+    "status": "New"
+  },
+  {
+    "id": "INQ-9018",
     "name": "Lakshmi Narayanan",
     "phone": "+91 97904 88765",
-    "message": "Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?",
-    "createdAt": "2026-11-14T00:43:03.097Z",
+    "email": "lakshmi.jewellers@gmail.com",
+    "product": "Gold / Silver PET Foil Calendar",
+    "size": "12 × 18 in",
+    "quantity": 1000,
+    "notes": "Sample kit received. We want to place order for Deepavali gifts.",
+    "message": "Direct Factory Inquiry:\nRequesting formal proforma invoice for 1,000 units of Gold / Silver PET Foil Calendar (12 × 18 in). Delivery to Coimbatore.",
+    "createdAt": "2026-11-14T04:15:00.000Z",
+    "status": "New"
+  },
+  {
+    "id": "INQ-9010",
+    "name": "Murugan Transports",
+    "phone": "+91 98421 11223",
+    "email": "info@murugantrans.in",
+    "product": "Daily Sheet Devotional Calendar",
+    "size": "Standard Size",
+    "quantity": 250,
+    "notes": "Standard tin plate top binding required.",
+    "message": "Website Contact Inquiry: Please confirm delivery schedule for 250 daily sheet calendars before December 15.",
+    "createdAt": "2026-11-13T14:20:00.000Z",
     "status": "Replied"
   }
 ]

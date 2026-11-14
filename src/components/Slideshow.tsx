@@ -302,10 +302,10 @@ export const Slideshow = () => {
           aspect-ratio: 16 / 9;
           max-height: 680px;
           border-radius: var(--radius-xl);
-          border: 1px solid var(--border-gold);
+          border: 1px solid #454545;
           overflow: hidden;
-          background: #080a0f;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 30px rgba(207, 168, 78, 0.12);
+          background: #030303;
+          box-shadow: 0 20px 50px rgba(3, 3, 3, 0.75), 0 0 30px rgba(215, 134, 0, 0.2);
         }
 
         .slide-viewport {
@@ -379,10 +379,10 @@ export const Slideshow = () => {
         .slide-counter {
           font-family: var(--font-mono);
           font-size: 0.76rem;
-          color: var(--accent-gold-bright);
-          background: rgba(8, 10, 15, 0.75);
+          color: #FFD72E;
+          background: rgba(3, 3, 3, 0.85);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(207, 168, 78, 0.4);
+          border: 1px solid #D78600;
           padding: 4px 10px;
           border-radius: 6px;
           font-weight: 700;
@@ -394,9 +394,9 @@ export const Slideshow = () => {
           text-transform: uppercase;
           letter-spacing: 0.08em;
           color: #fff;
-          background: rgba(207, 168, 78, 0.22);
+          background: rgba(215, 134, 0, 0.25);
           backdrop-filter: blur(8px);
-          border: 1px solid var(--accent-gold);
+          border: 1px solid #D78600;
           padding: 4px 12px;
           border-radius: 20px;
         }
@@ -404,11 +404,11 @@ export const Slideshow = () => {
         .slide-feature-pill {
           font-size: 0.74rem;
           color: var(--text-secondary);
-          background: rgba(8, 10, 15, 0.75);
+          background: rgba(3, 3, 3, 0.85);
           backdrop-filter: blur(8px);
           padding: 4px 12px;
           border-radius: 20px;
-          border: 1px solid var(--border-subtle);
+          border: 1px solid #454545;
         }
 
         /* Info Card Directly Below Frame */
@@ -496,7 +496,7 @@ export const Slideshow = () => {
         }
 
         .slideshow-nav-arrow:hover {
-          background: rgba(207, 168, 78, 0.3);
+          background: rgba(215, 134, 0, 0.45);
           color: #fff;
           transform: translateY(-50%) scale(1.08);
         }
@@ -599,15 +599,15 @@ export const Slideshow = () => {
         }
 
         .slide-thumb-pill.active {
-          background: rgba(207, 168, 78, 0.12);
-          border-color: var(--accent-gold);
-          color: var(--accent-gold-bright);
-          font-weight: 600;
+          background: rgba(215, 134, 0, 0.2);
+          border-color: #D78600;
+          color: #FFD72E;
+          font-weight: 700;
         }
 
         .slide-thumb-pill.active .pill-dot {
-          background: var(--accent-gold-bright);
-          box-shadow: 0 0 6px var(--accent-gold);
+          background: #FFD72E;
+          box-shadow: 0 0 6px #FFD72E;
         }
 
         /* Responsive Breakpoints */

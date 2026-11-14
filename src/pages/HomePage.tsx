@@ -122,7 +122,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             {[
               { step: '01', title: 'Choose Model', desc: 'Select from 24K Gold Foil Wall, Daily Panchangam, Desk Easel, or Devotional Frame.' },
-              { step: '02', title: 'Send Branding', desc: 'Share your company name, logo, phone, and address via WhatsApp or online quote.' },
+              { step: '02', title: 'Send Branding', desc: 'Share your company name, logo, phone, and address via online quote or inquiry form.' },
               { step: '03', title: 'Approve Proof', desc: 'Review the complimentary digital color proof with exact text positioning.' },
               { step: '04', title: 'Fast Dispatch', desc: 'Pressed on high-speed lines in Sivakasi and dispatched safely to your location.' }
             ].map((s, idx) => (
@@ -230,11 +230,11 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           <div
             className="home-about-box"
             style={{
-              background: 'linear-gradient(145deg, #131720 0%, #0c0f15 100%)',
-              border: '1px solid var(--border-gold)',
+              background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
+              border: '1px solid #454545',
               borderRadius: 'var(--radius-xl)',
               padding: '48px 40px',
-              boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 35px rgba(207, 168, 78, 0.12)'
+              boxShadow: '0 25px 60px rgba(3,3,3,0.8), 0 0 35px rgba(215, 134, 0, 0.2)'
             }}
           >
             <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '48px', alignItems: 'center' }} className="about-grid">
@@ -274,15 +274,13 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                 </div>
 
                 <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-                  <a
-                    href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20place%20a%20calendar%20and%20frames%20order"
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    onClick={() => navigate('calculator')}
                     className="btn-gold"
-                    style={{ padding: '12px 24px', fontSize: '0.9rem', textDecoration: 'none' }}
+                    style={{ padding: '12px 24px', fontSize: '0.9rem', cursor: 'pointer' }}
                   >
-                    💬 Direct WhatsApp Press Desk
-                  </a>
+                    ⚡ Instant Factory Customizer
+                  </button>
                   <a
                     href="tel:+919790472767"
                     className="btn-outline-gold"
@@ -309,8 +307,8 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                       width: '44px',
                       height: '44px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #cfa84e 0%, #8c6e26 100%)',
-                      color: '#000',
+                      background: 'linear-gradient(135deg, #FFD72E 0%, #D78600 100%)',
+                      color: '#030303',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -322,7 +320,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>Amazing Ads Sivakasi</h3>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
+                    <p style={{ fontSize: '0.75rem', color: '#FFD72E', fontFamily: 'var(--font-mono)' }}>
                       Official Portal: amazingads.in
                     </p>
                   </div>
@@ -336,7 +334,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📞 Direct Phone Lines:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold-bright)' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: '#FFD72E' }}>
                       +91 97904 72767 / +91 97904 27670
                     </span>
                   </div>
@@ -351,7 +349,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                     <span style={{ fontFamily: 'var(--font-mono)' }}>aamazingads@gmail.com</span>
                   </div>
 
-                  <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px', marginTop: '6px' }}>
+                  <div style={{ borderTop: '1px solid #454545', paddingTop: '14px', marginTop: '6px' }}>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>🚚 Dispatch & Freight Partners:</strong>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                       Direct daily transport via VRL Logistics, BlueDart, ST Courier, Professional Couriers, and container freight to all Indian states.
@@ -370,8 +368,8 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           <div
             className="home-swatch-box"
             style={{
-              background: 'linear-gradient(145deg, #1f190e 0%, #12151c 100%)',
-              border: '1px solid var(--border-gold)',
+              background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
+              border: '1px solid #454545',
               borderRadius: 'var(--radius-xl)',
               padding: '48px',
               display: 'flex',
@@ -379,7 +377,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: '28px',
-              boxShadow: '0 20px 45px rgba(0,0,0,0.7), 0 0 30px rgba(207, 168, 78, 0.15)'
+              boxShadow: '0 20px 45px rgba(3,3,3,0.7), 0 0 30px rgba(215, 134, 0, 0.2)'
             }}
           >
             <div style={{ maxWidth: '650px' }}>
@@ -409,7 +407,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         .dept-card:hover {
           border-color: var(--border-gold-hover) !important;
           transform: translateY(-5px);
-          box-shadow: 0 16px 35px rgba(0,0,0,0.6), 0 0 25px rgba(207, 168, 78, 0.15);
+          box-shadow: 0 16px 35px rgba(3,3,3,0.6), 0 0 25px rgba(215, 134, 0, 0.25);
         }
         @media (max-width: 960px) {
           .about-grid {

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getCalendarProducts, SIVAKASI_CATALOG, type CalendarProduct } from '../services/api';
+import { useState, useEffect, type FormEvent } from 'react';
+import { getCalendarProducts, sendCustomerMessage, SIVAKASI_CATALOG, type CalendarProduct } from '../services/api';
 
 interface ProductCatalogProps {
   onSelectProduct?: (productName: string) => void;
@@ -75,6 +75,13 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Cart checkout lead state
+  const [checkoutName, setCheckoutName] = useState('');
+  const [checkoutPhone, setCheckoutPhone] = useState('');
+  const [checkoutNotes, setCheckoutNotes] = useState('');
+  const [checkoutSubmitted, setCheckoutSubmitted] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
   useEffect(() => {
     const loadProducts = () => {
       getCalendarProducts(activeCategory)
@@ -135,6 +142,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const handleAddToCart = (item: CalendarProduct) => {
     const itemSizes = (item.sizes && item.sizes.length > 0) ? item.sizes : (PRODUCT_SIZES[item.id] || [item.dimensions || 'Standard Size']);
     const size = selectedSizes[item.id] || itemSizes[0];
+    const sizeUnitPrice = (item.sizePrices && item.sizePrices[size]) || item.startingPrice;
     const qty = Math.max(1, itemQuantities[item.id] || 1);
     const cartItemId = `${item.id}-${size}`;
 
@@ -150,7 +158,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
             productId: item.id,
             name: item.name,
             size: size,
-            price: item.startingPrice,
+            price: sizeUnitPrice,
             quantity: qty,
             image: item.mockupImg
           }
@@ -160,7 +168,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
     // Provide visual feedback
     setRecentlyAddedId(item.id);
-    setToastMessage(`Added ${qty} × "${item.name}" (${size}) to Cart!`);
+    setToastMessage(`Added ${qty} × "${item.name}" (${size}) to Cart at ₹${sizeUnitPrice}/unit!`);
 
     setTimeout(() => {
       setRecentlyAddedId(null);
@@ -192,15 +200,35 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalCartAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Generate WhatsApp order message
-  const generateWhatsAppLink = () => {
-    if (cart.length === 0) return '#';
-    let text = `Hello Amazing Ads Sivakasi, I would like to order the following items from the catalog:\n\n`;
-    cart.forEach((ci, idx) => {
-      text += `${idx + 1}. *${ci.name}*\n   • Size: ${ci.size}\n   • Qty: ${ci.quantity}\n   • Est. Rate: ₹${ci.price}/unit (₹${ci.price * ci.quantity})\n\n`;
-    });
-    text += `*Total Order Items:* ${totalCartCount}\n*Estimated Base Total:* ₹${totalCartAmount}\n\nPlease share the final factory wholesale quotation and delivery timeline.`;
-    return `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
+  const handleCheckoutSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!checkoutName.trim() || !checkoutPhone.trim()) {
+      alert('Please provide your name and contact phone number.');
+      return;
+    }
+    try {
+      setCheckoutLoading(true);
+      const itemsList = cart.map((c, i) => `${i + 1}. ${c.name} (${c.size}) × ${c.quantity} units @ ₹${c.price} = ₹${c.price * c.quantity}`).join('\n');
+      const orderMessage = `Catalog Cart Order (${totalCartCount} units, Est. Total: ₹${totalCartAmount.toLocaleString()}):\n${itemsList}\nCustomer Notes: ${checkoutNotes || 'None'}`;
+      
+      await sendCustomerMessage(
+        checkoutName,
+        checkoutPhone,
+        orderMessage,
+        {
+          product: cart.map(c => c.name).join(', '),
+          size: cart.map(c => c.size).join(', '),
+          quantity: totalCartCount,
+          notes: `Total: ₹${totalCartAmount}. Notes: ${checkoutNotes}`
+        }
+      );
+      setCheckoutSubmitted(true);
+      setCart([]);
+      setCheckoutLoading(false);
+    } catch {
+      alert('Unable to submit order. Please call our direct helpline.');
+      setCheckoutLoading(false);
+    }
   };
 
   const categoryList = Array.from(new Set(['All', ...CATEGORIES.filter(c => c !== 'All'), ...products.map(p => p.category).filter(Boolean)]));
@@ -241,9 +269,9 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
             onClick={() => setIsCartOpen(true)}
             className="cart-trigger-pill"
             style={{
-              background: totalCartCount > 0 ? 'rgba(207, 168, 78, 0.18)' : 'var(--bg-card)',
-              border: `1px solid ${totalCartCount > 0 ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
-              color: totalCartCount > 0 ? 'var(--accent-gold-bright)' : 'var(--text-secondary)',
+              background: totalCartCount > 0 ? 'rgba(215, 134, 0, 0.2)' : 'var(--bg-card)',
+              border: `1px solid ${totalCartCount > 0 ? '#D78600' : 'var(--border-subtle)'}`,
+              color: totalCartCount > 0 ? '#FFD72E' : 'var(--text-secondary)',
               padding: '10px 20px',
               borderRadius: '30px',
               fontWeight: 700,
@@ -252,7 +280,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
               alignItems: 'center',
               gap: '10px',
               cursor: 'pointer',
-              boxShadow: totalCartCount > 0 ? '0 0 16px rgba(207, 168, 78, 0.25)' : 'none',
+              boxShadow: totalCartCount > 0 ? '0 0 16px rgba(215, 134, 0, 0.35)' : 'none',
               transition: 'all 0.2s ease'
             }}
           >
@@ -325,36 +353,31 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                 {/* 2. Below Image: Name, Size Select, Add to Cart */}
                 <div className="product-details-container">
                   
-                  {/* Product Name & Starting Price */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px', gap: '8px' }}>
+                  {/* Product Name */}
+                  <div style={{ marginBottom: '14px' }}>
                     <h3 style={{ fontSize: '1.2rem', color: '#fff', fontWeight: 700, lineHeight: 1.25 }}>
                       {item.name}
                     </h3>
-                    <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <span style={{ fontSize: '1.15rem', color: 'var(--accent-gold-bright)', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
-                        ₹{item.startingPrice}
-                      </span>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block' }}>
-                        per unit
-                      </span>
-                    </div>
                   </div>
 
-                  {/* Size Select Dropdown */}
+                  {/* Size Select Dropdown with Frame Price */}
                   <div style={{ marginBottom: '16px' }}>
                     <label style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '6px' }}>
-                      Select Size:
+                      Select Frame Size & Rate:
                     </label>
                     <select
                       value={currentSize}
                       onChange={(e) => handleSizeChange(item.id, e.target.value)}
                       className="product-size-select"
                     >
-                      {sizes.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
+                      {sizes.map((s) => {
+                        const sPrice = (item.sizePrices && item.sizePrices[s]) || item.startingPrice;
+                        return (
+                          <option key={s} value={s}>
+                            {s} — ₹{sPrice}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -528,12 +551,30 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                   ))}
                 </div>
               )}
+              {/* Order Confirmation Screen */}
+              {checkoutSubmitted && (
+                <div style={{ padding: '24px 16px', textAlign: 'center', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '12px', margin: '14px 0' }}>
+                  <span style={{ fontSize: '2.4rem', display: 'block', marginBottom: '8px' }}>✅</span>
+                  <div style={{ fontWeight: 800, color: '#34d399', fontSize: '1.1rem', marginBottom: '6px' }}>Order Submitted to Factory Desk!</div>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', lineHeight: 1.5, marginBottom: '14px' }}>
+                    Thank you! Your cart order has been received at our Sivakasi manufacturing desk. We will call you directly to verify delivery schedule and dieline proofing.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { setCheckoutSubmitted(false); setIsCartOpen(false); }}
+                    className="btn-gold"
+                    style={{ padding: '8px 18px', fontSize: '0.82rem', cursor: 'pointer' }}
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Drawer Footer with Actions */}
             {cart.length > 0 && (
               <div className="cart-drawer-footer">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                   <div>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Subtotal (Excl. GST & Cargo):</span>
                     <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
@@ -545,26 +586,44 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <a
-                    href={generateWhatsAppLink()}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-gold"
-                    style={{
-                      width: '100%',
-                      padding: '13px',
-                      fontSize: '0.92rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      textDecoration: 'none'
-                    }}
-                  >
-                    <span>💬</span>
-                    <span>Order Cart via WhatsApp</span>
-                  </a>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {/* Direct Checkout Form */}
+                  <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-subtle)', padding: '12px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>
+                      ⚡ Direct Factory Order Placement
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Your Full Name *"
+                      value={checkoutName}
+                      onChange={(e) => setCheckoutName(e.target.value)}
+                      style={{ padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', color: '#fff' }}
+                    />
+                    <input
+                      type="tel"
+                      required
+                      placeholder="Contact Phone Number *"
+                      value={checkoutPhone}
+                      onChange={(e) => setCheckoutPhone(e.target.value)}
+                      style={{ padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', color: '#fff' }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Delivery City / Corporate notes (optional)"
+                      value={checkoutNotes}
+                      onChange={(e) => setCheckoutNotes(e.target.value)}
+                      style={{ padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', color: '#fff' }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={checkoutLoading}
+                      className="btn-gold"
+                      style={{ width: '100%', padding: '12px', fontSize: '0.9rem', marginTop: '4px', cursor: 'pointer' }}
+                    >
+                      {checkoutLoading ? 'Submitting Order...' : 'Submit Direct Factory Order →'}
+                    </button>
+                  </form>
 
                   <button
                     onClick={() => {
@@ -572,7 +631,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                       if (onSelectProduct) onSelectProduct(cart[0].name);
                     }}
                     className="btn-outline-gold"
-                    style={{ width: '100%', padding: '11px', fontSize: '0.85rem' }}
+                    style={{ width: '100%', padding: '10px', fontSize: '0.82rem' }}
                   >
                     Open Bulk Customizer Calculator →
                   </button>
@@ -601,7 +660,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
         .clean-product-card:hover {
           border-color: var(--border-gold-hover);
           transform: translateY(-4px);
-          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(207, 168, 78, 0.15);
+          box-shadow: 0 16px 36px rgba(3, 3, 3, 0.7), 0 0 25px rgba(215, 134, 0, 0.25);
         }
 
         .product-image-container {
@@ -609,7 +668,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           width: 100%;
           height: 270px;
           overflow: hidden;
-          background: #0f1218;
+          background: #030303;
         }
 
         .product-display-img {
@@ -628,9 +687,9 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           position: absolute;
           top: 14px;
           left: 14px;
-          background: rgba(10, 12, 16, 0.88);
-          border: 1px solid var(--border-gold);
-          color: var(--accent-gold-bright);
+          background: rgba(3, 3, 3, 0.88);
+          border: 1px solid #D78600;
+          color: #FFD72E;
           font-size: 0.7rem;
           font-weight: 700;
           padding: 4px 10px;
@@ -660,8 +719,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
         }
 
         .product-size-select:focus {
-          border-color: var(--accent-gold);
-          box-shadow: 0 0 0 2px rgba(207, 168, 78, 0.2);
+          border-color: #D78600;
+          box-shadow: 0 0 0 2px rgba(215, 134, 0, 0.3);
         }
 
         .btn-cart-success {

@@ -29,7 +29,8 @@ const productSchema = new mongoose.Schema({
   description: String,
   features: [String],
   mockupImg: String,
-  sizes: [String]
+  sizes: [String],
+  sizePrices: { type: mongoose.Schema.Types.Mixed, default: {} }
 }, { timestamps: true });
 
 let ProductModel;
@@ -43,6 +44,11 @@ const messageSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: String,
   phone: String,
+  email: String,
+  product: String,
+  size: String,
+  quantity: Number,
+  notes: String,
   message: String,
   status: { type: String, default: 'New' },
   createdAt: { type: String }
@@ -90,10 +96,15 @@ const DEFAULT_CALENDAR_CATALOG = [
     ],
     mockupImg: '/images/gods/mahalakshmi.jpg',
     sizes: [
-      '15 × 20 inches (Standard Wall)',
-      '17 × 27 inches (Jumbo Royal Wall)',
-      '12 × 18 inches (Compact Office)'
-    ]
+      '12 × 18 inches',
+      '15 × 20 inches',
+      '17 × 27 inches'
+    ],
+    sizePrices: {
+      '12 × 18 inches': 125,
+      '15 × 20 inches': 145,
+      '17 × 27 inches': 210
+    }
   },
   {
     id: 'custom-5d-calendar',
@@ -120,10 +131,15 @@ const DEFAULT_CALENDAR_CATALOG = [
     ],
     mockupImg: '/images/gods/murugan.jpg',
     sizes: [
-      '12 × 18 inches (Standard 5D Frame)',
-      '16 × 24 inches (Executive Deluxe)',
-      '18 × 28 inches (Grand Temple)'
-    ]
+      '12 × 18 inches',
+      '16 × 24 inches',
+      '18 × 28 inches'
+    ],
+    sizePrices: {
+      '12 × 18 inches': 220,
+      '16 × 24 inches': 295,
+      '18 × 28 inches': 380
+    }
   },
   {
     id: 'stone-art-calendar',
@@ -150,10 +166,15 @@ const DEFAULT_CALENDAR_CATALOG = [
     ],
     mockupImg: '/images/stone-art-calendar-real.jpg',
     sizes: [
-      '14 × 20 inches (Royal Stone Frame)',
-      '18 × 24 inches (Imperial Mandir Cut)',
-      '11 × 16 inches (Compact Wall)'
-    ]
+      '12 × 18 inches',
+      '14 × 20 inches',
+      '18 × 24 inches'
+    ],
+    sizePrices: {
+      '12 × 18 inches': 250,
+      '14 × 20 inches': 280,
+      '18 × 24 inches': 395
+    }
   },
   {
     id: 'hand-fan',
@@ -181,10 +202,13 @@ const DEFAULT_CALENDAR_CATALOG = [
     ],
     mockupImg: '/images/gods/ganesha.jpg',
     sizes: [
-      '8 × 8 inches (Standard Round)',
-      '9 × 10 inches (Jumbo Leaf)',
-      'Custom Shape Die-Cut'
-    ]
+      '8 × 8 inches',
+      '9 × 10 inches'
+    ],
+    sizePrices: {
+      '8 × 8 inches': 28,
+      '9 × 10 inches': 34
+    }
   },
   {
     id: 'special-products',
@@ -211,10 +235,15 @@ const DEFAULT_CALENDAR_CATALOG = [
     ],
     mockupImg: '/images/gods/ayyappan.jpg',
     sizes: [
-      'A4 Executive Desk (8.5 × 11 in)',
-      'A5 Compact Desk (6 × 8.5 in)',
-      'VIP Gift Box Set (12 × 15 in)'
-    ]
+      '9 × 12 inches',
+      '12 × 16 inches',
+      '16 × 20 inches'
+    ],
+    sizePrices: {
+      '9 × 12 inches': 195,
+      '12 × 16 inches': 275,
+      '16 × 20 inches': 360
+    }
   }
 ];
 
@@ -388,7 +417,8 @@ router.put('/calendar-products/:id', async (req, res) => {
     id: current.id, // preserve ID
     startingPrice: req.body.startingPrice !== undefined ? Number(req.body.startingPrice) : current.startingPrice,
     minOrder: req.body.minOrder !== undefined ? Number(req.body.minOrder) : current.minOrder,
-    sizes: Array.isArray(req.body.sizes) ? req.body.sizes : current.sizes
+    sizes: Array.isArray(req.body.sizes) ? req.body.sizes : current.sizes,
+    sizePrices: req.body.sizePrices && typeof req.body.sizePrices === 'object' ? req.body.sizePrices : (current.sizePrices || {})
   };
 
   calendarCatalog[index] = updated;
@@ -436,7 +466,8 @@ router.post('/calendar-products', async (req, res) => {
     sizes: Array.isArray(req.body.sizes) && req.body.sizes.length > 0 ? req.body.sizes : [
       '14 × 20 inches (Standard)',
       '18 × 24 inches (Deluxe)'
-    ]
+    ],
+    sizePrices: req.body.sizePrices && typeof req.body.sizePrices === 'object' ? req.body.sizePrices : {}
   };
 
   calendarCatalog.push(newProduct);
@@ -550,13 +581,59 @@ router.post('/admin/login', (req, res) => {
   });
 });
 
-// 2h. Customer WhatsApp Messages (Create & Retrieve)
+// Deduplication Helper for Customer Inquiries
+function isDuplicateCustomerMessage(name, phone, email, messageText) {
+  const now = Date.now();
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanName = (name || '').trim().toLowerCase();
+  const cleanText = (messageText || '').trim().toLowerCase();
+
+  return customerMessages.some(m => {
+    const timeDiff = now - new Date(m.createdAt).getTime();
+    if (timeDiff > 120000) return false; // older than 2 minutes is not a duplicate
+
+    const mPhone = (m.phone || '').replace(/[^0-9]/g, '');
+    const mEmail = (m.email || '').trim().toLowerCase();
+    const mName = (m.name || '').trim().toLowerCase();
+    const mText = (m.message || '').trim().toLowerCase();
+
+    // Exact message text or phone match within 2 minutes
+    if (cleanPhone && mPhone && cleanPhone.length >= 7 && mPhone.length >= 7 && cleanPhone === mPhone) {
+      return true;
+    }
+    if (cleanEmail && mEmail && cleanEmail === mEmail) {
+      return true;
+    }
+    if (cleanName && mName && cleanName === mName && (cleanText === mText || (cleanPhone && mPhone && cleanPhone === mPhone))) {
+      return true;
+    }
+    return false;
+  });
+}
+
+// 2h. Customer Inquiries (Create, Retrieve, Status & Delete)
 router.post('/messages', async (req, res) => {
-  const { name, phone, message } = req.body;
-  if (!name || !message) {
+  const { name, phone, email, product, size, quantity, notes, message } = req.body;
+  if (!name || (!message && !product)) {
     return res.status(400).json({
       success: false,
-      message: 'Name and message are required'
+      message: 'Name and inquiry details are required'
+    });
+  }
+
+  // Prevent duplicate submissions within 2 minutes
+  if (isDuplicateCustomerMessage(name, phone, email, message)) {
+    const existing = customerMessages.find(m => {
+      const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+      const mPhone = (m.phone || '').replace(/[^0-9]/g, '');
+      return (cleanPhone && mPhone && cleanPhone === mPhone) || (email && m.email && email.toLowerCase() === m.email.toLowerCase());
+    }) || customerMessages[0];
+
+    return res.status(200).json({
+      success: true,
+      message: 'Inquiry already received and queued for factory manager',
+      data: existing
     });
   }
 
@@ -564,7 +641,12 @@ router.post('/messages', async (req, res) => {
     id: `MSG-${Date.now().toString().slice(-4)}`,
     name: name.trim(),
     phone: phone ? phone.trim() : 'Not provided',
-    message: message.trim(),
+    email: email ? email.trim() : '',
+    product: product ? product.trim() : '',
+    size: size ? size.trim() : '',
+    quantity: quantity ? Number(quantity) : null,
+    notes: notes ? notes.trim() : '',
+    message: (message || `${product || 'Product'} inquiry - Size: ${size || 'Standard'}, Qty: ${quantity || 100}`).trim(),
     createdAt: new Date().toISOString(),
     status: 'New'
   };
@@ -582,7 +664,7 @@ router.post('/messages', async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: 'Message routed to factory manager successfully',
+    message: 'Inquiry routed to factory manager successfully',
     data: newMessage
   });
 });
@@ -616,6 +698,35 @@ router.put('/messages/:id/status', async (req, res) => {
   res.status(404).json({ success: false, message: 'Message not found' });
 });
 
+router.delete('/messages/:id', async (req, res) => {
+  const { id } = req.params;
+  const initialLength = customerMessages.length;
+  customerMessages = customerMessages.filter(m => m.id !== id);
+
+  if (customerMessages.length === initialLength) {
+    return res.status(404).json({
+      success: false,
+      message: `Inquiry with ID '${id}' not found`
+    });
+  }
+
+  saveMessagesToDisk(customerMessages);
+
+  if (mongoose.connection.readyState === 1 && MessageModel) {
+    try {
+      await MessageModel.deleteOne({ id });
+    } catch (err) {
+      console.warn('[MongoDB] Delete message error:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Inquiry deleted successfully',
+    deletedId: id
+  });
+});
+
 // 3. Dynamic Quote Calculator Engine for Amazing Ads Sivakasi
 router.post('/quote-calculator', (req, res) => {
   const {
@@ -633,9 +744,11 @@ router.post('/quote-calculator', (req, res) => {
 
   const qty = parseInt(quantity, 10) || 100;
 
-  // Real Sivakasi base pricing per unit
+  // Real Sivakasi base pricing per unit (allows size-specific base rate)
   let baseUnitPrice = 110;
-  if (format?.includes('PET Foil') || format?.includes('Gold Foil')) baseUnitPrice = 145;
+  if (req.body.customUnitPrice && Number(req.body.customUnitPrice) > 0) {
+    baseUnitPrice = Number(req.body.customUnitPrice);
+  } else if (format?.includes('PET Foil') || format?.includes('Gold Foil')) baseUnitPrice = 145;
   else if (format?.includes('5D') || format?.includes('3D')) baseUnitPrice = 220;
   else if (format?.includes('Stone Art') || format?.includes('Kundan')) baseUnitPrice = 280;
   else if (format?.includes('Hand Fan')) baseUnitPrice = 28;
@@ -647,15 +760,15 @@ router.post('/quote-calculator', (req, res) => {
 
   // Finish extras
   let finishSurcharge = 0;
-  if (finish === '24K Heated Brass Gold Foil') finishSurcharge = 22;
+  if (finish === '24K Heated Brass Gold Foil' || finish?.includes('Gold Foil')) finishSurcharge = 22;
   else if (finish === 'Spot Gloss UV & Velvet Lamination') finishSurcharge = 16;
-  else if (finish === '3D Optical Lenticular Depth') finishSurcharge = 45;
-  else if (finish === 'Hand-Set Kundan Stones & Glitter') finishSurcharge = 55;
+  else if (finish === '3D Optical Lenticular Depth' || finish?.includes('5D Optical')) finishSurcharge = 45;
+  else if (finish === 'Hand-Set Kundan Stones & Glitter' || finish?.includes('Stone Wash')) finishSurcharge = 55;
 
   // Binding adjustments
   let bindingCost = 10;
-  if (binding === 'Deluxe Moulded Synthetic Gold Frame') bindingCost = 35;
-  else if (binding === 'Heavy-Gauge Anti-Rust Tin Plate') bindingCost = 12;
+  if (binding === 'Deluxe Moulded Synthetic Gold Frame' || binding?.includes('Moulded')) bindingCost = 35;
+  else if (binding === 'Heavy-Gauge Anti-Rust Tin Plate' || binding?.includes('Tin Plate')) bindingCost = 12;
   else if (binding === 'Twin Wire-O Gold Spiral') bindingCost = 15;
 
   // Real Sivakasi Wholesale Volume Tiered Discounts
@@ -668,7 +781,7 @@ router.post('/quote-calculator', (req, res) => {
   else if (qty >= 200) discountPercentage = 8;
 
   const rawUnit = baseUnitPrice + finishSurcharge + bindingCost;
-  const unitPrice = Math.max(35, Math.round(rawUnit * (1 - discountPercentage / 100)));
+  const unitPrice = Math.max(25, Math.round(rawUnit * (1 - discountPercentage / 100)));
   const subtotal = unitPrice * qty;
   const standardSubtotal = Math.round(rawUnit * qty);
   const totalSavings = standardSubtotal - subtotal;
@@ -679,6 +792,7 @@ router.post('/quote-calculator', (req, res) => {
     quoteId,
     productId: productId || null,
     format: format || 'Real 24K Gold Foil Wall',
+    size: req.body.size || null,
     paperGsm: paperGsm || '400 GSM Rigid Board',
     finish: finish || '24K Heated Brass Gold Foil',
     binding: binding || 'Heavy-Gauge Anti-Rust Tin Plate',
@@ -702,6 +816,28 @@ router.post('/quote-calculator', (req, res) => {
   };
 
   quoteRequests.push(quoteSummary);
+
+  // If customer details were provided, also record as customer inquiry for Admin Tab 1 (if not already queued)
+  if (clientName && (clientPhone || clientEmail) && !isDuplicateCustomerMessage(clientName, clientPhone, clientEmail)) {
+    const newLead = {
+      id: `INQ-${quoteId.slice(-4)}`,
+      name: clientName.trim(),
+      phone: clientPhone ? clientPhone.trim() : 'Not provided',
+      email: clientEmail ? clientEmail.trim() : '',
+      product: format || 'Customizer Quotation',
+      size: req.body.size || 'Standard Size',
+      quantity: qty,
+      notes: req.body.notes || '',
+      message: `Quotation ${quoteId}: ${format || 'Calendar'} (${req.body.size || 'Standard'}), ${qty} units @ ₹${unitPrice}/unit. Est: ₹${subtotal.toLocaleString()}.${company ? ` Company: ${company}` : ''}`,
+      createdAt: new Date().toISOString(),
+      status: 'New'
+    };
+    customerMessages.unshift(newLead);
+    saveMessagesToDisk(customerMessages);
+    if (mongoose.connection.readyState === 1 && MessageModel) {
+      try { MessageModel.create(newLead); } catch {}
+    }
+  }
 
   res.status(200).json({
     success: true,
@@ -743,6 +879,26 @@ router.post('/sample-kit', (req, res) => {
 
   sampleKitRequests.push(sampleOrder);
 
+  // Automatically record to Customer Inquiries for Admin display
+  const sampleInquiry = {
+    id: `SMP-${sampleOrder.sampleId.slice(-4)}`,
+    name: name.trim(),
+    phone: phone ? phone.trim() : 'Not provided',
+    email: email.trim(),
+    product: 'Free Master Swatch Kit',
+    size: 'Sample Box Spec',
+    quantity: 1,
+    notes: shippingAddress.trim(),
+    message: `Sample Kit Request (${sampleOrder.sampleId})\nCompany: ${company || 'N/A'}\nShipping: ${shippingAddress}`,
+    createdAt: new Date().toISOString(),
+    status: 'New'
+  };
+  customerMessages.unshift(sampleInquiry);
+  saveMessagesToDisk(customerMessages);
+  if (mongoose.connection.readyState === 1 && MessageModel) {
+    try { MessageModel.create(sampleInquiry); } catch {}
+  }
+
   console.log(`[Amazing Ads Sample Kit] Dispatched to ${sampleOrder.name} (${sampleOrder.company}) at ${sampleOrder.shippingAddress}`);
 
   res.status(201).json({
@@ -778,11 +934,34 @@ router.post('/contact', (req, res) => {
 
   corporateInquiries.push(inquiry);
 
+  // Automatically save as Customer Inquiry so Admin sees it in Tab 1 immediately (deduplicating if sent via messages)
+  const contactPhone = (specs?.phone || req.body.phone || 'Provided via form').trim();
+  if (!isDuplicateCustomerMessage(name, contactPhone, email, message)) {
+    const contactMsg = {
+      id: `CNT-${inquiry.inquiryId.slice(-4)}`,
+      name: name.trim(),
+      phone: contactPhone,
+      email: email.trim(),
+      product: req.body.subject || 'Contact Page Inquiry',
+      size: req.body.size || 'Custom',
+      quantity: quantityNeeded ? parseInt(quantityNeeded, 10) || null : null,
+      notes: req.body.company || '',
+      message: `Contact Inquiry (${inquiry.inquiryId}):\n${message}${company ? `\nCompany: ${company}` : ''}`,
+      createdAt: new Date().toISOString(),
+      status: 'New'
+    };
+    customerMessages.unshift(contactMsg);
+    saveMessagesToDisk(customerMessages);
+    if (mongoose.connection.readyState === 1 && MessageModel) {
+      try { MessageModel.create(contactMsg); } catch {}
+    }
+  }
+
   console.log(`[Amazing Ads Sivakasi Inquiry] ${inquiry.company} - ${inquiry.name}: ${inquiry.message}`);
 
   res.status(201).json({
     success: true,
-    message: `Thank you, ${name}. Your order brief (${inquiry.inquiryId}) is assigned to our Sivakasi Works manager. We will contact you via WhatsApp / Call shortly.`,
+    message: `Thank you, ${name}. Your order brief (${inquiry.inquiryId}) is assigned to our Sivakasi Works manager. We will contact you via Phone / Email shortly.`,
     data: inquiry
   });
 });

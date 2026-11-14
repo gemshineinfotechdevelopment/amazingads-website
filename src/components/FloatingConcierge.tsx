@@ -32,7 +32,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
             border: '1px solid var(--border-gold)',
             borderRadius: 'var(--radius-lg)',
             padding: '24px',
-            boxShadow: 'var(--shadow-lg), 0 0 35px rgba(207, 168, 78, 0.25)',
+            boxShadow: 'var(--shadow-lg), 0 0 35px rgba(215, 134, 0, 0.3)',
             animation: 'pageFadeIn 0.25s ease'
           }}
         >
@@ -60,30 +60,6 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* WhatsApp Link */}
-            <a
-              href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote"
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: 'rgba(16, 185, 129, 0.12)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '10px 14px',
-                color: '#34d399',
-                textDecoration: 'none',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span>💬</span>
-              <span>WhatsApp: +91 97904 72767</span>
-            </a>
-
             {/* Direct Phone Call */}
             <a
               href="tel:+919790472767"
@@ -91,8 +67,8 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                background: 'rgba(207, 168, 78, 0.12)',
-                border: '1px solid rgba(207, 168, 78, 0.3)',
+                background: 'rgba(215, 134, 0, 0.16)',
+                border: '1px solid rgba(215, 134, 0, 0.4)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '10px 14px',
                 color: 'var(--accent-gold-bright)',
@@ -161,7 +137,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(207, 168, 78, 0.3)',
+          boxShadow: '0 8px 25px rgba(3, 3, 3, 0.7), 0 0 20px rgba(215, 134, 0, 0.35)',
           transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           fontSize: '0.85rem',
           fontWeight: 700,
@@ -176,7 +152,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
       <style>{`
         .floating-btn:hover {
           transform: translateY(-3px) scale(1.03);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(207, 168, 78, 0.45) !important;
+          box-shadow: 0 12px 30px rgba(3, 3, 3, 0.8), 0 0 30px rgba(255, 215, 46, 0.45) !important;
         }
         @media (max-width: 640px) {
           .floating-concierge-wrap {

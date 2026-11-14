@@ -41,11 +41,11 @@ export const CorporateInquiry = () => {
       <div className="container">
         <div
           style={{
-            background: 'linear-gradient(145deg, #161b24 0%, #101319 100%)',
+            background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
             borderRadius: 'var(--radius-xl)',
-            border: '1px solid var(--border-gold)',
+            border: '1px solid #454545',
             padding: '40px',
-            boxShadow: 'var(--shadow-lg), 0 0 35px rgba(207, 168, 78, 0.12)',
+            boxShadow: 'var(--shadow-lg), 0 0 35px rgba(215, 134, 0, 0.2)',
             display: 'grid',
             gridTemplateColumns: '1fr 1.1fr',
             gap: '40px',
@@ -79,9 +79,9 @@ export const CorporateInquiry = () => {
                       width: '26px',
                       height: '26px',
                       borderRadius: '50%',
-                      background: 'rgba(207, 168, 78, 0.15)',
-                      border: '1px solid var(--border-gold)',
-                      color: 'var(--accent-gold-bright)',
+                      background: 'rgba(215, 134, 0, 0.18)',
+                      border: '1px solid #D78600',
+                      color: '#FFD72E',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

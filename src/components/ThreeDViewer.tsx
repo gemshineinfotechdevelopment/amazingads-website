@@ -254,7 +254,7 @@ export const ThreeDViewer = () => {
               alignItems: 'center',
               gap: '6px',
               transition: 'all 0.2s ease',
-              boxShadow: activeMode === tab.id ? '0 0 16px rgba(207, 168, 78, 0.35)' : 'none'
+              boxShadow: activeMode === tab.id ? '0 0 16px rgba(255, 215, 46, 0.4)' : 'none'
             }}
           >
             <span>{tab.icon}</span>
@@ -263,52 +263,7 @@ export const ThreeDViewer = () => {
         ))}
       </div>
 
-      {/* 2. Interactive Deity Quick Switcher (Murugan / Ayyappan / Shiva / Mahalakshmi / Balaji / Ganesha) */}
-      <div
-        style={{
-          maxWidth: '720px',
-          margin: '0 auto 16px',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid var(--border-gold)',
-          borderRadius: '30px',
-          padding: '6px 14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-          flexWrap: 'wrap'
-        }}
-      >
-        <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-gold)', whiteSpace: 'nowrap' }}>
-          ✦ Select Divine Artwork:
-        </span>
-        {[
-          { key: 'murugan', label: '🦚 Lord Murugan' },
-          { key: 'ayyappan', label: '🛕 Swami Ayyappan' },
-          { key: 'sivan', label: '🔱 Lord Shiva' },
-          { key: 'mahalakshmi', label: '🌸 Mahalakshmi' },
-          { key: 'balaji', label: '👑 Tirupati Balaji' },
-          { key: 'ganesha', label: '🐘 Lord Ganesha' }
-        ].map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setSelectedGod(item.key as GodKey)}
-            style={{
-              padding: '5px 12px',
-              borderRadius: '20px',
-              background: selectedGod === item.key ? 'linear-gradient(135deg, #cfa84e, #8c6e26)' : 'transparent',
-              color: selectedGod === item.key ? '#000' : 'var(--text-secondary)',
-              border: `1px solid ${selectedGod === item.key ? '#ffd700' : 'rgba(255,255,255,0.1)'}`,
-              fontSize: '0.74rem',
-              fontWeight: selectedGod === item.key ? 800 : 600,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* 3. Interactive Imprint Customizer Bar */}
       <div
@@ -373,7 +328,7 @@ export const ThreeDViewer = () => {
             borderRadius: 'var(--radius-xl)',
             border: '2.5px solid var(--border-gold)',
             boxShadow: isHovered
-              ? 'var(--shadow-lg), 0 0 50px rgba(207, 168, 78, 0.45), inset 0 0 30px rgba(0,0,0,0.6)'
+              ? 'var(--shadow-lg), 0 0 50px rgba(255, 215, 46, 0.45), inset 0 0 30px rgba(0,0,0,0.6)'
               : 'var(--shadow-md), 0 0 20px rgba(0,0,0,0.8)',
             transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
             transformStyle: 'preserve-3d',
@@ -1028,7 +983,7 @@ export const ThreeDViewer = () => {
 
                 <div
                   style={{
-                    background: 'rgba(207, 168, 78, 0.1)',
+                    background: 'rgba(215, 134, 0, 0.16)',
                     border: '1.5px dashed var(--accent-gold)',
                     borderRadius: '8px',
                     padding: '8px 12px',
@@ -1036,7 +991,7 @@ export const ThreeDViewer = () => {
                     marginTop: '10px'
                   }}
                 >
-                  <p style={{ fontSize: '0.72rem', color: '#ffd700', fontWeight: 800 }}>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--accent-gold-bright)', fontWeight: 800 }}>
                     ★ {customBrand || 'SRI VENKATESWARA TRADERS & JEWELLERS'} ★
                   </p>
                   <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>

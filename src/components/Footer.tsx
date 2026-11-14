@@ -26,8 +26,8 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
   return (
     <footer
       style={{
-        background: '#07080b',
-        borderTop: '1px solid var(--border-gold)',
+        background: '#333333',
+        borderTop: '1px solid #454545',
         padding: '70px 0 30px',
         position: 'relative',
         width: '100%',
@@ -131,7 +131,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
                 <span>Chennai & Madurai Corporate Distribution Hubs</span>
               </div>
               <div style={{ marginTop: '4px' }}>
-                <strong style={{ color: 'var(--accent-gold-bright)', display: 'block' }}>Direct Factory Hotline & WhatsApp:</strong>
+                <strong style={{ color: 'var(--accent-gold-bright)', display: 'block' }}>Direct Factory Hotline:</strong>
                 <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.phone} {settings.secondaryPhone ? `• ${settings.secondaryPhone}` : ''}</span>
               </div>
               <div>
@@ -144,7 +144,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
         {/* Bottom Bar */}
         <div
           style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid #454545',
             paddingTop: '24px',
             display: 'flex',
             justifyContent: 'space-between',

@@ -66,9 +66,9 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 <span
                   key={item}
                   style={{
-                    background: 'rgba(207, 168, 78, 0.1)',
-                    border: '1px solid rgba(207, 168, 78, 0.3)',
-                    color: 'var(--accent-gold-bright)',
+                    background: 'rgba(215, 134, 0, 0.14)',
+                    border: '1px solid rgba(215, 134, 0, 0.4)',
+                    color: '#FFD72E',
                     padding: '4px 12px',
                     borderRadius: '20px',
                     fontSize: '0.75rem',
@@ -158,11 +158,11 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
               className="hero-preview-box"
               style={{
                 position: 'relative',
-                background: 'linear-gradient(145deg, #181c25 0%, #0e1117 100%)',
+                background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
                 borderRadius: 'var(--radius-xl)',
-                border: '1px solid var(--border-gold)',
+                border: '1px solid #454545',
                 padding: '24px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(207, 168, 78, 0.15)',
+                boxShadow: '0 25px 50px -12px rgba(3, 3, 3, 0.8), 0 0 35px rgba(215, 134, 0, 0.2)',
                 overflow: 'hidden'
               }}
             >
@@ -173,7 +173,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   paddingBottom: '16px',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                  borderBottom: '1px solid #454545'
                 }}
               >
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -184,13 +184,13 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                         width: '12px',
                         height: '14px',
                         borderRadius: '3px',
-                        background: 'linear-gradient(180deg, #d8ba63 0%, #876c24 100%)',
+                        background: 'linear-gradient(180deg, #FFD72E 0%, #D78600 100%)',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
                       }}
                     />
                   ))}
                 </div>
-                <span style={{ fontSize: '0.72rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>
+                <span style={{ fontSize: '0.72rem', color: '#FFD72E', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>
                   SPEC: 350 GSM LINEN • TWIN WIRE-O
                 </span>
               </div>
@@ -202,9 +202,9 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                   borderRadius: 'var(--radius-md)',
                   overflow: 'hidden',
                   position: 'relative',
-                  border: '1px solid var(--border-gold)',
+                  border: '1px solid #454545',
                   boxShadow: '0 16px 36px rgba(0, 0, 0, 0.65)',
-                  background: '#0d1017'
+                  background: '#030303'
                 }}
               >
                 <img
@@ -224,12 +224,12 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                     position: 'absolute',
                     top: '12px',
                     right: '12px',
-                    background: 'linear-gradient(135deg, #d4af37 0%, #aa8528 100%)',
-                    color: '#fff',
+                    background: 'linear-gradient(135deg, #FFD72E 0%, #D78600 100%)',
+                    color: '#030303',
                     padding: '4px 12px',
                     borderRadius: '20px',
                     fontSize: '0.68rem',
-                    fontWeight: 700,
+                    fontWeight: 800,
                     letterSpacing: '0.08em',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.6)',
                     backdropFilter: 'blur(6px)'
@@ -245,8 +245,8 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                   position: 'absolute',
                   bottom: '16px',
                   right: '16px',
-                  background: 'rgba(17, 20, 26, 0.95)',
-                  border: '1px solid var(--border-gold)',
+                  background: 'rgba(3, 3, 3, 0.95)',
+                  border: '1px solid #454545',
                   borderRadius: 'var(--radius-md)',
                   padding: '8px 14px',
                   display: 'flex',
@@ -260,7 +260,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                     width: '16px',
                     height: '16px',
                     borderRadius: '50%',
-                    background: 'conic-gradient(#f7e199, #b38d38, #f7e199)'
+                    background: 'conic-gradient(#FFD72E, #D78600, #FFD72E)'
                   }}
                 />
                 <div>

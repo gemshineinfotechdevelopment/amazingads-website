@@ -104,9 +104,9 @@ export const VirtualProofing = () => {
                     flex: 1,
                     padding: '8px',
                     borderRadius: '4px',
-                    background: foilEnabled ? 'linear-gradient(135deg, #cfa84e 0%, #8c6e26 100%)' : 'transparent',
+                    background: foilEnabled ? 'linear-gradient(135deg, #fff5c0 0%, #fae896 50%, #deb84a 100%)' : 'transparent',
                     border: 'none',
-                    color: foilEnabled ? '#000' : 'var(--text-muted)',
+                    color: foilEnabled ? '#121315' : 'var(--text-muted)',
                     fontSize: '0.8rem',
                     fontWeight: 700,
                     cursor: 'pointer'
@@ -136,7 +136,7 @@ export const VirtualProofing = () => {
                       gap: '12px',
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
-                      background: paperTexture === item.id ? 'rgba(207, 168, 78, 0.15)' : 'var(--bg-input)',
+                      background: paperTexture === item.id ? 'rgba(215, 134, 0, 0.18)' : 'var(--bg-input)',
                       border: `1px solid ${paperTexture === item.id ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
                       color: paperTexture === item.id ? '#fff' : 'var(--text-secondary)',
                       fontSize: '0.85rem',
@@ -256,7 +256,7 @@ export const VirtualProofing = () => {
                         fontWeight: 700,
                         margin: '6px 0 0',
                         color: foilEnabled ? '#a67c1e' : '#1f1c19',
-                        textShadow: foilEnabled ? '0 1px 2px rgba(255,255,255,0.8), 0 0 10px rgba(207, 168, 78, 0.4)' : 'none',
+                        textShadow: foilEnabled ? '0 1px 2px rgba(255,255,255,0.8), 0 0 10px rgba(215, 134, 0, 0.45)' : 'none',
                         letterSpacing: '0.04em'
                       }}
                     >
@@ -322,10 +322,10 @@ export const VirtualProofing = () => {
                         style={{
                           padding: '8px 0',
                           borderRadius: '6px',
-                          background: isToday ? (foilEnabled ? 'rgba(207, 168, 78, 0.3)' : 'rgba(0,0,0,0.08)') : 'transparent',
+                          background: isToday ? (foilEnabled ? 'rgba(215, 134, 0, 0.35)' : 'rgba(0,0,0,0.08)') : 'transparent',
                           color: isSunday ? '#b85d3b' : (isToday ? '#73510b' : '#24201a'),
                           fontWeight: isToday ? 800 : (isSunday ? 700 : 500),
-                          border: isToday ? '1px solid rgba(207, 168, 78, 0.5)' : 'none'
+                          border: isToday ? '1px solid rgba(215, 134, 0, 0.55)' : 'none'
                         }}
                       >
                         {day}
@@ -353,8 +353,8 @@ export const VirtualProofing = () => {
                       width: '26px',
                       height: '26px',
                       borderRadius: '50%',
-                      background: foilEnabled ? 'linear-gradient(135deg, #cfa84e 0%, #8c6e26 100%)' : '#332d26',
-                      color: foilEnabled ? '#000' : '#fff',
+                      background: foilEnabled ? 'linear-gradient(135deg, #fff5c0 0%, #fae896 50%, #deb84a 100%)' : '#332d26',
+                      color: foilEnabled ? '#121315' : '#fff',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

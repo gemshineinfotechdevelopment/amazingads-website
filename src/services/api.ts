@@ -19,24 +19,29 @@ export interface CalendarProduct {
   features: string[];
   mockupImg: string;
   sizes?: string[];
+  sizePrices?: Record<string, number>;
 }
 
 export interface QuotePayload {
   productId?: string;
   format: string;
-  paperGsm: string;
-  finish: string;
-  binding: string;
+  size?: string;
+  customUnitPrice?: number;
+  paperGsm?: string;
+  finish?: string;
+  binding?: string;
   quantity: number;
   clientName?: string;
   clientEmail?: string;
   clientPhone?: string;
   company?: string;
+  notes?: string;
 }
 
 export interface QuoteResult {
   quoteId: string;
   format: string;
+  size?: string;
   paperGsm: string;
   finish: string;
   binding: string;
@@ -118,10 +123,15 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
     ],
     mockupImg: '/images/gods/mahalakshmi.jpg',
     sizes: [
-      '15 × 20 inches (Standard Wall)',
-      '17 × 27 inches (Jumbo Royal Wall)',
-      '12 × 18 inches (Compact Office)'
-    ]
+      '12 × 18 inches',
+      '15 × 20 inches',
+      '17 × 27 inches'
+    ],
+    sizePrices: {
+      '12 × 18 inches': 125,
+      '15 × 20 inches': 145,
+      '17 × 27 inches': 210
+    }
   },
   {
     id: 'custom-5d-calendar',
@@ -148,10 +158,15 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
     ],
     mockupImg: '/images/gods/murugan.jpg',
     sizes: [
-      '12 × 18 inches (Standard 5D Frame)',
-      '16 × 24 inches (Executive Deluxe)',
-      '18 × 28 inches (Grand Temple)'
-    ]
+      '12 × 18 inches',
+      '16 × 24 inches',
+      '18 × 28 inches'
+    ],
+    sizePrices: {
+      '12 × 18 inches': 220,
+      '16 × 24 inches': 295,
+      '18 × 28 inches': 380
+    }
   },
   {
     id: 'stone-art-calendar',
@@ -178,10 +193,15 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
     ],
     mockupImg: '/images/stone-art-calendar-real.jpg',
     sizes: [
-      '14 × 20 inches (Sculpted Relief)',
-      '18 × 24 inches (Royal Teak Frame)',
-      '20 × 30 inches (Collector Frame)'
-    ]
+      '12 × 18 inches',
+      '14 × 20 inches',
+      '18 × 24 inches'
+    ],
+    sizePrices: {
+      '12 × 18 inches': 250,
+      '14 × 20 inches': 280,
+      '18 × 24 inches': 395
+    }
   },
   {
     id: 'hand-fan',
@@ -208,10 +228,13 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
     ],
     mockupImg: '/images/gods/ganesha.jpg',
     sizes: [
-      '8 × 8 inches (Standard Circle)',
-      '9 × 9 inches (Large Leaf Cut)',
-      'Custom Contour Die-Cut'
-    ]
+      '8 × 8 inches',
+      '9 × 10 inches'
+    ],
+    sizePrices: {
+      '8 × 8 inches': 28,
+      '9 × 10 inches': 34
+    }
   },
   {
     id: 'special-products',
@@ -238,10 +261,15 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
     ],
     mockupImg: '/images/gods/ayyappan.jpg',
     sizes: [
-      'A4 Executive Desk (8.5 × 11 in)',
-      'A5 Compact Desk (6 × 8.5 in)',
-      'VIP Gift Box Set (12 × 15 in)'
-    ]
+      '9 × 12 inches',
+      '12 × 16 inches',
+      '16 × 20 inches'
+    ],
+    sizePrices: {
+      '9 × 12 inches': 195,
+      '12 × 16 inches': 275,
+      '16 × 20 inches': 360
+    }
   }
 ];
 
@@ -439,7 +467,9 @@ export async function calculateQuote(payload: QuotePayload): Promise<QuoteResult
   // Local fallback calculation using exact Sivakasi formula
   const qty = payload.quantity || 100;
   let baseUnitPrice = 110;
-  if (payload.format.includes('PET Foil') || payload.format.includes('Gold Foil')) baseUnitPrice = 145;
+  if (payload.customUnitPrice && payload.customUnitPrice > 0) {
+    baseUnitPrice = payload.customUnitPrice;
+  } else if (payload.format.includes('PET Foil') || payload.format.includes('Gold Foil')) baseUnitPrice = 145;
   else if (payload.format.includes('5D') || payload.format.includes('Lenticular') || payload.format.includes('3D')) baseUnitPrice = 220;
   else if (payload.format.includes('Stone Art') || payload.format.includes('Kundan')) baseUnitPrice = 280;
   else if (payload.format.includes('Hand Fan')) baseUnitPrice = 28;
@@ -449,16 +479,20 @@ export async function calculateQuote(payload: QuotePayload): Promise<QuoteResult
   else if (payload.format.includes('Tabletop') || payload.format.includes('Desk')) baseUnitPrice = 95;
   else if (payload.format.includes('Photo Frame') || payload.format.includes('Frame')) baseUnitPrice = 180;
 
+  const finish = payload.finish || 'Standard Mirror Finish';
+  const binding = payload.binding || 'Standard Mount';
+  const paperGsm = payload.paperGsm || '400 GSM Rigid Board';
+
   let finishSurcharge = 0;
-  if (payload.finish.includes('24K')) finishSurcharge = 22;
-  else if (payload.finish.includes('Spot Gloss')) finishSurcharge = 16;
-  else if (payload.finish.includes('3D Optical')) finishSurcharge = 45;
-  else if (payload.finish.includes('Kundan')) finishSurcharge = 55;
+  if (finish.includes('24K')) finishSurcharge = 22;
+  else if (finish.includes('Spot Gloss')) finishSurcharge = 16;
+  else if (finish.includes('3D Optical')) finishSurcharge = 45;
+  else if (finish.includes('Kundan')) finishSurcharge = 55;
 
   let bindingCost = 10;
-  if (payload.binding.includes('Synthetic Gold Frame')) bindingCost = 35;
-  else if (payload.binding.includes('Tin Plate')) bindingCost = 12;
-  else if (payload.binding.includes('Wire-O')) bindingCost = 15;
+  if (binding.includes('Synthetic Gold Frame')) bindingCost = 35;
+  else if (binding.includes('Tin Plate')) bindingCost = 12;
+  else if (binding.includes('Wire-O')) bindingCost = 15;
 
   let discountPercentage = 0;
   try {
@@ -489,9 +523,9 @@ export async function calculateQuote(payload: QuotePayload): Promise<QuoteResult
   return {
     quoteId,
     format: payload.format,
-    paperGsm: payload.paperGsm,
-    finish: payload.finish,
-    binding: payload.binding,
+    paperGsm,
+    finish,
+    binding,
     quantity: qty,
     unitPrice,
     subtotal,
@@ -581,11 +615,16 @@ export async function getPressStats(): Promise<PressStats> {
   };
 }
 
-// 7. Customer WhatsApp Messages
+// 7. Customer Inquiries & Leads
 export interface CustomerMessage {
   id: string;
   name: string;
   phone: string;
+  email?: string;
+  product?: string;
+  size?: string;
+  quantity?: number;
+  notes?: string;
   message: string;
   createdAt: string;
   status: 'New' | 'Replied';
@@ -606,6 +645,11 @@ export function getStoredCustomerMessages(): CustomerMessage[] {
       id: 'MSG-8821',
       name: 'Karthik Raja',
       phone: '+91 98401 23456',
+      email: 'karthik.raja@chennaienterprises.com',
+      product: 'Stone Art Calendars',
+      size: '14 × 20 inches',
+      quantity: 500,
+      notes: 'Need corporate logo embossing on frame',
       message: 'Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our shop name printed at top.',
       createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
       status: 'New'
@@ -614,6 +658,11 @@ export function getStoredCustomerMessages(): CustomerMessage[] {
       id: 'MSG-8819',
       name: 'Lakshmi Narayanan',
       phone: '+91 97904 88765',
+      email: 'lakshmi.narayanan@gmail.com',
+      product: 'Gold / Silver PET Foil Calendar',
+      size: '15 × 20 inches',
+      quantity: 250,
+      notes: 'Delivery to Madurai warehouse',
       message: 'Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?',
       createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
       status: 'Replied'
@@ -621,18 +670,58 @@ export function getStoredCustomerMessages(): CustomerMessage[] {
   ];
 }
 
+export function deduplicateCustomerMessages(list: CustomerMessage[]): CustomerMessage[] {
+  const seen = new Set<string>();
+  const result: CustomerMessage[] = [];
+
+  for (const item of list) {
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+
+    // Filter out duplicates from same user within 2 minutes
+    const isDup = result.some(prev => {
+      const timeDiff = Math.abs(new Date(prev.createdAt).getTime() - new Date(item.createdAt).getTime());
+      if (timeDiff > 120000) return false;
+      const sameName = prev.name.trim().toLowerCase() === item.name.trim().toLowerCase();
+      const sameEmail = prev.email && item.email && prev.email.trim().toLowerCase() === item.email.trim().toLowerCase();
+      const cleanP1 = (prev.phone || '').replace(/[^0-9]/g, '');
+      const cleanP2 = (item.phone || '').replace(/[^0-9]/g, '');
+      const samePhone = cleanP1 && cleanP2 && cleanP1.length >= 7 && cleanP2.length >= 7 && cleanP1 === cleanP2;
+
+      return (sameName && (sameEmail || samePhone)) || (sameEmail && samePhone);
+    });
+
+    if (!isDup) {
+      result.push(item);
+    }
+  }
+
+  return result;
+}
+
 export function saveStoredCustomerMessages(messages: CustomerMessage[]) {
   try {
-    localStorage.setItem(LOCAL_STORAGE_MESSAGES_KEY, JSON.stringify(messages));
-    window.dispatchEvent(new CustomEvent('new-customer-message', { detail: messages }));
+    const deduped = deduplicateCustomerMessages(messages);
+    localStorage.setItem(LOCAL_STORAGE_MESSAGES_KEY, JSON.stringify(deduped));
+    window.dispatchEvent(new CustomEvent('new-customer-message', { detail: deduped }));
   } catch {}
 }
 
-export async function sendCustomerMessage(name: string, phone: string, message: string): Promise<CustomerMessage> {
+export async function sendCustomerMessage(
+  name: string,
+  phone: string,
+  message: string,
+  extra?: { email?: string; product?: string; size?: string; quantity?: number; notes?: string }
+): Promise<CustomerMessage> {
   const newMsg: CustomerMessage = {
     id: `MSG-${Date.now().toString().slice(-4)}`,
     name: name.trim(),
     phone: phone.trim() || 'Not specified',
+    email: extra?.email?.trim() || '',
+    product: extra?.product?.trim() || '',
+    size: extra?.size?.trim() || '',
+    quantity: extra?.quantity || undefined,
+    notes: extra?.notes?.trim() || '',
     message: message.trim(),
     createdAt: new Date().toISOString(),
     status: 'New'
@@ -648,16 +737,16 @@ export async function sendCustomerMessage(name: string, phone: string, message: 
       const json = await res.json();
       if (json.data) {
         const stored = getStoredCustomerMessages();
-        stored.unshift(json.data);
-        saveStoredCustomerMessages(stored);
+        const updated = deduplicateCustomerMessages([json.data, ...stored]);
+        saveStoredCustomerMessages(updated);
         return json.data;
       }
     }
   } catch {}
 
   const stored = getStoredCustomerMessages();
-  stored.unshift(newMsg);
-  saveStoredCustomerMessages(stored);
+  const updated = deduplicateCustomerMessages([newMsg, ...stored]);
+  saveStoredCustomerMessages(updated);
   return newMsg;
 }
 
@@ -667,12 +756,13 @@ export async function fetchCustomerMessages(): Promise<CustomerMessage[]> {
     if (res.ok) {
       const json = await res.json();
       if (json.data && Array.isArray(json.data)) {
-        saveStoredCustomerMessages(json.data);
-        return json.data;
+        const deduped = deduplicateCustomerMessages(json.data);
+        saveStoredCustomerMessages(deduped);
+        return deduped;
       }
     }
   } catch {}
-  return getStoredCustomerMessages();
+  return deduplicateCustomerMessages(getStoredCustomerMessages());
 }
 
 export async function updateMessageStatus(id: string, status: 'New' | 'Replied'): Promise<void> {
@@ -686,6 +776,18 @@ export async function updateMessageStatus(id: string, status: 'New' | 'Replied')
 
   const stored = getStoredCustomerMessages();
   const updated = stored.map(m => m.id === id ? { ...m, status } : m);
+  saveStoredCustomerMessages(updated);
+}
+
+export async function deleteCustomerMessage(id: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/messages/${id}`, {
+      method: 'DELETE'
+    });
+  } catch {}
+
+  const stored = getStoredCustomerMessages();
+  const updated = stored.filter(m => m.id !== id);
   saveStoredCustomerMessages(updated);
 }
 
@@ -705,7 +807,8 @@ export interface FactorySettings {
   address: string;
   phone: string;
   secondaryPhone?: string;
-  whatsapp: string;
+  hotlinePhone?: string;
+  whatsapp?: string;
   email: string;
   supportEmail?: string;
   websiteUrl?: string;
@@ -732,7 +835,7 @@ export const DEFAULT_FACTORY_SETTINGS: FactorySettings = {
   address: '3/1, Vannakara Street, Chairman P.K.S.A. Arumugam Road, Sivakasi 626189, Tamil Nadu',
   phone: '+91 97904 72767',
   secondaryPhone: '+91 97904 27670',
-  whatsapp: '+91 97904 72767',
+  hotlinePhone: '+91 97904 72767',
   email: 'aamazingads@gmail.com',
   supportEmail: 'sales@amazingads.in',
   websiteUrl: 'www.amazingads.in',

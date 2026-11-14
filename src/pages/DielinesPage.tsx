@@ -213,11 +213,11 @@ export const DielinesPage = () => {
           <div className="dieline-sidebar" style={{ position: 'sticky', top: '90px' }}>
             <div
               style={{
-                background: 'linear-gradient(155deg, #181d26 0%, #11141b 100%)',
+                background: 'linear-gradient(155deg, #16171a 0%, #22252c 60%, #2f333b 100%)',
                 border: '1px solid var(--border-gold)',
                 borderRadius: 'var(--radius-lg)',
                 padding: '32px',
-                boxShadow: 'var(--shadow-lg), 0 0 35px rgba(207, 168, 78, 0.15)'
+                boxShadow: 'var(--shadow-lg), 0 0 35px rgba(215, 134, 0, 0.2)'
               }}
             >
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
@@ -242,7 +242,7 @@ export const DielinesPage = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  background: 'rgba(207, 168, 78, 0.04)',
+                  background: 'rgba(215, 134, 0, 0.08)',
                   transition: 'all 0.2s ease',
                   textAlign: 'center'
                 }}

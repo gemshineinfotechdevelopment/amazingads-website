@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useRouter } from '../context/RouterContext';
-import { submitCorporateInquiry, getStoredFactorySettings, type FactorySettings } from '../services/api';
+import { sendCustomerMessage, getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface ContactPageProps {
   onOpenSampleKit?: () => void;
@@ -42,14 +42,16 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
     try {
       setSubmitting(true);
-      await submitCorporateInquiry({
+      await sendCustomerMessage(
         name,
-        email: email || `${phone}@amazingads.contact`,
-        company: company || 'Trade Customer',
-        quantityNeeded: 'Bulk',
-        targetDate: 'Immediate',
-        message: `Subject: ${subject}\nPhone: ${phone}\nMessage: ${message}`
-      });
+        phone,
+        message,
+        {
+          email,
+          product: subject,
+          notes: company ? `Company: ${company}` : ''
+        }
+      );
       setSubmitted(true);
       setSubmitting(false);
     } catch {
@@ -137,15 +139,10 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
                   <span style={{ fontSize: '1.4rem' }}>📞</span>
                   <div>
-                    <strong style={{ color: '#fff', display: 'block' }}>Direct Factory Hotline & WhatsApp:</strong>
+                    <strong style={{ color: '#fff', display: 'block' }}>Direct Factory Hotline:</strong>
                     <span style={{ color: 'var(--accent-gold-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
                       {settings.phone} {settings.secondaryPhone ? `/ ${settings.secondaryPhone}` : ''}
                     </span>
-                    {settings.whatsapp && (
-                      <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        WhatsApp Business: {settings.whatsapp}
-                      </span>
-                    )}
                   </div>
                 </div>
 
@@ -176,7 +173,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
                 style={{
                   marginTop: '32px',
                   padding: '20px',
-                  background: 'rgba(207, 168, 78, 0.08)',
+                  background: 'rgba(215, 134, 0, 0.14)',
                   border: '1px solid var(--border-gold)',
                   borderRadius: 'var(--radius-lg)'
                 }}
@@ -259,7 +256,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
-                      Phone / WhatsApp *
+                      Phone Number *
                     </label>
                     <input
                       type="tel"

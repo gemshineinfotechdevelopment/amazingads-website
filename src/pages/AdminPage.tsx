@@ -8,7 +8,7 @@ import {
   resetCalendarProducts,
   fetchCustomerMessages,
   updateMessageStatus,
-  getStoredFactoryDiscounts,
+  deleteCustomerMessage,
   saveStoredFactoryDiscounts,
   getStoredFactorySettings,
   saveStoredFactorySettings,
@@ -16,20 +16,15 @@ import {
   DEFAULT_FACTORY_SETTINGS,
   type CalendarProduct,
   type CustomerMessage,
-  type DiscountTier,
   type FactorySettings
 } from '../services/api';
 
-type AdminTab = 'messages' | 'catalog' | 'matrix' | 'discounts' | 'quotes' | 'settings';
+type AdminTab = 'messages' | 'catalog' | 'matrix' | 'quotes' | 'settings';
 
-// Official Authentic WhatsApp Icon
-const WhatsAppIcon = ({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 18.06c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.106 8.106 0 01-1.25-4.29c0-4.5 3.66-8.16 8.16-8.16 2.18 0 4.23.85 5.77 2.39s2.39 3.59 2.39 5.77c0 4.5-3.66 8.16-8.16 8.16zm4.47-6.11c-.25-.12-1.45-.72-1.68-.8-.23-.08-.39-.12-.56.12-.17.25-.64.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.71-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.45-.6 1.66-1.17.2-.57.2-1.07.14-1.17-.06-.1-.23-.17-.48-.3z"
-    />
+// Inquiry and Lead Message Icon
+const InquiryIcon = ({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
   </svg>
 );
 
@@ -81,29 +76,7 @@ const SAMPLE_QUOTES: InquiredOrder[] = [
   }
 ];
 
-const IMAGE_PRESETS = [
-  { label: 'Lord Balaji (Stone Art Photo)', url: '/images/stone-art-calendar-real.jpg' },
-  { label: 'Mahalakshmi (Gold PET)', url: '/images/gods/mahalakshmi.jpg' },
-  { label: 'Lord Murugan (5D Tech)', url: '/images/gods/murugan.jpg' },
-  { label: 'Lord Ganesha (Hand Fan)', url: '/images/gods/ganesha.jpg' },
-  { label: 'Lord Ayyappan (Gold Foil)', url: '/images/gods/ayyappan.jpg' },
-  { label: 'Executive Desk Calendar', url: '/images/executive-desk-calendar.jpg' },
-  { label: 'Promotional Hand Fan', url: '/images/hand-fan-promo-real.jpg' },
-  { label: 'Custom 5D Holographic', url: '/images/custom-5d-calendar-real.jpg' }
-];
 
-const SIZE_PRESETS = [
-  '15 × 20 inches (Standard Wall)',
-  '17 × 27 inches (Jumbo Royal Wall)',
-  '12 × 18 inches (Compact Office)',
-  '14 × 20 inches (Sculpted Relief)',
-  '16 × 24 inches (Executive Deluxe)',
-  '18 × 28 inches (Grand Temple)',
-  '8 × 8 inches (Standard Circle)',
-  '9 × 10 inches (Jumbo Leaf)',
-  'A4 Executive Desk (8.5 × 11 in)',
-  'A5 Compact Desk (6 × 8.5 in)'
-];
 
 const INITIAL_FORM_STATE: CalendarProduct = {
   id: '',
@@ -189,16 +162,20 @@ export const AdminPage = () => {
 
   // Products Data
   const [products, setProducts] = useState<CalendarProduct[]>([]);
-  const [matrixData, setMatrixData] = useState<Record<string, { name: string; price: number; sizes: string[] }>>({});
+  const [matrixData, setMatrixData] = useState<Record<string, {
+    name: string;
+    price: number;
+    sizes: string[];
+    sizePrices: Record<string, number>;
+  }>>({});
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Customer WhatsApp Messages
+  // Customer Inquiries & Form Messages
   const [messages, setMessages] = useState<CustomerMessage[]>([]);
 
-  // Editable Factory & Discounts State
-  const [discountTiers, setDiscountTiers] = useState<DiscountTier[]>(getStoredFactoryDiscounts());
+  // Editable Factory Settings State
   const [factorySettings, setFactorySettings] = useState<FactorySettings>(getStoredFactorySettings());
 
   // Modal & Form State
@@ -206,6 +183,7 @@ export const AdminPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<CalendarProduct>(INITIAL_FORM_STATE);
   const [newSizeInput, setNewSizeInput] = useState('');
+  const [newSizePriceInput, setNewSizePriceInput] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   // Toast State
@@ -222,13 +200,19 @@ export const AdminPage = () => {
       setProducts(prods);
       setMessages(msgs);
 
-      // Initialize matrix data
-      const matrixInit: Record<string, { name: string; price: number; sizes: string[] }> = {};
+      // Initialize matrix data with frame-size-specific pricing
+      const matrixInit: Record<string, { name: string; price: number; sizes: string[]; sizePrices: Record<string, number> }> = {};
       prods.forEach(p => {
+        const szs = p.sizes && p.sizes.length > 0 ? [...p.sizes] : [p.dimensions || 'Standard Size'];
+        const sp: Record<string, number> = {};
+        szs.forEach(s => {
+          sp[s] = p.sizePrices?.[s] ?? p.startingPrice;
+        });
         matrixInit[p.id] = {
           name: p.name,
           price: p.startingPrice,
-          sizes: p.sizes && p.sizes.length > 0 ? [...p.sizes] : [p.dimensions || 'Standard Size']
+          sizes: szs,
+          sizePrices: sp
         };
       });
       setMatrixData(matrixInit);
@@ -295,22 +279,42 @@ export const AdminPage = () => {
     const existingSizes = product.sizes && product.sizes.length > 0 
       ? product.sizes 
       : [product.dimensions || 'Standard Size'];
+    
+    // Build initial sizePrices map
+    const existingSizePrices: Record<string, number> = {};
+    existingSizes.forEach(s => {
+      existingSizePrices[s] = product.sizePrices?.[s] ?? product.startingPrice;
+    });
+
     setFormData({
       ...product,
-      sizes: [...existingSizes]
+      sizes: [...existingSizes],
+      sizePrices: existingSizePrices
     });
     setNewSizeInput('');
+    setNewSizePriceInput('');
     setUploadedFileName(null);
     setIsModalOpen(true);
   };
 
   const handleOpenCreate = () => {
     setIsEditing(false);
+    const defaultSizes = ['12 × 18 in', '15 × 20 in', '17 × 27 in'];
+    const defaultSizePrices: Record<string, number> = {
+      '12 × 18 in': 125,
+      '15 × 20 in': 145,
+      '17 × 27 in': 210
+    };
+
     setFormData({
       ...INITIAL_FORM_STATE,
-      id: `product-${Date.now()}`
+      id: `product-${Date.now()}`,
+      sizes: defaultSizes,
+      sizePrices: defaultSizePrices,
+      startingPrice: 125
     });
     setNewSizeInput('');
+    setNewSizePriceInput('');
     setUploadedFileName(null);
     setIsModalOpen(true);
   };
@@ -318,6 +322,7 @@ export const AdminPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setNewSizeInput('');
+    setNewSizePriceInput('');
     setUploadedFileName(null);
   };
 
@@ -338,21 +343,36 @@ export const AdminPage = () => {
     }
   };
 
-  const handleAddSize = (sizeToAdd?: string) => {
+  const handleAddSize = (sizeToAdd?: string, priceToAdd?: number) => {
     const size = (sizeToAdd || newSizeInput).trim();
     if (!size) return;
     if (formData.sizes && formData.sizes.includes(size)) {
       showToast('This size is already in the list', 'info');
       return;
     }
+    const price = priceToAdd || (newSizePriceInput ? Number(newSizePriceInput) : formData.startingPrice);
     const updatedSizes = [...(formData.sizes || []), size];
-    setFormData({ ...formData, sizes: updatedSizes });
-    if (!sizeToAdd) setNewSizeInput('');
+    const updatedSizePrices = { ...(formData.sizePrices || {}), [size]: Math.max(1, price) };
+    setFormData({ ...formData, sizes: updatedSizes, sizePrices: updatedSizePrices });
+    if (!sizeToAdd) {
+      setNewSizeInput('');
+      setNewSizePriceInput('');
+    }
+  };
+
+  const handleUpdateSizePrice = (sizeName: string, price: number) => {
+    const updatedSizePrices = { ...(formData.sizePrices || {}), [sizeName]: Math.max(1, price) };
+    setFormData({ ...formData, sizePrices: updatedSizePrices });
   };
 
   const handleRemoveSize = (indexToRemove: number) => {
+    const sizeToRemove = formData.sizes?.[indexToRemove];
     const updatedSizes = (formData.sizes || []).filter((_, i) => i !== indexToRemove);
-    setFormData({ ...formData, sizes: updatedSizes });
+    const updatedSizePrices = { ...(formData.sizePrices || {}) };
+    if (sizeToRemove) {
+      delete updatedSizePrices[sizeToRemove];
+    }
+    setFormData({ ...formData, sizes: updatedSizes, sizePrices: updatedSizePrices });
   };
 
   const handleSaveProduct = async (e: FormEvent) => {
@@ -361,22 +381,33 @@ export const AdminPage = () => {
       showToast('Product name is required', 'error');
       return;
     }
-    if (formData.startingPrice <= 0) {
-      showToast('Starting price must be greater than zero', 'error');
-      return;
-    }
     if (!formData.sizes || formData.sizes.length === 0) {
-      showToast('Please add at least one available size', 'error');
+      showToast('Please add at least one frame size and price', 'error');
       return;
     }
 
+    const firstSize = formData.sizes[0];
+    const computedPrice = (firstSize && formData.sizePrices?.[firstSize]) ? formData.sizePrices[firstSize] : (formData.startingPrice || 125);
+    
+    const payloadToSave: CalendarProduct = {
+      ...formData,
+      startingPrice: computedPrice,
+      category: formData.category ? formData.category.trim() : 'Devotional Calendars',
+      tag: formData.category ? formData.category.trim() : 'Wholesale',
+      subtitle: formData.subtitle || `${formData.name} - Sivakasi Direct Factory Works`,
+      description: formData.description || `${formData.name} direct wholesale manufacture with custom corporate crest and high-definition embellishments.`,
+      features: formData.features && formData.features.length > 0 ? formData.features : ['Direct Sivakasi Factory Pressing', 'High Quality Frame Finish', 'Priority Courier Dispatch'],
+      dimensions: firstSize || '15 × 20 in',
+      mockupImg: formData.mockupImg || '/images/gods/mahalakshmi.jpg'
+    };
+
     try {
       if (isEditing) {
-        await updateCalendarProduct(formData.id, formData);
-        showToast(`Product "${formData.name}" updated successfully!`);
+        await updateCalendarProduct(payloadToSave.id, payloadToSave);
+        showToast(`Product "${payloadToSave.name}" updated successfully!`);
       } else {
-        await createCalendarProduct(formData);
-        showToast(`New product "${formData.name}" created successfully!`);
+        await createCalendarProduct(payloadToSave);
+        showToast(`New product "${payloadToSave.name}" created successfully!`);
       }
       setIsModalOpen(false);
       await loadData();
@@ -409,7 +440,7 @@ export const AdminPage = () => {
     }
   };
 
-  // Matrix Quick Updates
+  // Matrix Quick Updates with Frame Size-Wise Pricing
   const handleMatrixFieldChange = (productId: string, field: 'name' | 'price', value: string | number) => {
     setMatrixData(prev => ({
       ...prev,
@@ -420,27 +451,62 @@ export const AdminPage = () => {
     }));
   };
 
-  const handleMatrixRemoveSize = (productId: string, sizeIdx: number) => {
+  const handleMatrixSizePriceChange = (productId: string, sizeName: string, price: number) => {
     setMatrixData(prev => {
       const current = prev[productId];
       if (!current) return prev;
-      const updatedSizes = current.sizes.filter((_, idx) => idx !== sizeIdx);
+      const updatedSizePrices = {
+        ...current.sizePrices,
+        [sizeName]: Math.max(1, Number(price) || 1)
+      };
       return {
         ...prev,
-        [productId]: { ...current, sizes: updatedSizes }
+        [productId]: {
+          ...current,
+          sizePrices: updatedSizePrices
+        }
       };
     });
   };
 
-  const handleMatrixAddSize = (productId: string, newSize: string) => {
+  const handleMatrixRemoveSize = (productId: string, sizeIdx: number) => {
+    setMatrixData(prev => {
+      const current = prev[productId];
+      if (!current) return prev;
+      const sizeToRemove = current.sizes[sizeIdx];
+      const updatedSizes = current.sizes.filter((_, idx) => idx !== sizeIdx);
+      const updatedSizePrices = { ...current.sizePrices };
+      if (sizeToRemove) {
+        delete updatedSizePrices[sizeToRemove];
+      }
+      return {
+        ...prev,
+        [productId]: {
+          ...current,
+          sizes: updatedSizes,
+          sizePrices: updatedSizePrices
+        }
+      };
+    });
+  };
+
+  const handleMatrixAddSize = (productId: string, newSize: string, price?: number) => {
     const trimmed = newSize.trim();
     if (!trimmed) return;
     setMatrixData(prev => {
       const current = prev[productId];
       if (!current || current.sizes.includes(trimmed)) return prev;
+      const sizePrice = price && price > 0 ? price : current.price;
       return {
         ...prev,
-        [productId]: { ...current, sizes: [...current.sizes, trimmed] }
+        [productId]: {
+          ...current,
+          sizes: [...current.sizes, trimmed],
+          sizePrices: {
+            ...current.sizePrices,
+            [trimmed]: sizePrice
+          }
+        }
       };
     });
   };
@@ -452,9 +518,10 @@ export const AdminPage = () => {
       await updateCalendarProduct(productId, {
         name: row.name,
         startingPrice: row.price,
-        sizes: row.sizes
+        sizes: row.sizes,
+        sizePrices: row.sizePrices
       });
-      showToast(`Updated "${row.name}" with Price ₹${row.price} and ${row.sizes.length} sizes.`);
+      showToast(`Updated "${row.name}" with Price ₹${row.price} and ${row.sizes.length} frame size rates.`);
       await loadData();
     } catch {
       showToast('Failed to save row changes', 'error');
@@ -467,72 +534,32 @@ export const AdminPage = () => {
         await updateCalendarProduct(id, {
           name: row.name,
           startingPrice: row.price,
-          sizes: row.sizes
+          sizes: row.sizes,
+          sizePrices: row.sizePrices
         });
       }
-      showToast('All products, prices, and sizes saved successfully!');
+      showToast('All products, frame size rates, and matrix changes saved successfully!');
       await loadData();
     } catch {
       showToast('Failed to save all matrix rows', 'error');
     }
   };
 
-  // Message Actions
+  // Customer Inquiries Message Actions
   const handleToggleMessageStatus = async (msg: CustomerMessage) => {
     const nextStatus: 'New' | 'Replied' = msg.status === 'New' ? 'Replied' : 'New';
     await updateMessageStatus(msg.id, nextStatus);
     const updated: CustomerMessage[] = messages.map(m => m.id === msg.id ? { ...m, status: nextStatus } : m);
     setMessages(updated);
-    showToast(`Message marked as ${nextStatus}`);
+    showToast(`Inquiry marked as ${nextStatus}`);
   };
 
-  const handleReplyWhatsApp = (msg: CustomerMessage) => {
-    const text = `Hello ${msg.name},\nThank you for contacting Amazing Ads Sivakasi regarding:\n"${msg.message}"\n\nOur factory team is ready with direct wholesale rates and sample proofs. Please share your required quantity and delivery location.`;
-    const cleanPhone = msg.phone.replace(/[^0-9]/g, '');
-    const url = cleanPhone.length >= 10
-      ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
-
-  // Editable Discount Tiers Handlers
-  const handleUpdateDiscountTier = (tierId: string, field: keyof DiscountTier, value: string | number) => {
-    setDiscountTiers(prev => prev.map(t => {
-      if (t.id === tierId) {
-        return {
-          ...t,
-          [field]: field === 'minQty' || field === 'discountPercentage' ? Number(value) : value
-        };
-      }
-      return t;
-    }));
-  };
-
-  const handleAddDiscountTier = () => {
-    const newTier: DiscountTier = {
-      id: `tier-${Date.now()}`,
-      minQty: 1000,
-      maxQty: '1,999',
-      discountPercentage: 20,
-      label: 'Custom Tier'
-    };
-    setDiscountTiers(prev => [...prev, newTier]);
-  };
-
-  const handleDeleteDiscountTier = (tierId: string) => {
-    setDiscountTiers(prev => prev.filter(t => t.id !== tierId));
-  };
-
-  const handleSaveDiscountTiers = () => {
-    saveStoredFactoryDiscounts(discountTiers);
-    showToast('Wholesale discount tiers updated & synced with Quote Calculator!');
-  };
-
-  // Editable Factory & Brand Settings Handlers
-  const handleSaveFactorySettings = (e: FormEvent) => {
-    e.preventDefault();
-    saveStoredFactorySettings(factorySettings);
-    showToast('Sivakasi factory and dispatch logistics settings saved successfully!');
+  const handleDeleteMessage = async (msgId: string) => {
+    if (window.confirm('Are you sure you want to remove this inquiry?')) {
+      await deleteCustomerMessage(msgId);
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      showToast('Inquiry deleted successfully');
+    }
   };
 
   const handleLogoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -563,11 +590,10 @@ export const AdminPage = () => {
 
   const handleResetFactoryDefaults = () => {
     if (window.confirm('Reset all factory details, logo, contact numbers and discount tiers back to Sivakasi factory defaults?')) {
-      setDiscountTiers([...DEFAULT_DISCOUNT_TIERS]);
       saveStoredFactoryDiscounts([...DEFAULT_DISCOUNT_TIERS]);
       setFactorySettings({ ...DEFAULT_FACTORY_SETTINGS });
       saveStoredFactorySettings({ ...DEFAULT_FACTORY_SETTINGS });
-      showToast('Factory specifications and discount tiers restored to defaults.');
+      showToast('Factory specifications and company settings restored to defaults.');
     }
   };
 
@@ -596,7 +622,7 @@ export const AdminPage = () => {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '24px',
-          fontFamily: "'Outfit', sans-serif"
+          fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif"
         }}
       >
         <div
@@ -653,7 +679,7 @@ export const AdminPage = () => {
                 🛡️
               </div>
             )}
-            <h2 style={{ fontSize: '1.7rem', fontWeight: 900, color: '#ffffff', margin: '0 0 6px', letterSpacing: '0.02em', fontFamily: "'Playfair Display', Georgia, serif" }}>
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 900, color: '#ffffff', margin: '0 0 6px', letterSpacing: '0.02em', fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
               Admin Portal
             </h2>
             <p style={{ fontSize: '0.88rem', color: '#e0f2fe', margin: 0, fontWeight: 500 }}>
@@ -791,7 +817,7 @@ export const AdminPage = () => {
         background: '#f8fafc',
         color: '#0f172a',
         display: 'flex',
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
         overflow: 'hidden'
       }}
     >
@@ -868,7 +894,7 @@ export const AdminPage = () => {
                 />
               ) : null}
               <div style={{ minWidth: 0, overflow: 'hidden' }}>
-                <div style={{ fontWeight: 800, fontSize: '1rem', color: '#ffffff', letterSpacing: '0.02em', lineHeight: 1.2, fontFamily: "'Playfair Display', Georgia, serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontWeight: 800, fontSize: '1rem', color: '#ffffff', letterSpacing: '0.02em', lineHeight: 1.2, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {factorySettings.factoryName || 'AMAZING ADS'}
                 </div>
                 <div style={{ fontSize: '0.68rem', color: '#e0f2fe', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700, marginTop: '2px' }}>
@@ -885,7 +911,7 @@ export const AdminPage = () => {
             Main Navigation
           </div>
 
-          {/* 1. CUSTOMER WHATSAPP INQUIRIES */}
+          {/* 1. CUSTOMER INQUIRIES */}
           <button
             onClick={() => setActiveTab('messages')}
             style={{
@@ -907,8 +933,8 @@ export const AdminPage = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <WhatsAppIcon size={18} color={activeTab === 'messages' ? '#e0f2fe' : '#25D366'} />
-              <span>WhatsApp Messages</span>
+              <InquiryIcon size={18} color={activeTab === 'messages' ? '#ffffff' : '#0284c7'} />
+              <span>Customer Inquiries</span>
             </div>
             {unreadMessagesCount > 0 ? (
               <span style={{ fontSize: '0.72rem', background: '#ef4444', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
@@ -979,30 +1005,6 @@ export const AdminPage = () => {
             </span>
           </button>
 
-          {/* 4. EDITABLE FACTORY & DISCOUNTS */}
-          <button
-            onClick={() => setActiveTab('discounts')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              width: '100%',
-              padding: '11px 14px',
-              borderRadius: '12px',
-              background: activeTab === 'discounts' ? BLUE_GRADIENT : '#ffffff',
-              border: `1px solid ${activeTab === 'discounts' ? 'transparent' : '#f1f5f9'}`,
-              color: activeTab === 'discounts' ? '#ffffff' : '#1e293b',
-              fontSize: '0.88rem',
-              fontWeight: activeTab === 'discounts' ? 800 : 600,
-              cursor: 'pointer',
-              textAlign: 'left',
-              boxShadow: activeTab === 'discounts' ? '0 4px 16px rgba(2, 132, 199, 0.35)' : 'none',
-              transition: 'all 0.18s ease'
-            }}
-          >
-            <span>🏭</span>
-            <span>Factory & Discounts</span>
-          </button>
 
           {/* 5. QUOTES & LEADS */}
           <button
@@ -1160,13 +1162,12 @@ export const AdminPage = () => {
             </button>
             <div>
               <div style={{ fontSize: '0.72rem', color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800 }}>
-                Admin Portal / {activeTab === 'messages' ? 'Customer WhatsApp Messages' : activeTab === 'catalog' ? 'Products & Catalog' : activeTab === 'matrix' ? 'Price & Size Matrix' : activeTab === 'discounts' ? 'Factory & Wholesale Discounts' : activeTab === 'quotes' ? 'Quotes & Online Estimates' : 'Settings & Contact Details'}
+                Admin Portal / {activeTab === 'messages' ? 'Customer Inquiries' : activeTab === 'catalog' ? 'Products & Catalog' : activeTab === 'matrix' ? 'Price & Size Matrix' : activeTab === 'quotes' ? 'Quotes & Online Estimates' : 'Settings & Contact Details'}
               </div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
-                {activeTab === 'messages' && 'Customer WhatsApp Inquiries & Messages'}
+              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
+                {activeTab === 'messages' && 'Customer Inquiries & Form Submissions'}
                 {activeTab === 'catalog' && 'Product Specifications & Catalog Management'}
                 {activeTab === 'matrix' && 'Quick Price & Size Bulk Matrix'}
-                {activeTab === 'discounts' && 'Factory & Wholesale Discounts Configuration'}
                 {activeTab === 'quotes' && 'Quotes & Online Estimates'}
                 {activeTab === 'settings' && 'Company Settings, Logo & Contact Details'}
               </h2>
@@ -1212,30 +1213,30 @@ export const AdminPage = () => {
         {/* Dashboard Main Content */}
         <main style={{ padding: '26px 28px', flex: 1, height: 'calc(100vh - 70px)', overflowY: 'auto', background: '#f8fafc' }}>
 
-          {/* TAB 1: CUSTOMER WHATSAPP MESSAGES */}
+          {/* TAB 1: CUSTOMER INQUIRIES & FORM SUBMISSIONS */}
           {activeTab === 'messages' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <WhatsAppIcon size={24} color="#25D366" />
-                    <span>Customer WhatsApp Messages ({messages.length})</span>
+                    <InquiryIcon size={24} color="#0284c7" />
+                    <span>Customer Inquiries ({messages.length})</span>
                   </h3>
                   <p style={{ color: '#64748b', fontSize: '0.84rem', margin: '4px 0 0' }}>
-                    Messages submitted through the public website's WhatsApp button are captured here live.
+                    Inquiries submitted via Website Contact Form, Customizer Orders, Cart Drawer, and Sample Kit Requests appear here live.
                   </p>
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <span style={{ background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '4px 12px', borderRadius: '14px', fontSize: '0.76rem', fontWeight: 700 }}>
-                    {unreadMessagesCount} New Unreplied
+                    {unreadMessagesCount} New Inquiries
                   </span>
                 </div>
               </div>
 
               {messages.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '48px 0', color: '#64748b' }}>
-                  No customer messages received yet. Send a test message from the public website's WhatsApp button!
+                  No customer inquiries received yet. When visitors submit forms on the public website, they appear here live!
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1243,8 +1244,8 @@ export const AdminPage = () => {
                     <div
                       key={msg.id}
                       style={{
-                        background: msg.status === 'New' ? '#f8fafc' : '#ffffff',
-                        border: `1px solid ${msg.status === 'New' ? '#bae6fd' : '#e2e8f0'}`,
+                        background: msg.status === 'New' ? '#f0f9ff' : '#ffffff',
+                        border: `1px solid ${msg.status === 'New' ? '#7dd3fc' : '#e2e8f0'}`,
                         borderRadius: '14px',
                         padding: '18px',
                         display: 'flex',
@@ -1256,16 +1257,43 @@ export const AdminPage = () => {
                       }}
                     >
                       <div style={{ flex: '1 1 320px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                          <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.02rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.04rem' }}>
                             {msg.name}
                           </span>
-                          <span style={{ fontSize: '0.84rem', color: '#0284c7', fontWeight: 700 }}>
+                          <a
+                            href={`tel:${msg.phone}`}
+                            style={{
+                              fontSize: '0.86rem',
+                              color: '#0284c7',
+                              fontWeight: 700,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
                             📞 {msg.phone}
-                          </span>
+                          </a>
+                          {msg.email && (
+                            <a
+                              href={`mailto:${msg.email}`}
+                              style={{
+                                fontSize: '0.82rem',
+                                color: '#0369a1',
+                                fontWeight: 600,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              ✉️ {msg.email}
+                            </a>
+                          )}
                           <span
                             style={{
-                              background: msg.status === 'New' ? '#25D366' : '#94a3b8',
+                              background: msg.status === 'New' ? '#0284c7' : '#94a3b8',
                               color: '#fff',
                               padding: '2px 8px',
                               borderRadius: '10px',
@@ -1277,6 +1305,27 @@ export const AdminPage = () => {
                           </span>
                         </div>
 
+                        {/* Order / Product Specifications if provided */}
+                        {(msg.product || msg.size || msg.quantity) && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '6px 0 10px' }}>
+                            {msg.product && (
+                              <span style={{ background: '#e0f2fe', border: '1px solid #bae6fd', color: '#0369a1', borderRadius: '6px', padding: '2px 8px', fontSize: '0.76rem', fontWeight: 700 }}>
+                                📦 {msg.product}
+                              </span>
+                            )}
+                            {msg.size && (
+                              <span style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#065f46', borderRadius: '6px', padding: '2px 8px', fontSize: '0.76rem', fontWeight: 700 }}>
+                                📏 Frame Size: {msg.size}
+                              </span>
+                            )}
+                            {msg.quantity && (
+                              <span style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#92400e', borderRadius: '6px', padding: '2px 8px', fontSize: '0.76rem', fontWeight: 700 }}>
+                                🔢 Qty: {Number(msg.quantity).toLocaleString()} units
+                              </span>
+                            )}
+                          </div>
+                        )}
+
                         <div
                           style={{
                             background: '#ffffff',
@@ -1286,38 +1335,64 @@ export const AdminPage = () => {
                             color: '#1e293b',
                             fontSize: '0.9rem',
                             lineHeight: 1.5,
-                            marginBottom: '6px'
+                            marginBottom: '6px',
+                            whiteSpace: 'pre-line'
                           }}
                         >
-                          "{msg.message}"
+                          {msg.message}
                         </div>
+
+                        {msg.notes && (
+                          <div style={{ fontSize: '0.8rem', color: '#64748b', fontStyle: 'italic', marginBottom: '6px' }}>
+                            📝 Additional Details: {msg.notes}
+                          </div>
+                        )}
 
                         <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
                           Received: {new Date(msg.createdAt).toLocaleString()}
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <button
-                          onClick={() => handleReplyWhatsApp(msg)}
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <a
+                          href={`tel:${msg.phone}`}
                           style={{
-                            background: '#25D366',
-                            border: 'none',
+                            background: BLUE_GRADIENT,
                             color: '#ffffff',
                             padding: '9px 16px',
                             borderRadius: '10px',
                             fontSize: '0.82rem',
                             fontWeight: 800,
-                            cursor: 'pointer',
-                            display: 'flex',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
                             alignItems: 'center',
                             gap: '6px',
-                            boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)'
+                            boxShadow: '0 2px 8px rgba(2, 132, 199, 0.3)'
                           }}
                         >
-                          <WhatsAppIcon size={16} color="#ffffff" />
-                          <span>Reply via WhatsApp</span>
-                        </button>
+                          <span>📞 Call Customer</span>
+                        </a>
+
+                        {msg.email && (
+                          <a
+                            href={`mailto:${msg.email}`}
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #0284c7',
+                              color: '#0284c7',
+                              padding: '8px 14px',
+                              borderRadius: '10px',
+                              fontSize: '0.82rem',
+                              fontWeight: 700,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <span>✉️ Email</span>
+                          </a>
+                        )}
 
                         <button
                           onClick={() => handleToggleMessageStatus(msg)}
@@ -1333,6 +1408,23 @@ export const AdminPage = () => {
                           }}
                         >
                           {msg.status === 'New' ? 'Mark Replied' : 'Mark New'}
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteMessage(msg.id)}
+                          style={{
+                            background: '#fee2e2',
+                            border: '1px solid #fecaca',
+                            color: '#dc2626',
+                            padding: '9px 12px',
+                            borderRadius: '10px',
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                          title="Delete Inquiry"
+                        >
+                          🗑️
                         </button>
                       </div>
                     </div>
@@ -1444,7 +1536,7 @@ export const AdminPage = () => {
                         <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                           <h4
                             style={{
-                              fontFamily: "'Playfair Display', Georgia, serif",
+                              fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
                               fontWeight: 700,
                               fontSize: '1.14rem',
                               color: '#0f172a',
@@ -1513,16 +1605,16 @@ export const AdminPage = () => {
             </div>
           )}
 
-          {/* TAB 3: BULK PRICE & SIZE MATRIX (NO SPINNERS) */}
+          {/* TAB 3: BULK PRICE & FRAME SIZE MATRIX */}
           {activeTab === 'matrix' && (
             <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
-                    Fast Bulk Matrix Editor
+                    Fast Bulk Matrix & Frame Size Pricing
                   </h3>
                   <p style={{ color: '#64748b', fontSize: '0.84rem', margin: '4px 0 0' }}>
-                    Edit product names, wholesale base prices, and sizes inline across all catalog items without spinner arrows.
+                    Edit product titles, base starting rates, and individual prices for each frame size inline without spinner arrows.
                   </p>
                 </div>
                 <button
@@ -1548,15 +1640,20 @@ export const AdminPage = () => {
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
                       <th style={{ padding: '10px 12px' }}>Photo</th>
-                      <th style={{ padding: '10px 12px' }}>Product Title</th>
-                      <th style={{ padding: '10px 12px', width: '140px' }}>Price (₹)</th>
-                      <th style={{ padding: '10px 12px' }}>Sizes Manager</th>
+                      <th style={{ padding: '10px 12px', minWidth: '180px' }}>Product Title</th>
+                      <th style={{ padding: '10px 12px', width: '120px' }}>Base Rate (₹)</th>
+                      <th style={{ padding: '10px 12px', minWidth: '380px' }}>Frame Sizes & Size-Wise Prices (₹)</th>
                       <th style={{ padding: '10px 12px', textAlign: 'right' }}>Save</th>
                     </tr>
                   </thead>
                   <tbody>
                     {products.map((p) => {
-                      const row = matrixData[p.id] || { name: p.name, price: p.startingPrice, sizes: p.sizes || [] };
+                      const row = matrixData[p.id] || {
+                        name: p.name,
+                        price: p.startingPrice,
+                        sizes: p.sizes || [],
+                        sizePrices: p.sizePrices || {}
+                      };
 
                       return (
                         <tr key={p.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
@@ -1580,7 +1677,7 @@ export const AdminPage = () => {
                                 borderRadius: '8px',
                                 padding: '7px 10px',
                                 fontSize: '0.94rem',
-                                fontFamily: "'Playfair Display', Georgia, serif",
+                                fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
                                 fontWeight: 700,
                                 color: '#0f172a',
                                 WebkitTextFillColor: '#0f172a'
@@ -1590,7 +1687,6 @@ export const AdminPage = () => {
                           <td style={{ padding: '10px 12px' }}>
                             <div style={{ position: 'relative' }}>
                               <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 800 }}>₹</span>
-                              {/* NO SPINNER ARROWS */}
                               <input
                                 type="number"
                                 min={1}
@@ -1614,49 +1710,80 @@ export const AdminPage = () => {
                             </div>
                           </td>
                           <td style={{ padding: '10px 12px' }}>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
-                              {row.sizes.map((sz, szIdx) => (
-                                <span
-                                  key={szIdx}
-                                  style={{
-                                    background: '#f0f9ff',
-                                    border: '1px solid #bae6fd',
-                                    padding: '2px 8px',
-                                    borderRadius: '6px',
-                                    fontSize: '0.74rem',
-                                    color: '#0369a1',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                  }}
-                                >
-                                  <span>{sz}</span>
-                                  <button
-                                    onClick={() => handleMatrixRemoveSize(p.id, szIdx)}
-                                    style={{ background: 'transparent', border: 'none', color: '#dc2626', cursor: 'pointer', padding: 0, fontWeight: 900 }}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                              {row.sizes.map((sz, szIdx) => {
+                                const sizePrice = row.sizePrices?.[sz] ?? row.price;
+                                return (
+                                  <div
+                                    key={szIdx}
+                                    style={{
+                                      background: '#f0f9ff',
+                                      border: '1px solid #bae6fd',
+                                      borderRadius: '8px',
+                                      padding: '4px 8px',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '6px'
+                                    }}
                                   >
-                                    ×
-                                  </button>
-                                </span>
-                              ))}
+                                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0369a1' }}>
+                                      {sz}:
+                                    </span>
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', borderRadius: '5px', border: '1px solid #7dd3fc', padding: '1px 4px' }}>
+                                      <span style={{ fontSize: '0.72rem', color: '#0284c7', fontWeight: 800 }}>₹</span>
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        className="no-spinners"
+                                        value={sizePrice}
+                                        onChange={(e) => handleMatrixSizePriceChange(p.id, sz, Number(e.target.value))}
+                                        style={{
+                                          width: '52px',
+                                          border: 'none',
+                                          background: 'transparent',
+                                          fontSize: '0.8rem',
+                                          fontWeight: 800,
+                                          color: '#0f172a',
+                                          textAlign: 'center',
+                                          padding: '2px 0'
+                                        }}
+                                      />
+                                    </div>
+                                    <button
+                                      onClick={() => handleMatrixRemoveSize(p.id, szIdx)}
+                                      style={{ background: 'transparent', border: 'none', color: '#dc2626', cursor: 'pointer', padding: 0, fontWeight: 900, fontSize: '0.9rem' }}
+                                      title="Remove size"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                );
+                              })}
                             </div>
                             <button
                               onClick={() => {
-                                const customSize = window.prompt(`Enter new size for ${row.name}:`, '15 × 20 in');
-                                if (customSize) handleMatrixAddSize(p.id, customSize);
+                                const customSize = window.prompt(`Enter frame size for "${row.name}" (e.g. 15 × 20 in):`, '15 × 20 in');
+                                if (customSize) {
+                                  const customPriceStr = window.prompt(`Enter wholesale price (₹) for "${customSize}":`, String(row.price));
+                                  const customPrice = customPriceStr ? Number(customPriceStr) : row.price;
+                                  handleMatrixAddSize(p.id, customSize, customPrice);
+                                }
                               }}
                               style={{
                                 background: '#ffffff',
                                 border: '1px dashed #0284c7',
                                 color: '#0284c7',
-                                padding: '3px 8px',
+                                padding: '4px 10px',
                                 borderRadius: '6px',
-                                fontSize: '0.72rem',
+                                fontSize: '0.74rem',
                                 fontWeight: 700,
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
                               }}
                             >
-                              + Add Size
+                              <span>+ Add Frame Size & Price</span>
                             </button>
                           </td>
                           <td style={{ padding: '10px 12px', textAlign: 'right' }}>
@@ -1666,8 +1793,8 @@ export const AdminPage = () => {
                                 background: BLUE_GRADIENT_LIGHT,
                                 border: 'none',
                                 color: '#ffffff',
-                                padding: '6px 14px',
-                                borderRadius: '6px',
+                                padding: '7px 16px',
+                                borderRadius: '8px',
                                 fontSize: '0.8rem',
                                 fontWeight: 800,
                                 cursor: 'pointer'
@@ -1685,380 +1812,9 @@ export const AdminPage = () => {
             </div>
           )}
 
-          {/* TAB 4: EDITABLE FACTORY & DISCOUNTS CONFIGURATION */}
-          {activeTab === 'discounts' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              
-              {/* 1. EDITABLE WHOLESALE DISCOUNT TIERS (NO SPINNERS) */}
-              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
-                      Wholesale Volume Discount Tiers (Fully Editable)
-                    </h3>
-                    <p style={{ color: '#64748b', fontSize: '0.84rem', margin: '4px 0 0' }}>
-                      Changes saved here immediately update the online Quote Calculator for customers.
-                    </p>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button
-                      type="button"
-                      onClick={handleAddDiscountTier}
-                      style={{
-                        background: '#f8fafc',
-                        border: '1px solid #bae6fd',
-                        color: '#0284c7',
-                        padding: '8px 16px',
-                        borderRadius: '8px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      + Add Discount Tier
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveDiscountTiers}
-                      style={{
-                        background: BLUE_GRADIENT,
-                        border: 'none',
-                        color: '#ffffff',
-                        padding: '8px 20px',
-                        borderRadius: '8px',
-                        fontSize: '0.84rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)'
-                      }}
-                    >
-                      💾 Save Discount Tiers
-                    </button>
-                  </div>
-                </div>
 
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
-                        <th style={{ padding: '10px 12px' }}>Tier Label</th>
-                        <th style={{ padding: '10px 12px', width: '160px' }}>Min Qty (Units)</th>
-                        <th style={{ padding: '10px 12px', width: '160px' }}>Max Range Text</th>
-                        <th style={{ padding: '10px 12px', width: '160px' }}>Discount (%)</th>
-                        <th style={{ padding: '10px 12px', textAlign: 'right', width: '80px' }}>Remove</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {discountTiers.map((t) => (
-                        <tr key={t.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '10px 12px' }}>
-                            <input
-                              type="text"
-                              value={t.label}
-                              onChange={(e) => handleUpdateDiscountTier(t.id, 'label', e.target.value)}
-                              style={{
-                                width: '100%',
-                                background: '#f8fafc',
-                                border: '1px solid #bae6fd',
-                                borderRadius: '8px',
-                                padding: '7px 10px',
-                                fontSize: '0.86rem',
-                                color: '#0f172a'
-                              }}
-                            />
-                          </td>
-                          <td style={{ padding: '10px 12px' }}>
-                            <input
-                              type="number"
-                              min={1}
-                              className="no-spinners"
-                              value={t.minQty}
-                              onChange={(e) => handleUpdateDiscountTier(t.id, 'minQty', e.target.value)}
-                              style={{
-                                width: '100%',
-                                background: '#f8fafc',
-                                border: '1px solid #bae6fd',
-                                borderRadius: '8px',
-                                padding: '7px 10px',
-                                fontSize: '0.88rem',
-                                fontWeight: 800,
-                                color: '#0f172a',
-                                appearance: 'none',
-                                MozAppearance: 'textfield'
-                              }}
-                            />
-                          </td>
-                          <td style={{ padding: '10px 12px' }}>
-                            <input
-                              type="text"
-                              value={t.maxQty}
-                              onChange={(e) => handleUpdateDiscountTier(t.id, 'maxQty', e.target.value)}
-                              style={{
-                                width: '100%',
-                                background: '#f8fafc',
-                                border: '1px solid #bae6fd',
-                                borderRadius: '8px',
-                                padding: '7px 10px',
-                                fontSize: '0.86rem',
-                                color: '#0f172a'
-                              }}
-                            />
-                          </td>
-                          <td style={{ padding: '10px 12px' }}>
-                            <div style={{ position: 'relative' }}>
-                              <input
-                                type="number"
-                                min={0}
-                                max={100}
-                                className="no-spinners"
-                                value={t.discountPercentage}
-                                onChange={(e) => handleUpdateDiscountTier(t.id, 'discountPercentage', e.target.value)}
-                                style={{
-                                  width: '100%',
-                                  background: '#f8fafc',
-                                  border: '1px solid #bae6fd',
-                                  borderRadius: '8px',
-                                  padding: '7px 24px 7px 10px',
-                                  fontSize: '0.9rem',
-                                  fontWeight: 900,
-                                  color: '#0284c7',
-                                  appearance: 'none',
-                                  MozAppearance: 'textfield'
-                                }}
-                              />
-                              <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontWeight: 900, color: '#0284c7' }}>%</span>
-                            </div>
-                          </td>
-                          <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteDiscountTier(t.id)}
-                              style={{
-                                background: '#fee2e2',
-                                border: '1px solid #fecaca',
-                                color: '#dc2626',
-                                padding: '6px 10px',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '0.8rem'
-                              }}
-                              title="Delete Tier"
-                            >
-                              🗑️
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
 
-              {/* 2. EDITABLE FACTORY & LOGISTICS SPECIFICATIONS */}
-              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
-                      Sivakasi Works Factory & Logistics Specifications (Editable)
-                    </h3>
-                    <p style={{ color: '#64748b', fontSize: '0.84rem', margin: '4px 0 0' }}>
-                      Update factory address, hotline numbers, lead times, and freight carriers.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleResetFactoryDefaults}
-                    style={{
-                      background: '#fee2e2',
-                      border: '1px solid #fecaca',
-                      color: '#dc2626',
-                      padding: '7px 14px',
-                      borderRadius: '8px',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    ↺ Reset to Default Factory Specs
-                  </button>
-                </div>
 
-                <form onSubmit={handleSaveFactorySettings}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                        Factory Name / Title
-                      </label>
-                      <input
-                        type="text"
-                        value={factorySettings.factoryName}
-                        onChange={(e) => setFactorySettings({ ...factorySettings, factoryName: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#f8fafc',
-                          border: '1px solid #bae6fd',
-                          borderRadius: '8px',
-                          padding: '9px 12px',
-                          fontSize: '0.88rem',
-                          color: '#0f172a',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                        Factory Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={factorySettings.email}
-                        onChange={(e) => setFactorySettings({ ...factorySettings, email: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#f8fafc',
-                          border: '1px solid #bae6fd',
-                          borderRadius: '8px',
-                          padding: '9px 12px',
-                          fontSize: '0.88rem',
-                          color: '#0f172a',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                      Sivakasi Works Full Address
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={factorySettings.address}
-                      onChange={(e) => setFactorySettings({ ...factorySettings, address: e.target.value })}
-                      style={{
-                        width: '100%',
-                        background: '#f8fafc',
-                        border: '1px solid #bae6fd',
-                        borderRadius: '8px',
-                        padding: '9px 12px',
-                        fontSize: '0.88rem',
-                        color: '#0f172a',
-                        resize: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '16px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                        Factory Hotlines / Phones
-                      </label>
-                      <input
-                        type="text"
-                        value={factorySettings.phone}
-                        onChange={(e) => setFactorySettings({ ...factorySettings, phone: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#f8fafc',
-                          border: '1px solid #bae6fd',
-                          borderRadius: '8px',
-                          padding: '9px 12px',
-                          fontSize: '0.88rem',
-                          color: '#0f172a',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                        Standard Orders Turnaround
-                      </label>
-                      <input
-                        type="text"
-                        value={factorySettings.standardLeadTime}
-                        onChange={(e) => setFactorySettings({ ...factorySettings, standardLeadTime: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#f8fafc',
-                          border: '1px solid #bae6fd',
-                          borderRadius: '8px',
-                          padding: '9px 12px',
-                          fontSize: '0.88rem',
-                          color: '#0f172a',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                        Bulk Lots Turnaround (2000+)
-                      </label>
-                      <input
-                        type="text"
-                        value={factorySettings.bulkLeadTime}
-                        onChange={(e) => setFactorySettings({ ...factorySettings, bulkLeadTime: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#f8fafc',
-                          border: '1px solid #bae6fd',
-                          borderRadius: '8px',
-                          padding: '9px 12px',
-                          fontSize: '0.88rem',
-                          color: '#0f172a',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                      Contracted Transport Logistics Carriers
-                    </label>
-                    <input
-                      type="text"
-                      value={factorySettings.carriers}
-                      onChange={(e) => setFactorySettings({ ...factorySettings, carriers: e.target.value })}
-                      style={{
-                        width: '100%',
-                        background: '#f8fafc',
-                        border: '1px solid #bae6fd',
-                        borderRadius: '8px',
-                        padding: '9px 12px',
-                        fontSize: '0.88rem',
-                        color: '#0f172a',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button
-                      type="submit"
-                      style={{
-                        background: BLUE_GRADIENT,
-                        border: 'none',
-                        color: '#ffffff',
-                        padding: '10px 26px',
-                        borderRadius: '10px',
-                        fontSize: '0.9rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)'
-                      }}
-                    >
-                      💾 Save Factory & Logistics Settings
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-            </div>
-          )}
 
           {/* TAB 5: QUOTES & INQUIRIES */}
           {activeTab === 'quotes' && (
@@ -2090,7 +1846,7 @@ export const AdminPage = () => {
                           style={{
                             padding: '10px 12px',
                             color: '#0f172a',
-                            fontFamily: "'Playfair Display', Georgia, serif",
+                            fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
                             fontWeight: 700,
                             fontSize: '0.92rem'
                           }}
@@ -2100,28 +1856,24 @@ export const AdminPage = () => {
                         <td style={{ padding: '10px 12px', fontWeight: 800 }}>{q.quantity} units</td>
                         <td style={{ padding: '10px 12px', fontWeight: 900, color: '#16a34a' }}>₹{q.totalPrice.toLocaleString()}</td>
                         <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                          <button
-                            onClick={() => {
-                              const text = `Hello ${q.clientName},\nRegarding your quote for ${q.quantity} units of ${q.product} (₹${q.totalPrice}): our Sivakasi works can dispatch within 4 business days.`;
-                              window.open(`https://wa.me/${q.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
-                            }}
+                          <a
+                            href={`tel:${q.phone}`}
                             style={{
-                              background: '#25D366',
-                              border: 'none',
+                              background: BLUE_GRADIENT,
                               color: '#fff',
-                              padding: '6px 14px',
+                              padding: '7px 16px',
                               borderRadius: '8px',
-                              fontSize: '0.78rem',
+                              fontSize: '0.8rem',
                               fontWeight: 800,
-                              cursor: 'pointer',
+                              textDecoration: 'none',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '6px'
+                              gap: '6px',
+                              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)'
                             }}
                           >
-                            <WhatsAppIcon size={14} color="#ffffff" />
-                            <span>WhatsApp</span>
-                          </button>
+                            <span>📞 Call Customer</span>
+                          </a>
                         </td>
                       </tr>
                     ))}
@@ -2150,11 +1902,11 @@ export const AdminPage = () => {
                 }}
               >
                 <div>
-                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
                     Company Settings, Logo & Contact Details
                   </h3>
                   <p style={{ color: '#64748b', fontSize: '0.86rem', margin: '4px 0 0' }}>
-                    Configure official company branding, upload custom logo, update phone numbers, WhatsApp, emails, and factory address.
+                    Configure official company branding, upload custom logo, update phone numbers, emails, and factory address.
                   </p>
                 </div>
 
@@ -2209,7 +1961,7 @@ export const AdminPage = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                     <span style={{ fontSize: '1.3rem' }}>🎨</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
                       Company Logo & Visual Identity
                     </h4>
                   </div>
@@ -2354,7 +2106,7 @@ export const AdminPage = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                     <span style={{ fontSize: '1.3rem' }}>🏢</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
                       Company Profile & Business Details
                     </h4>
                   </div>
@@ -2481,7 +2233,7 @@ export const AdminPage = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                     <span style={{ fontSize: '1.3rem' }}>📞</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
                       Contact Details & Customer Hotlines
                     </h4>
                   </div>
@@ -2532,13 +2284,17 @@ export const AdminPage = () => {
 
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                        Official WhatsApp Business Number *
+                        Factory Helpline / Secondary Phone *
                       </label>
                       <input
                         type="text"
                         required
-                        value={factorySettings.whatsapp}
-                        onChange={(e) => setFactorySettings({ ...factorySettings, whatsapp: e.target.value })}
+                        value={factorySettings.secondaryPhone || factorySettings.whatsapp || '+91 97904 27670'}
+                        onChange={(e) => setFactorySettings({
+                          ...factorySettings,
+                          secondaryPhone: e.target.value,
+                          whatsapp: e.target.value
+                        })}
                         style={{
                           width: '100%',
                           background: '#f8fafc',
@@ -2633,7 +2389,7 @@ export const AdminPage = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                     <span style={{ fontSize: '1.3rem' }}>🚚</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
                       Production Turnarounds & Freight Logistics
                     </h4>
                   </div>
@@ -2784,7 +2540,7 @@ export const AdminPage = () => {
                   style={{
                     fontSize: '1.35rem',
                     fontWeight: 700,
-                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
                     color: '#0f172a',
                     margin: 0
                   }}
@@ -2792,7 +2548,7 @@ export const AdminPage = () => {
                   {isEditing ? `Edit: ${formData.name}` : 'Add New Calendar Edition'}
                 </h3>
                 <p style={{ color: '#0284c7', fontSize: '0.82rem', margin: '3px 0 0', fontWeight: 600 }}>
-                  Upload image, configure product name, starting price without spinners, sizes, and specs.
+                  Enter product name, category, frame size rates, and upload image from your device.
                 </p>
               </div>
               <button
@@ -2810,154 +2566,124 @@ export const AdminPage = () => {
             </div>
 
             <form onSubmit={handleSaveProduct}>
-              {/* Product Name & Starting Price (NO SPINNERS) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: '14px', marginBottom: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '6px' }}>
-                    Product Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Gold / Silver PET Foil Calendar"
-                    style={{
-                      width: '100%',
-                      background: '#ffffff',
-                      border: '1px solid #bae6fd',
-                      borderRadius: '8px',
-                      padding: '10px 12px',
-                      color: '#0f172a',
-                      WebkitTextFillColor: '#0f172a',
-                      fontFamily: "'Playfair Display', Georgia, serif",
-                      fontWeight: 700,
-                      fontSize: '0.96rem',
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '6px' }}>
-                    Starting Price (₹) * (No Spinners)
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 900 }}>₹</span>
-                    {/* NO INCREASE/DECREASE SPINNERS */}
-                    <input
-                      type="number"
-                      required
-                      min={1}
-                      className="no-spinners"
-                      value={formData.startingPrice}
-                      onChange={(e) => setFormData({ ...formData, startingPrice: Number(e.target.value) })}
-                      style={{
-                        width: '100%',
-                        background: '#ffffff',
-                        border: '1px solid #bae6fd',
-                        borderRadius: '8px',
-                        padding: '10px 10px 10px 24px',
-                        color: '#0f172a',
-                        WebkitTextFillColor: '#0f172a',
-                        fontSize: '0.95rem',
-                        fontWeight: 900,
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                        appearance: 'none',
-                        MozAppearance: 'textfield'
-                      }}
-                    />
-                  </div>
-                </div>
+              {/* 1. PRODUCT NAME */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '6px' }}>
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Gold / Silver PET Foil Calendar"
+                  style={{
+                    width: '100%',
+                    background: '#ffffff',
+                    border: '1px solid #bae6fd',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#0f172a',
+                    WebkitTextFillColor: '#0f172a',
+                    fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
+                    fontWeight: 700,
+                    fontSize: '0.96rem',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
               </div>
 
-              {/* Category & Tag */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                    Category
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    style={{
-                      width: '100%',
-                      background: '#ffffff',
-                      border: '1px solid #bae6fd',
-                      borderRadius: '8px',
-                      padding: '9px 12px',
-                      color: '#0f172a',
-                      WebkitTextFillColor: '#0f172a',
-                      fontSize: '0.86rem',
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                    Badge Tag
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.tag}
-                    onChange={(e) => setFormData({ ...formData, tag: e.target.value })}
-                    style={{
-                      width: '100%',
-                      background: '#ffffff',
-                      border: '1px solid #bae6fd',
-                      borderRadius: '8px',
-                      padding: '9px 12px',
-                      color: '#0f172a',
-                      WebkitTextFillColor: '#0f172a',
-                      fontSize: '0.86rem',
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
+              {/* 2. CATEGORY */}
+              <div style={{ marginBottom: '18px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '6px' }}>
+                  Category
+                </label>
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g. Devotional Calendars / Premium Foils / 5D Holographic"
+                  style={{
+                    width: '100%',
+                    background: '#ffffff',
+                    border: '1px solid #bae6fd',
+                    borderRadius: '8px',
+                    padding: '9px 12px',
+                    color: '#0f172a',
+                    WebkitTextFillColor: '#0f172a',
+                    fontSize: '0.88rem',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
               </div>
 
-              {/* SIZES MANAGEMENT */}
+              {/* 3. FRAME SIZES & SPECIFIC RATES MANAGER * (WITHOUT QUICK PRESETS) */}
               <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '14px', padding: '16px', marginBottom: '18px' }}>
-                <span style={{ fontSize: '0.84rem', fontWeight: 900, color: '#0c4a6e', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                  Available Sizes Manager *
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '0.84rem', fontWeight: 900, color: '#0c4a6e', textTransform: 'uppercase' }}>
+                    Frame Sizes & Specific Rates Manager *
+                  </span>
+                  <span style={{ fontSize: '0.74rem', color: '#0284c7', fontWeight: 700 }}>
+                    Set unique wholesale rate (₹) per frame size
+                  </span>
+                </div>
                 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', minHeight: '36px', background: '#ffffff', padding: '8px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-                  {formData.sizes && formData.sizes.map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        background: '#e0f2fe',
-                        border: '1px solid #bae6fd',
-                        color: '#0369a1',
-                        borderRadius: '6px',
-                        padding: '4px 10px',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <span>📏 {s}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSize(idx)}
-                        style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontWeight: 900, fontSize: '0.9rem', padding: 0 }}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px', minHeight: '44px', background: '#ffffff', padding: '10px', borderRadius: '10px', border: '1px solid #bae6fd' }}>
+                  {formData.sizes && formData.sizes.map((s, idx) => {
+                    const currentPrice = formData.sizePrices?.[s] ?? formData.startingPrice ?? 125;
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          background: '#e0f2fe',
+                          border: '1px solid #bae6fd',
+                          borderRadius: '8px',
+                          padding: '5px 10px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
+                        <span style={{ fontWeight: 800, fontSize: '0.82rem', color: '#0369a1' }}>
+                          📏 {s}
+                        </span>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', borderRadius: '5px', border: '1px solid #7dd3fc', padding: '1px 5px' }}>
+                          <span style={{ fontSize: '0.74rem', color: '#0284c7', fontWeight: 800 }}>₹</span>
+                          <input
+                            type="number"
+                            min={1}
+                            className="no-spinners"
+                            value={currentPrice}
+                            onChange={(e) => handleUpdateSizePrice(s, Number(e.target.value))}
+                            style={{
+                              width: '54px',
+                              border: 'none',
+                              background: 'transparent',
+                              fontSize: '0.82rem',
+                              fontWeight: 800,
+                              color: '#0f172a',
+                              textAlign: 'center',
+                              padding: '2px 0'
+                            }}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSize(idx)}
+                          style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontWeight: 900, fontSize: '1rem', padding: 0 }}
+                          title="Remove this size"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                {/* Add New Frame Size with Specific Price (NO PRESETS) */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <input
                     type="text"
                     value={newSizeInput}
@@ -2968,9 +2694,9 @@ export const AdminPage = () => {
                         handleAddSize();
                       }
                     }}
-                    placeholder="Type custom size (e.g. 15 × 20 inches / Royal Mandir)"
+                    placeholder="Size name (e.g. 15 × 20 in)"
                     style={{
-                      flex: 1,
+                      flex: '1 1 200px',
                       background: '#ffffff',
                       border: '1px solid #7dd3fc',
                       borderRadius: '8px',
@@ -2981,6 +2707,29 @@ export const AdminPage = () => {
                       outline: 'none'
                     }}
                   />
+                  <div style={{ position: 'relative', width: '120px' }}>
+                    <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 800 }}>₹</span>
+                    <input
+                      type="number"
+                      min={1}
+                      className="no-spinners"
+                      value={newSizePriceInput}
+                      onChange={(e) => setNewSizePriceInput(e.target.value)}
+                      placeholder="Rate"
+                      style={{
+                        width: '100%',
+                        background: '#ffffff',
+                        border: '1px solid #7dd3fc',
+                        borderRadius: '8px',
+                        padding: '8px 8px 8px 22px',
+                        fontSize: '0.86rem',
+                        fontWeight: 800,
+                        color: '#0f172a',
+                        WebkitTextFillColor: '#0f172a',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => handleAddSize()}
@@ -2988,45 +2737,23 @@ export const AdminPage = () => {
                       background: BLUE_GRADIENT,
                       border: 'none',
                       color: '#ffffff',
-                      padding: '8px 16px',
+                      padding: '8px 18px',
                       borderRadius: '8px',
                       fontSize: '0.82rem',
                       fontWeight: 800,
                       cursor: 'pointer'
                     }}
                   >
-                    + Add Size
+                    + Add Size & Price
                   </button>
-                </div>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                  {SIZE_PRESETS.map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleAddSize(preset)}
-                      style={{
-                        background: '#ffffff',
-                        border: '1px solid #bae6fd',
-                        color: '#0369a1',
-                        padding: '3px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.74rem',
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      + {preset}
-                    </button>
-                  ))}
                 </div>
               </div>
 
-              {/* ADMIN IMAGE UPLOAD FROM DEVICE & PRESETS (Requested Feature) */}
-              <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '14px', padding: '16px', marginBottom: '18px' }}>
+              {/* 4. PRODUCT MOCKUP IMAGE (UPLOAD FROM DEVICE) */}
+              <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '14px', padding: '16px', marginBottom: '22px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ fontSize: '0.84rem', fontWeight: 900, color: '#0c4a6e' }}>
-                    Product Mockup Image (Upload from Device or Select Preset)
+                    Product Mockup Image (Upload from Device) *
                   </span>
                   {uploadedFileName && (
                     <span style={{ fontSize: '0.74rem', background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '2px 8px', borderRadius: '6px', fontWeight: 700 }}>
@@ -3041,7 +2768,7 @@ export const AdminPage = () => {
                     border: '2px dashed #38bdf8',
                     background: '#ffffff',
                     borderRadius: '12px',
-                    padding: '16px',
+                    padding: '20px',
                     textAlign: 'center',
                     marginBottom: '14px',
                     cursor: 'pointer'
@@ -3055,18 +2782,18 @@ export const AdminPage = () => {
                     style={{ display: 'none' }}
                     onChange={handleImageFileUpload}
                   />
-                  <div style={{ fontSize: '1.6rem', marginBottom: '4px' }}>📁</div>
-                  <div style={{ fontWeight: 800, color: '#0369a1', fontSize: '0.9rem' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '6px' }}>📁</div>
+                  <div style={{ fontWeight: 800, color: '#0369a1', fontSize: '0.94rem' }}>
                     Click to Upload Product Image from Your Computer / Phone
                   </div>
-                  <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '2px' }}>
-                    Auto-optimized via canvas compression for fast storage (Max 8MB)
+                  <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '3px' }}>
+                    Auto-optimized for crisp display and fast loading (Max 8MB)
                   </div>
                 </div>
 
-                {/* Preview and URL Input */}
-                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '14px', alignItems: 'center', marginBottom: '12px' }}>
-                  <div style={{ width: '100px', height: '100px', borderRadius: '10px', overflow: 'hidden', border: '2px solid #0284c7', background: '#f8fafc' }}>
+                {/* Preview Thumbnail */}
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                  <div style={{ width: '80px', height: '80px', borderRadius: '10px', overflow: 'hidden', border: '2px solid #0284c7', background: '#f8fafc', flexShrink: 0 }}>
                     <img
                       src={formData.mockupImg}
                       alt="Preview"
@@ -3074,92 +2801,14 @@ export const AdminPage = () => {
                       onError={(e) => { e.currentTarget.src = '/images/gods/mahalakshmi.jpg'; }}
                     />
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '3px' }}>
-                      Or Image File Path / Web URL:
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.mockupImg}
-                      onChange={(e) => {
-                        setFormData({ ...formData, mockupImg: e.target.value });
-                        setUploadedFileName(null);
-                      }}
-                      placeholder="/images/stone-art-calendar-real.jpg"
-                      style={{
-                        width: '100%',
-                        background: '#ffffff',
-                        border: '1px solid #bae6fd',
-                        borderRadius: '8px',
-                        padding: '8px 10px',
-                        fontSize: '0.84rem',
-                        color: '#0f172a',
-                        WebkitTextFillColor: '#0f172a',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Artwork Presets */}
-                <div>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0369a1', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                    Quick Select Artwork Presets:
-                  </span>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                    {IMAGE_PRESETS.map((ip, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => {
-                          setFormData({ ...formData, mockupImg: ip.url });
-                          setUploadedFileName(null);
-                        }}
-                        style={{
-                          background: formData.mockupImg === ip.url ? BLUE_GRADIENT : '#ffffff',
-                          color: formData.mockupImg === ip.url ? '#ffffff' : '#334155',
-                          border: `1px solid ${formData.mockupImg === ip.url ? '#0284c7' : '#bae6fd'}`,
-                          padding: '4px 8px',
-                          borderRadius: '6px',
-                          fontSize: '0.72rem',
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {ip.label}
-                      </button>
-                    ))}
+                  <div style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>
+                    Current image preview. When you upload a file from your device, it will automatically update here and save to the product.
                   </div>
                 </div>
               </div>
 
-              {/* Description */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
-                  Product Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  style={{
-                    width: '100%',
-                    background: '#ffffff',
-                    border: '1px solid #bae6fd',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '0.86rem',
-                    color: '#0f172a',
-                    WebkitTextFillColor: '#0f172a',
-                    outline: 'none',
-                    resize: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '14px' }}>
+              {/* Form Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
                 <button
                   type="button"
                   onClick={handleCloseModal}
@@ -3167,7 +2816,7 @@ export const AdminPage = () => {
                     background: '#f1f5f9',
                     border: '1px solid #cbd5e1',
                     color: '#475569',
-                    padding: '8px 16px',
+                    padding: '9px 18px',
                     borderRadius: '8px',
                     fontSize: '0.84rem',
                     fontWeight: 600,
@@ -3182,7 +2831,7 @@ export const AdminPage = () => {
                     background: BLUE_GRADIENT,
                     border: 'none',
                     color: '#ffffff',
-                    padding: '9px 24px',
+                    padding: '9px 26px',
                     borderRadius: '8px',
                     fontSize: '0.88rem',
                     fontWeight: 800,

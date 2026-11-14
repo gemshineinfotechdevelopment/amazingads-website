@@ -1,9 +1,18 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { calculateQuote, type QuotePayload, type QuoteResult } from '../services/api';
+import {
+  calculateQuote,
+  getCalendarProducts,
+  sendCustomerMessage,
+  SIVAKASI_CATALOG,
+  type CalendarProduct,
+  type QuotePayload,
+  type QuoteResult
+} from '../services/api';
 import { useRouter } from '../context/RouterContext';
 
 export interface FormatOption {
   id: string;
+  productId: string;
   label: string;
   fullName: string;
   size: string;
@@ -12,109 +21,132 @@ export interface FormatOption {
   base: number;
   tag: string;
   img: string;
-  defaultPaper: string;
+  defaultSizes: { size: string; price: number }[];
   defaultFinish: string;
-  defaultBinding: string;
 }
 
 const FORMAT_OPTIONS: FormatOption[] = [
   {
     id: 'Gold / Silver PET Foil Calendar',
+    productId: 'pet-foil-calendar',
     label: 'Gold / Silver PET Foil',
     fullName: 'Gold / Silver PET Foil Calendar',
-    size: '15 × 20 in / 17 × 27 in',
+    size: '12 × 18 in / 15 × 20 in / 17 × 27 in',
     icon: '👑',
     popular: true,
     base: 145,
     tag: 'Flagship Luxury Spec',
     img: '/images/pet-foil-calendar-real.jpg',
-    defaultPaper: '400 GSM Rigid Board',
-    defaultFinish: 'Mirror Gold & Silver Foil Emboss',
-    defaultBinding: 'Heavy-Gauge Anti-Rust Tin Plate'
+    defaultSizes: [
+      { size: '12 × 18 inches', price: 125 },
+      { size: '15 × 20 inches', price: 145 },
+      { size: '17 × 27 inches', price: 210 }
+    ],
+    defaultFinish: 'Mirror 24K Gold & Silver Foil Emboss'
   },
   {
     id: 'Custom 5D Calendars',
+    productId: 'custom-5d-calendar',
     label: 'Custom 5D Holographic',
     fullName: 'Custom 5D Holographic Calendars',
-    size: '12 × 18 in (75 LPI 5D Lens)',
+    size: '12 × 18 in / 16 × 24 in / 18 × 28 in',
     icon: '🌀',
     popular: true,
     base: 220,
     tag: 'Trending 5D Tech',
     img: '/images/custom-5d-calendar-real.jpg',
-    defaultPaper: '75 LPI Lenticular PET',
-    defaultFinish: '5D Optical Depth Lenticular',
-    defaultBinding: 'Deluxe Moulded Synthetic Gold Frame'
+    defaultSizes: [
+      { size: '12 × 18 inches', price: 220 },
+      { size: '16 × 24 inches', price: 295 },
+      { size: '18 × 28 inches', price: 380 }
+    ],
+    defaultFinish: 'Deluxe Moulded Synthetic Gold Frame'
   },
   {
     id: 'Stone Art Calendars',
+    productId: 'stone-art-calendar',
     label: 'Stone Art Sculptural',
     fullName: 'Stone Art Sculptural Calendars',
-    size: '14 × 20 in Frame',
+    size: '12 × 18 in / 14 × 20 in / 18 × 24 in',
     icon: '🗿',
     popular: false,
     base: 280,
     tag: 'Artisan Heritage Craft',
     img: '/images/stone-art-calendar-real.jpg',
-    defaultPaper: 'Composite Stone Resin Board',
-    defaultFinish: 'Antique Stone Wash & Kundan Work',
-    defaultBinding: 'Deluxe Moulded Synthetic Gold Frame'
+    defaultSizes: [
+      { size: '12 × 18 inches', price: 250 },
+      { size: '14 × 20 inches', price: 280 },
+      { size: '18 × 24 inches', price: 395 }
+    ],
+    defaultFinish: 'Antique Stone Wash & Kundan Work'
   },
   {
     id: 'Hand Fan',
+    productId: 'hand-fan',
     label: 'Promotional Hand Fan',
     fullName: 'Promotional Advertising Hand Fan',
-    size: 'Standard 8 × 8 in with Handle',
+    size: '8 × 8 in / 9 × 10 in',
     icon: '🪭',
     popular: false,
     base: 28,
     tag: 'High ROI Bulk Promo',
     img: '/images/hand-fan-promo-real.jpg',
-    defaultPaper: 'Virgin PP Plastic (0.6mm)',
-    defaultFinish: 'Double-Sided UV Gloss Lamination',
-    defaultBinding: 'Ergonomic Safety Plastic Handle'
+    defaultSizes: [
+      { size: '8 × 8 inches', price: 28 },
+      { size: '9 × 10 inches', price: 34 }
+    ],
+    defaultFinish: 'Double-Sided UV Gloss Lamination'
   },
   {
     id: 'Special Products',
+    productId: 'special-products',
     label: 'Special Products',
     fullName: 'Special Products (LED / Gifts / Sets)',
-    size: 'Bespoke Executive Spec',
+    size: '9 × 12 in / 12 × 16 in / 16 × 20 in',
     icon: '🎁',
     popular: true,
     base: 195,
     tag: 'Bespoke Made-to-Order',
     img: '/images/special-products-gift-real.jpg',
-    defaultPaper: 'Cast Acrylic & Luxury MDF',
-    defaultFinish: 'Spot UV & Laser Engraving',
-    defaultBinding: 'Custom Luxury Magnetic Rigid Box'
+    defaultSizes: [
+      { size: '9 × 12 inches', price: 195 },
+      { size: '12 × 16 inches', price: 275 },
+      { size: '16 × 20 inches', price: 360 }
+    ],
+    defaultFinish: 'Spot UV & Laser Engraving'
   }
 ];
 
-const PAPER_OPTIONS = [
-  { id: '400 GSM Rigid Board', label: '400 GSM Rigid Kappa Board + PET Foil', desc: 'Heavyweight rigid backing for Gold/Silver PET foil and metallic stamping' },
-  { id: '75 LPI Lenticular PET', label: '75 LPI Optical Lenticular 5D Sheet', desc: 'Precision optical micro-lens sheet for 5D depth and angle motion' },
-  { id: 'Composite Stone Resin Board', label: 'Stone-Infused Composite Resin Mount', desc: 'High-density tactile sculptural texture for stone art frames' },
-  { id: 'Virgin PP Plastic (0.6mm)', label: 'Virgin PP Polypropylene Plastic / Card', desc: 'Waterproof, tear-proof, flexible plastic for promotional hand fans' },
-  { id: 'Cast Acrylic & Luxury MDF', label: 'Cast Acrylic & Velvet Wood Mount', desc: 'Illuminated LED calendars & bespoke executive gift organizers' }
-];
-
-const FINISH_OPTIONS = [
-  { id: 'Mirror Gold & Silver Foil Emboss', label: 'Gold & Silver PET Foil Emboss', surcharge: '+₹22/unit', desc: 'High-gloss mirror metallic reflection on deities and corporate logo' },
-  { id: '5D Optical Depth Lenticular', label: '5D Optical Depth & Morphing', surcharge: '+₹45/unit', desc: 'Dynamic holographic 3D dimensional effect without glasses' },
-  { id: 'Antique Stone Wash & Kundan Work', label: 'Sculpted Stone Wash & Gems', surcharge: '+₹55/unit', desc: 'Hand-crafted stone relief textures with antique metallic highlights' },
-  { id: 'Double-Sided UV Gloss Lamination', label: 'UV Full Color Gloss Protection', surcharge: '+₹6/unit', desc: 'Vibrant offset print coating for durable outdoor hand fans' },
-  { id: 'Spot UV & Laser Engraving', label: 'Spot UV & Laser Etched Branding', surcharge: '+₹35/unit', desc: 'Prestige finish for special corporate gift sets & acrylic LED units' }
-];
-
-const BINDING_OPTIONS = [
-  { id: 'Heavy-Gauge Anti-Rust Tin Plate', label: 'Anti-Rust Tin Plate with Center Loop', desc: 'Traditional Sivakasi tin mounting for PET foil calendars' },
-  { id: 'Deluxe Moulded Synthetic Gold Frame', label: 'Carved Moulded Royal Frame', desc: 'Ornate wooden-finish frame for 5D and stone art calendars' },
-  { id: 'Ergonomic Safety Plastic Handle', label: 'Sturdy Contour Grip Handle', desc: 'Reinforced unbreakable handle for promotional hand fans' },
-  { id: 'Custom Luxury Magnetic Rigid Box', label: 'Bespoke Executive Desk Box / Stand', desc: 'Prestige packaging for Special Products and corporate gifts' }
+export const FINISH_OPTIONS = [
+  { id: 'Mirror 24K Gold & Silver Foil Emboss', label: 'Mirror 24K Gold & Silver Foil Emboss', surcharge: 22, desc: 'High-gloss mirror metallic reflection on deities and corporate crest' },
+  { id: 'Deluxe Moulded Synthetic Gold Frame', label: 'Deluxe Carved Royal Synthetic Frame', surcharge: 35, desc: 'Heavy moulded frame with wood-grain or gold foil border finish' },
+  { id: 'Antique Stone Wash & Kundan Work', label: 'Sculpted Stone Wash & Gems Relief', surcharge: 55, desc: 'Hand-crafted stone relief textures with antique metallic highlights' },
+  { id: 'Heavy-Gauge Anti-Rust Tin Plate', label: 'Heavy-Gauge Anti-Rust Tin Mounting', surcharge: 0, desc: 'Traditional Sivakasi tin mounting with brass center hanging loop' },
+  { id: 'Double-Sided UV Gloss Lamination', label: 'Double-Sided UV Gloss Protection', surcharge: 8, desc: 'Weatherproof high-gloss protective shield for vibrant outdoor durability' }
 ];
 
 export const CalendarCustomizer = () => {
   const { pageParams } = useRouter();
+
+  // Live products sync from catalog
+  const [liveCatalog, setLiveCatalog] = useState<CalendarProduct[]>(SIVAKASI_CATALOG);
+
+  useEffect(() => {
+    getCalendarProducts()
+      .then((data) => {
+        if (data && data.length > 0) setLiveCatalog(data);
+      })
+      .catch(() => {});
+
+    const handleCatalogUpdate = (e: Event) => {
+      const custom = e as CustomEvent<CalendarProduct[]>;
+      if (custom.detail && Array.isArray(custom.detail)) {
+        setLiveCatalog(custom.detail);
+      }
+    };
+    window.addEventListener('catalog-updated', handleCatalogUpdate);
+    return () => window.removeEventListener('catalog-updated', handleCatalogUpdate);
+  }, []);
 
   const getInitialProduct = () => {
     if (pageParams?.product) {
@@ -131,9 +163,8 @@ export const CalendarCustomizer = () => {
 
   const initialOpt = getInitialProduct();
   const [format, setFormat] = useState(initialOpt.id);
-  const [paperGsm, setPaperGsm] = useState(initialOpt.defaultPaper);
+  const [selectedSize, setSelectedSize] = useState(initialOpt.defaultSizes[0].size);
   const [finish, setFinish] = useState(initialOpt.defaultFinish);
-  const [binding, setBinding] = useState(initialOpt.defaultBinding);
   const [quantity, setQuantity] = useState(250);
 
   // Sync format if pageParams changes subsequently
@@ -147,9 +178,8 @@ export const CalendarCustomizer = () => {
       );
       if (matched && matched.id !== format) {
         setFormat(matched.id);
-        setPaperGsm(matched.defaultPaper);
+        setSelectedSize(matched.defaultSizes[0].size);
         setFinish(matched.defaultFinish);
-        setBinding(matched.defaultBinding);
       }
     }
   }, [pageParams?.product, format]);
@@ -158,13 +188,43 @@ export const CalendarCustomizer = () => {
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [calculating, setCalculating] = useState(false);
 
-  // Modal for quote submission
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Form submission state
   const [clientName, setClientName] = useState('');
   const [company, setCompany] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
+  const [clientNotes, setClientNotes] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const selectedFormatObj = FORMAT_OPTIONS.find(f => f.id === format) || FORMAT_OPTIONS[0];
+  const liveProduct = liveCatalog.find(p => p.id === selectedFormatObj.productId || p.name.toLowerCase().includes(selectedFormatObj.label.toLowerCase()));
+
+  // Frame size list with individual frame-specific pricing
+  const sizesList: { size: string; price: number }[] = (liveProduct?.sizes && liveProduct.sizes.length > 0)
+    ? liveProduct.sizes.map(s => ({
+        size: s,
+        price: (liveProduct.sizePrices && liveProduct.sizePrices[s]) || liveProduct.startingPrice || selectedFormatObj.base
+      }))
+    : selectedFormatObj.defaultSizes;
+
+  // Ensure selectedSize is valid in current sizesList
+  const currentSizeObj = sizesList.find(s => s.size === selectedSize) || sizesList[0];
+  const frameUnitPrice = currentSizeObj.price;
+  const selectedFinishObj = FINISH_OPTIONS.find(f => f.id === finish) || FINISH_OPTIONS[0];
+
+  const handleSelectFormat = (opt: FormatOption) => {
+    setFormat(opt.id);
+    const prod = liveCatalog.find(p => p.id === opt.productId || p.name.toLowerCase().includes(opt.label.toLowerCase()));
+    if (prod && prod.sizes && prod.sizes.length > 0) {
+      setSelectedSize(prod.sizes[0]);
+    } else {
+      setSelectedSize(opt.defaultSizes[0].size);
+    }
+    setFinish(opt.defaultFinish);
+    setSubmitSuccess(false);
+  };
 
   // Calculate whenever selections change
   useEffect(() => {
@@ -172,10 +232,13 @@ export const CalendarCustomizer = () => {
     setCalculating(true);
 
     const payload: QuotePayload = {
-      format,
-      paperGsm,
+      productId: selectedFormatObj.productId,
+      format: selectedFormatObj.fullName,
+      size: currentSizeObj.size,
+      customUnitPrice: frameUnitPrice,
       finish,
-      binding,
+      binding: 'Standard Mount',
+      paperGsm: '400 GSM Rigid Board',
       quantity
     };
 
@@ -195,51 +258,104 @@ export const CalendarCustomizer = () => {
     return () => {
       isMounted = false;
     };
-  }, [format, paperGsm, finish, binding, quantity]);
+  }, [format, selectedSize, frameUnitPrice, finish, quantity, selectedFormatObj.fullName, selectedFormatObj.productId, currentSizeObj.size]);
 
-  const handleSelectFormat = (opt: FormatOption) => {
-    setFormat(opt.id);
-    setPaperGsm(opt.defaultPaper);
-    setFinish(opt.defaultFinish);
-    setBinding(opt.defaultBinding);
-  };
+  const handleDirectOrderSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!clientName.trim() || !clientPhone.trim()) {
+      alert('Please provide your name and contact phone number.');
+      return;
+    }
 
-  const selectedFormatObj = FORMAT_OPTIONS.find(f => f.id === format) || FORMAT_OPTIONS[0];
-  const selectedPaper = PAPER_OPTIONS.find(p => p.id === paperGsm) || PAPER_OPTIONS[0];
-  const selectedFinish = FINISH_OPTIONS.find(f => f.id === finish) || FINISH_OPTIONS[0];
-  const selectedBinding = BINDING_OPTIONS.find(b => b.id === binding) || BINDING_OPTIONS[0];
+    try {
+      setSubmitting(true);
+      const leadMessage = `Customizer Direct Inquiry:
+• Product: ${selectedFormatObj.fullName}
+• Frame Size: ${currentSizeObj.size} (Base Rate: ₹${frameUnitPrice}/unit)
+• Selected Finish: ${finish}
+• Order Volume: ${quantity} units
+• Estimated Unit Rate: ₹${quote ? quote.unitPrice : frameUnitPrice}/unit
+• Estimated Total: ₹${quote ? quote.subtotal.toLocaleString() : (frameUnitPrice * quantity).toLocaleString()}
+• Client: ${clientName} (${company || 'Individual/Trader'})
+• Phone: ${clientPhone}
+• Email: ${clientEmail || 'N/A'}
+• Branding / Notes: ${clientNotes || 'Standard'}`;
 
-  // WhatsApp instant order link generator
-  const generateWhatsAppQuoteLink = () => {
-    if (!quote) return '#';
-    const text = `Hello Amazing Ads Sivakasi, I configured an Instant Quote on your website:\n\n` +
-      `• *Product Model:* ${selectedFormatObj.fullName}\n` +
-      `• *Size:* ${selectedFormatObj.size}\n` +
-      `• *Paper / Stock:* ${paperGsm}\n` +
-      `• *Finish / Foil:* ${finish}\n` +
-      `• *Binding:* ${binding}\n` +
-      `• *Quantity:* ${quantity} Units\n` +
-      `• *Unit Price:* ₹${quote.unitPrice}/unit\n` +
-      `• *Estimated Total:* ₹${quote.subtotal.toLocaleString()}\n` +
-      `• *Quote Ref:* ${quote.quoteId}\n\n` +
-      `Please share the final factory approval, proof confirmation schedule, and dispatch timeline.`;
-    return `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
+      await sendCustomerMessage(
+        clientName,
+        clientPhone,
+        leadMessage,
+        {
+          email: clientEmail,
+          product: selectedFormatObj.fullName,
+          size: currentSizeObj.size,
+          quantity,
+          notes: `Total: ₹${quote?.subtotal || 0}. ${clientNotes}`
+        }
+      );
+
+      // Register official quote with backend
+      const res = await calculateQuote({
+        productId: selectedFormatObj.productId,
+        format: selectedFormatObj.fullName,
+        size: currentSizeObj.size,
+        customUnitPrice: frameUnitPrice,
+        finish,
+        binding: 'Standard Mount',
+        paperGsm: '400 GSM Rigid Board',
+        quantity,
+        clientName,
+        company,
+        clientEmail,
+        clientPhone,
+        notes: clientNotes
+      });
+      setQuote(res);
+      setSubmitSuccess(true);
+      setSubmitting(false);
+    } catch {
+      alert('Unable to submit inquiry. Please call our direct helpline.');
+      setSubmitting(false);
+    }
   };
 
   const handleFinalSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!clientName || !clientEmail) {
-      alert('Please provide your name and work email.');
+    if (!clientName.trim() || (!clientEmail.trim() && !clientPhone.trim())) {
+      alert('Please provide your name and phone number or email.');
       return;
     }
 
     try {
       setCalculating(true);
+      const leadMessage = `Official Customizer Proposal (${selectedFormatObj.fullName}):
+• Frame Size: ${currentSizeObj.size} (Rate: ₹${frameUnitPrice}/unit)
+• Finish: ${finish}
+• Quantity: ${quantity} units
+• Est. Total: ₹${quote ? quote.subtotal.toLocaleString() : 'N/A'}
+• Company: ${company || 'N/A'}`;
+
+      await sendCustomerMessage(
+        clientName,
+        clientPhone || 'Not specified',
+        leadMessage,
+        {
+          email: clientEmail,
+          product: selectedFormatObj.fullName,
+          size: currentSizeObj.size,
+          quantity,
+          notes: `Company: ${company || 'N/A'}`
+        }
+      );
+
       const res = await calculateQuote({
-        format,
-        paperGsm,
+        productId: selectedFormatObj.productId,
+        format: selectedFormatObj.fullName,
+        size: currentSizeObj.size,
+        customUnitPrice: frameUnitPrice,
         finish,
-        binding,
+        binding: 'Standard Mount',
+        paperGsm: '400 GSM Rigid Board',
         quantity,
         clientName,
         company,
@@ -323,34 +439,45 @@ export const CalendarCustomizer = () => {
               </div>
             </div>
 
-            {/* Specifications Form Grid */}
+            {/* Specifications Form Grid: Simplified, Frame Size Wise */}
             <div className="specs-form-grid">
               
-              {/* Paper Stock */}
+              {/* 1. FRAME SIZE SELECTION WITH SIZE-SPECIFIC PRICING */}
               <div className="spec-form-group">
                 <label className="spec-label">
-                  <span>Paper / Board Stock (GSM)</span>
-                  <span className="spec-tag">Material</span>
+                  <span>Frame Dimensions & Frame-Specific Rate</span>
+                  <span className="spec-tag" style={{ color: 'var(--accent-gold-bright)' }}>Frame Size</span>
                 </label>
-                <select
-                  value={paperGsm}
-                  onChange={(e) => setPaperGsm(e.target.value)}
-                  className="spec-select"
-                >
-                  {PAPER_OPTIONS.map((opt) => (
-                    <option key={opt.id} value={opt.id}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="spec-hint">{selectedPaper?.desc}</p>
+                <div className="customizer-sizes-grid">
+                  {sizesList.map((szObj) => {
+                    const isSelected = selectedSize === szObj.size;
+                    return (
+                      <button
+                        key={szObj.size}
+                        type="button"
+                        onClick={() => setSelectedSize(szObj.size)}
+                        className={`customizer-size-btn ${isSelected ? 'active' : ''}`}
+                      >
+                        <div className="customizer-size-name">{szObj.size}</div>
+                        <div className="customizer-size-price">
+                          <strong>₹{szObj.price}</strong>
+                          <span className="unit">/ unit</span>
+                        </div>
+                        {isSelected && <span className="customizer-size-badge">✓ Selected</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="spec-hint" style={{ marginTop: '8px' }}>
+                  Wholesale rate automatically updates based on selected frame size.
+                </p>
               </div>
 
-              {/* Foil / Finish */}
+              {/* 2. FRAME STYLE & DELUXE FINISH */}
               <div className="spec-form-group">
                 <label className="spec-label">
-                  <span>Foil Stamping & Embellishment</span>
-                  <span className="spec-tag" style={{ color: 'var(--accent-gold-bright)' }}>Finish</span>
+                  <span>Frame Border & Deluxe Finish</span>
+                  <span className="spec-tag">Embellishment</span>
                 </label>
                 <select
                   value={finish}
@@ -359,31 +486,11 @@ export const CalendarCustomizer = () => {
                 >
                   {FINISH_OPTIONS.map((opt) => (
                     <option key={opt.id} value={opt.id}>
-                      {opt.label} ({opt.surcharge})
+                      {opt.label} {opt.surcharge > 0 ? `(+₹${opt.surcharge}/unit)` : '(Standard Included)'}
                     </option>
                   ))}
                 </select>
-                <p className="spec-hint">{selectedFinish?.desc}</p>
-              </div>
-
-              {/* Binding Hardware */}
-              <div className="spec-form-group">
-                <label className="spec-label">
-                  <span>Mounting & Binding</span>
-                  <span className="spec-tag">Hardware</span>
-                </label>
-                <select
-                  value={binding}
-                  onChange={(e) => setBinding(e.target.value)}
-                  className="spec-select"
-                >
-                  {BINDING_OPTIONS.map((opt) => (
-                    <option key={opt.id} value={opt.id}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="spec-hint">{selectedBinding?.desc}</p>
+                <p className="spec-hint">{selectedFinishObj?.desc}</p>
               </div>
             </div>
 
@@ -448,6 +555,116 @@ export const CalendarCustomizer = () => {
                 </div>
               )}
             </div>
+
+            {/* Direct Factory Inquiry Form inside Customizer */}
+            <div className="customizer-direct-inquiry-box" style={{ marginTop: '24px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h4 style={{ fontSize: '1.05rem', color: '#fff', fontWeight: 700, margin: 0 }}>
+                    Direct Factory Order & Proof Request
+                  </h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                    Submit your details. This inquiry logs directly into our Sivakasi admin works queue.
+                  </p>
+                </div>
+                <span className="foil-badge" style={{ fontSize: '0.7rem' }}>DIRECT WORKS LEAD</span>
+              </div>
+
+              {submitSuccess ? (
+                <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '8px', padding: '18px', textAlign: 'center' }}>
+                  <span style={{ fontSize: '2rem' }}>✅</span>
+                  <div style={{ color: '#34d399', fontWeight: 800, fontSize: '1.05rem', marginTop: '6px' }}>
+                    Inquiry Submitted to Sivakasi Works Desk!
+                  </div>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', marginTop: '4px' }}>
+                    Thank you, {clientName}! Ref: <strong>{quote?.quoteId || 'AA-INQ'}</strong>. Our factory manager will call you at <strong>{clientPhone}</strong> to confirm delivery and corporate branding.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitSuccess(false)}
+                    className="btn-outline-gold"
+                    style={{ marginTop: '10px', padding: '6px 14px', fontSize: '0.8rem' }}
+                  >
+                    Configure Another Specification
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleDirectOrderSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Your Name *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Ramesh Kumar"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        className="form-input"
+                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Phone Number *</label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98765 43210"
+                        value={clientPhone}
+                        onChange={(e) => setClientPhone(e.target.value)}
+                        className="form-input"
+                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Email Address</label>
+                      <input
+                        type="email"
+                        placeholder="corporate@company.com"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        className="form-input"
+                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Company / Temple Name (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Sri Krishna Enterprises"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        className="form-input"
+                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Branding / Crest Header Notes (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Print company logo and branch addresses on header"
+                      value={clientNotes}
+                      onChange={(e) => setClientNotes(e.target.value)}
+                      className="form-input"
+                      style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="btn-gold"
+                    style={{ width: '100%', padding: '13px', fontSize: '0.92rem', marginTop: '4px', cursor: 'pointer' }}
+                  >
+                    {submitting ? 'Submitting to Factory Desk...' : '⚡ Submit Order Inquiry to Sivakasi Works'}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
 
           {/* Right Column: Sticky Live Quotation Card */}
@@ -470,7 +687,7 @@ export const CalendarCustomizer = () => {
                   </span>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                     <span className="quote-unit-price">
-                      {calculating ? '...' : (quote ? `₹${quote.unitPrice}` : '...')}
+                      {calculating ? '...' : (quote ? `₹${quote.unitPrice}` : `₹${frameUnitPrice}`)}
                     </span>
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ unit</span>
                   </div>
@@ -481,7 +698,7 @@ export const CalendarCustomizer = () => {
                     Total for {quantity} Units
                   </span>
                   <div className="quote-total-price">
-                    {calculating ? '...' : (quote ? `₹${quote.subtotal.toLocaleString()}` : '—')}
+                    {calculating ? '...' : (quote ? `₹${quote.subtotal.toLocaleString()}` : `₹${(frameUnitPrice * quantity).toLocaleString()}`)}
                   </div>
                 </div>
               </div>
@@ -493,20 +710,16 @@ export const CalendarCustomizer = () => {
                   <span className="spec-v">{selectedFormatObj.label}</span>
                 </div>
                 <div className="quote-spec-row">
-                  <span className="spec-k">Dimensions:</span>
-                  <span className="spec-v">{selectedFormatObj.size}</span>
+                  <span className="spec-k">Frame Size:</span>
+                  <span className="spec-v" style={{ color: 'var(--accent-gold-bright)', fontWeight: 700 }}>{currentSizeObj.size}</span>
                 </div>
                 <div className="quote-spec-row">
-                  <span className="spec-k">Paper Stock:</span>
-                  <span className="spec-v">{paperGsm.split('+')[0].trim()}</span>
+                  <span className="spec-k">Frame Rate:</span>
+                  <span className="spec-v">₹{frameUnitPrice} / unit</span>
                 </div>
                 <div className="quote-spec-row">
                   <span className="spec-k">Finish:</span>
                   <span className="spec-v">{finish}</span>
-                </div>
-                <div className="quote-spec-row">
-                  <span className="spec-k">Binding:</span>
-                  <span className="spec-v">{binding}</span>
                 </div>
                 <div className="quote-spec-row">
                   <span className="spec-k">Turnaround:</span>
@@ -516,24 +729,14 @@ export const CalendarCustomizer = () => {
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {/* WhatsApp Direct Order Button */}
-                <a
-                  href={generateWhatsAppQuoteLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-whatsapp-quote"
-                >
-                  <span>💬 Instant WhatsApp Order / Inquiry</span>
-                </a>
-
                 {/* Lock Quote / PDF Modal Button */}
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(true)}
-                  className="btn-outline-gold"
-                  style={{ width: '100%', padding: '12px', fontSize: '0.88rem' }}
+                  className="btn-gold"
+                  style={{ width: '100%', padding: '13px', fontSize: '0.92rem', cursor: 'pointer' }}
                 >
-                  📄 Request Official PDF Proposal
+                  📄 Request Official PDF Proposal & Proof
                 </button>
               </div>
 
@@ -565,12 +768,12 @@ export const CalendarCustomizer = () => {
           <div
             style={{
               background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-gold)',
+              border: '1px solid #454545',
               borderRadius: 'var(--radius-lg)',
               maxWidth: '520px',
               width: '100%',
               padding: '36px',
-              boxShadow: 'var(--shadow-lg), 0 0 40px rgba(207, 168, 78, 0.2)',
+              boxShadow: 'var(--shadow-lg), 0 0 40px rgba(215, 134, 0, 0.25)',
               position: 'relative'
             }}
             onClick={(e) => e.stopPropagation()}
@@ -635,9 +838,10 @@ export const CalendarCustomizer = () => {
                   </div>
 
                   <div>
-                    <label>Contact Phone (WhatsApp for Instant Proofs)</label>
+                    <label>Contact Phone Number *</label>
                     <input
                       type="tel"
+                      required
                       placeholder="+91 98765 43210"
                       value={clientPhone}
                       onChange={(e) => setClientPhone(e.target.value)}
@@ -645,7 +849,7 @@ export const CalendarCustomizer = () => {
                   </div>
 
                   <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '6px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    Total Configured: <strong>{quantity} units</strong> of {format} with {finish}.
+                    Total Configured: <strong>{quantity} units</strong> of {format} ({currentSizeObj.size}) with {finish}.
                     <br />
                     Total Estimated: <strong style={{ color: 'var(--accent-gold-bright)' }}>₹{quote?.subtotal.toLocaleString()}</strong>
                   </div>
@@ -741,7 +945,7 @@ export const CalendarCustomizer = () => {
           width: 28px;
           height: 28px;
           border-radius: 50%;
-          background: rgba(207, 168, 78, 0.15);
+          background: rgba(215, 134, 0, 0.18);
           border: 1px solid var(--border-gold);
           color: var(--accent-gold-bright);
           font-family: var(--font-mono);
@@ -775,8 +979,8 @@ export const CalendarCustomizer = () => {
 
         .format-card.selected {
           border-color: var(--accent-gold);
-          background: rgba(207, 168, 78, 0.08);
-          box-shadow: 0 0 20px rgba(207, 168, 78, 0.2);
+          background: rgba(215, 134, 0, 0.12);
+          box-shadow: 0 0 20px rgba(215, 134, 0, 0.25);
         }
 
         .format-card-img-wrap {
@@ -883,7 +1087,7 @@ export const CalendarCustomizer = () => {
         }
 
         .active-format-banner {
-          background: rgba(207, 168, 78, 0.08);
+          background: rgba(215, 134, 0, 0.12);
           border: 1px solid var(--border-gold);
           border-radius: var(--radius-md);
           padding: 14px 18px;
@@ -935,7 +1139,7 @@ export const CalendarCustomizer = () => {
 
         .spec-select:focus {
           border-color: var(--accent-gold);
-          box-shadow: 0 0 0 2px rgba(207, 168, 78, 0.2);
+          box-shadow: 0 0 0 2px rgba(215, 134, 0, 0.3);
         }
 
         .spec-hint {
@@ -1056,11 +1260,11 @@ export const CalendarCustomizer = () => {
         }
 
         .live-quote-card {
-          background: linear-gradient(160deg, #181d26 0%, #11141b 100%);
-          border: 1px solid var(--border-gold);
+          background: linear-gradient(160deg, #2E2F2B 0%, #121310 100%);
+          border: 1px solid #454545;
           border-radius: var(--radius-lg);
           padding: 26px;
-          box-shadow: var(--shadow-lg), 0 0 25px rgba(207, 168, 78, 0.14);
+          box-shadow: var(--shadow-lg), 0 0 25px rgba(215, 134, 0, 0.22);
         }
 
         .quote-price-header {
@@ -1112,26 +1316,64 @@ export const CalendarCustomizer = () => {
           text-align: right;
         }
 
-        .btn-whatsapp-quote {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          background: #25D366;
-          color: #fff;
-          padding: 13px;
-          border-radius: var(--radius-sm);
-          font-weight: 700;
-          font-size: 0.92rem;
-          text-decoration: none;
-          transition: background 0.2s, transform 0.2s;
-          box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        /* Frame Sizes Grid */
+        .customizer-sizes-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+          gap: 10px;
+          margin-top: 6px;
         }
 
-        .btn-whatsapp-quote:hover {
-          background: #1ebc57;
-          transform: translateY(-1px);
+        .customizer-size-btn {
+          background: var(--bg-input);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-md);
+          padding: 12px 14px;
+          text-align: left;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          transition: all 0.2s ease;
+          position: relative;
+        }
+
+        .customizer-size-btn:hover {
+          border-color: var(--accent-gold);
+          background: rgba(215, 134, 0, 0.08);
+        }
+
+        .customizer-size-btn.active {
+          background: rgba(215, 134, 0, 0.18);
+          border: 1.5px solid var(--accent-gold);
+          box-shadow: 0 0 16px rgba(215, 134, 0, 0.3);
+        }
+
+        .customizer-size-name {
           color: #fff;
+          font-size: 0.88rem;
+          font-weight: 700;
+        }
+
+        .customizer-size-price {
+          color: var(--accent-gold-bright);
+          font-size: 0.95rem;
+          font-family: var(--font-mono);
+          font-weight: 800;
+        }
+
+        .customizer-size-price .unit {
+          font-size: 0.72rem;
+          color: var(--text-muted);
+          font-weight: normal;
+          margin-left: 3px;
+        }
+
+        .customizer-size-badge {
+          font-size: 0.68rem;
+          color: var(--accent-gold-bright);
+          font-weight: 700;
+          margin-top: 2px;
         }
 
         @media (max-width: 960px) {

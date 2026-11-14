@@ -3,7 +3,6 @@ import { RouterProvider, useRouter } from './context/RouterContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { SampleKitModal } from './components/SampleKitModal';
-import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 
 // Dedicated Standalone Pages
 import { HomePage } from './pages/HomePage';
@@ -68,9 +67,6 @@ const AppContent = () => {
         isOpen={isSampleKitOpen}
         onClose={() => setIsSampleKitOpen(false)}
       />
-
-      {/* Floating Direct WhatsApp Action */}
-      <FloatingWhatsApp />
     </div>
   );
 };

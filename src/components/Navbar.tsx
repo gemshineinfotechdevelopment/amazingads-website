@@ -50,9 +50,9 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        backgroundColor: scrolled ? 'rgba(10, 12, 16, 0.96)' : 'rgba(10, 12, 16, 0.90)',
+        backgroundColor: scrolled ? 'rgba(3, 3, 3, 0.96)' : 'rgba(33, 37, 40, 0.94)',
         backdropFilter: 'blur(18px)',
-        borderBottom: `1px solid ${scrolled ? 'var(--border-gold)' : 'var(--border-subtle)'}`,
+        borderBottom: '1px solid #454545',
         transition: 'all 0.3s ease',
         padding: scrolled ? '10px 0' : '15px 0',
         width: '100%'
@@ -75,8 +75,8 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
                 objectFit: 'contain',
                 background: 'rgba(255, 255, 255, 0.08)',
                 padding: '2px',
-                border: '1px solid var(--accent-gold)',
-                boxShadow: '0 0 15px rgba(207, 168, 78, 0.25)',
+                border: '1px solid #D78600',
+                boxShadow: '0 0 15px rgba(255, 215, 46, 0.35)',
                 flexShrink: 0
               }}
             />
@@ -86,7 +86,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
               <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff', whiteSpace: 'nowrap' }}>
                 AMAZING ADS
               </span>
-              <span style={{ fontSize: '0.68rem', color: 'var(--accent-gold)', letterSpacing: '0.08em', fontWeight: 700, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '0.68rem', color: '#D78600', letterSpacing: '0.08em', fontWeight: 700, whiteSpace: 'nowrap' }}>
                 SIVAKASI
               </span>
             </div>
@@ -171,16 +171,15 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           ))}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
             <a
-              href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20want%20to%20order%20calendars"
-              target="_blank"
-              rel="noreferrer"
+              href="tel:+919790472767"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                background: '#25D366',
-                color: '#fff',
+                background: 'rgba(215, 134, 0, 0.16)',
+                border: '1px solid #D78600',
+                color: '#FFD72E',
                 padding: '12px',
                 borderRadius: 'var(--radius-sm)',
                 fontWeight: 700,
@@ -188,7 +187,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
                 textDecoration: 'none'
               }}
             >
-              💬 WhatsApp: +91 97904 72767
+              📞 Call Factory: +91 97904 72767
             </a>
             <button 
               onClick={() => { onOpenSampleKit(); setMobileMenuOpen(false); }} 

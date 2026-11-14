@@ -77,7 +77,7 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
           maxWidth: '560px',
           width: '100%',
           padding: '36px',
-          boxShadow: 'var(--shadow-lg), 0 0 45px rgba(207, 168, 78, 0.25)',
+          boxShadow: 'var(--shadow-lg), 0 0 45px rgba(215, 134, 0, 0.3)',
           position: 'relative',
           maxHeight: '90vh',
           overflowY: 'auto'
