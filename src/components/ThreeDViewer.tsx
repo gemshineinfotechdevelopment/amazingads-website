@@ -292,7 +292,7 @@ className="scroll-pills-row threed-tabs-wrapper threed-tabs-nav"
           border: '1px solid var(--border-subtle)'
         }}
       >
-<span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+        <span className="gold-gradient-text" style={{ fontSize: '0.74rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0 }}>
           ✦ Custom Branding Imprint (Live Foil):
         </span>
         <input

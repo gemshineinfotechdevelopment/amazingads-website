@@ -15,8 +15,8 @@
   
   /* White – Text: #FFFFFF */
   --text-primary: #FFFFFF;
-  --text-secondary: #e2e8f0;
-  --text-muted: #d1d5db;
+  --text-secondary: #f3f4f6;
+  --text-muted: #cbd5e1;
 
   /* Orange Gold – Brand Heading: #D78600 */
   --brand-heading: #D78600;
@@ -37,7 +37,7 @@
   --border-gold: rgba(215, 134, 0, 0.45);
   --border-gold-hover: #FFD72E;
 
-  --font-heading: 'Syne', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -123,23 +123,23 @@ body {
 /* Ultra-Modern Display Typography */
 h1, h2, h3, h4, .font-heading {
   font-family: var(--font-heading);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: #ffffff;
-  line-height: 1.15;
+  line-height: 1.18;
   word-break: break-word;
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 4.4rem);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
   font-weight: 800;
 }
 
 h2 {
-  font-size: clamp(1.5rem, 3.5vw, 2.8rem);
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.5rem, 3.5vw, 2.7rem);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 
@@ -163,6 +163,7 @@ h4 {
 .gold-gradient-text {
   background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -235,12 +236,15 @@ h4 {
 }
 
 .breadcrumb-nav button:hover {
-  color: var(--accent-gold-bright);
+  color: #fff;
 }
 
 .breadcrumb-nav .current {
-  color: var(--accent-gold-bright);
-  font-weight: 600;
+  background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
 }
 
 /* Luxury Foil Sheen Animation */

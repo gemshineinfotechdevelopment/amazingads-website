@@ -2,8 +2,71 @@ import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
 import { ThreeDViewer } from '../components/ThreeDViewer';
-import { ProductCatalog } from '../components/ProductCatalog';
 import { getStoredFactorySettings, type FactorySettings } from '../services/api';
+
+interface ProductCategoryItem {
+  id: string;
+  title: string;
+  tag: string;
+  image: string;
+  description: string;
+  startingPrice: string;
+  targetProduct: string;
+  highlights: string[];
+}
+
+const PRODUCT_CATEGORIES: ProductCategoryItem[] = [
+  {
+    id: 'pet-foil',
+    title: 'Gold / Silver PET Foil Calendars',
+    tag: '👑 24K Gold & Silver Foil',
+    image: '/images/pet-foil-calendar-real.jpg',
+    description: 'High-temperature metallic gold & silver foil stamping on tear-proof, moisture-resistant PET film with deep hydraulic relief embossing.',
+    startingPrice: '₹125',
+    targetProduct: 'Gold / Silver PET Foil Calendar',
+    highlights: ['Mirror Metallic PET Foil', 'Hydraulic Relief Embossing', 'Tear-Proof & Water-Proof']
+  },
+  {
+    id: 'custom-5d',
+    title: 'Custom 5D Holographic Calendars',
+    tag: '🌀 5D Lenticular Motion',
+    image: '/images/custom-5d-calendar-real.jpg',
+    description: 'Micro-optical lenticular lenses delivering dynamic 3D optical depth perception and animated angle-morphing motion flip with golden frames.',
+    startingPrice: '₹220',
+    targetProduct: 'Custom 5D Calendars (Lord Murugan Edition)',
+    highlights: ['True 5D Optical Depth', 'Dual-Angle Image Morph Flip', 'Deluxe Golden Moulded Frame']
+  },
+  {
+    id: 'stone-art',
+    title: 'Stone Art Sculptural Calendars',
+    tag: '🗿 Sculpted Stone Relief',
+    image: '/images/stone-art-calendar-real.jpg',
+    description: 'Heirloom decorative calendars simulating temple stone carvings with tactile relief, hand-finished stone washes, and antique gold brushing.',
+    startingPrice: '₹250',
+    targetProduct: 'Stone Art Sculptural Calendars (Lord Balaji Edition)',
+    highlights: ['Sculpted Stone Relief Texture', 'Hand-Brushed Antique Patina', 'Carved Heritage Frame Finish']
+  },
+  {
+    id: 'hand-fan',
+    title: 'Promotional Advertising Hand Fans',
+    tag: '🪭 High-Impact Promotion',
+    image: '/images/hand-fan-promo-real.jpg',
+    description: 'Unbreakable virgin PP plastic and waterproof laminated duplex hand fans engineered for mass-reach corporate and festival advertising.',
+    startingPrice: '₹28',
+    targetProduct: 'Promotional Hand Fan (Lord Ganesha Edition)',
+    highlights: ['Unbreakable Virgin PP Plastic', 'Double-Sided 4-Color Vibrant Print', 'Ergonomic Non-Snap Grip Handle']
+  },
+  {
+    id: 'special-products',
+    title: 'Special Products & VIP Gift Sets',
+    tag: '🎁 Bespoke Corporate Gifts',
+    image: '/images/special-products-gift-real.jpg',
+    description: '24K Devotional Gold Foil Frames, illuminated acrylic LED calendars, bespoke luxury gift boxes, and executive hampers for corporate milestones.',
+    startingPrice: '₹195',
+    targetProduct: '24K Devotional Gold Foil Frame (Lord Ayyappan Edition)',
+    highlights: ['Laser Engraved & Spot UV Finishing', 'Illuminated Acrylic LED Options', 'Luxury Magnetic Gift Box Sets']
+  }
+];
 
 export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) => {
   const { navigate } = useRouter();
@@ -48,22 +111,256 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         </div>
       </section>
 
-      {/* Signature 2027 Calendar Collection */}
-      <section style={{ padding: '30px 0 50px' }}>
+      {/* Our Products - 5 Signature Manufacturing Categories */}
+      <section style={{ padding: '40px 0 60px' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 36px' }}>
-            <span className="foil-badge" style={{ marginBottom: '10px' }}>
-              ✦ 2027 SIVAKASI PRESS EDITIONS
+          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 42px' }}>
+            <span className="foil-badge" style={{ marginBottom: '12px' }}>
+              ✦ SIVAKASI PRESS EDITIONS
             </span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
-              Signature <span className="gold-gradient-text">Calendar Models</span>
+            <h2 style={{ fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', color: '#fff', marginBottom: '12px' }}>
+              Our <span className="gold-gradient-text">Products</span>
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              Direct factory wholesale pricing. Real 24K gold foil stamping, daily panchangam, and tabletop desk easels.
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
+              Direct factory wholesale manufacturing. Explore our 5 signature manufacturing lines engineered with 24K gold foil, 5D lenticular lenses, sculpted stone craft, and promotional tools.
             </p>
           </div>
 
-          <ProductCatalog onSelectProduct={(productName) => navigate('calculator', { product: productName })} />
+          {/* 5 Product Categories Grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '28px',
+              marginBottom: '40px'
+            }}
+          >
+            {PRODUCT_CATEGORIES.map((cat) => (
+              <div
+                key={cat.id}
+                className="product-cat-card"
+                style={{
+                  background: 'linear-gradient(180deg, #222320 0%, #171816 100%)',
+                  border: '1px solid #454545',
+                  borderRadius: '18px',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                {/* Product Category Image Preview */}
+                <div
+                  style={{
+                    position: 'relative',
+                    height: '240px',
+                    width: '100%',
+                    overflow: 'hidden',
+                    backgroundColor: '#10110e'
+                  }}
+                >
+                  <img
+                    src={cat.image}
+                    alt={cat.title}
+                    className="product-cat-img"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                    loading="lazy"
+                  />
+
+                  {/* Top Badges */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '12px',
+                      left: '12px',
+                      right: '12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '8px',
+                      zIndex: 3
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: 'rgba(3, 3, 3, 0.85)',
+                        backdropFilter: 'blur(8px)',
+                        border: '1px solid #D78600',
+                        color: '#FFD72E',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        letterSpacing: '0.04em'
+                      }}
+                    >
+                      {cat.tag}
+                    </span>
+
+                    <span
+                      style={{
+                        background: 'linear-gradient(135deg, #FFD72E 0%, #D78600 100%)',
+                        color: '#030303',
+                        fontSize: '0.74rem',
+                        fontWeight: 900,
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        letterSpacing: '0.02em',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)'
+                      }}
+                    >
+                      Starts {cat.startingPrice}
+                    </span>
+                  </div>
+
+                  {/* Gradient Shade on Bottom of Image */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '70px',
+                      background: 'linear-gradient(180deg, transparent 0%, rgba(34, 35, 32, 0.95) 100%)',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Card Information & Action */}
+                <div
+                  style={{
+                    padding: '22px 24px 26px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flex: 1,
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        fontSize: '1.25rem',
+                        fontWeight: 800,
+                        color: '#ffffff',
+                        marginBottom: '8px',
+                        lineHeight: '1.3'
+                      }}
+                    >
+                      {cat.title}
+                    </h3>
+
+                    <p
+                      style={{
+                        fontSize: '0.86rem',
+                        color: '#cbd5e1',
+                        lineHeight: '1.55',
+                        marginBottom: '16px'
+                      }}
+                    >
+                      {cat.description}
+                    </p>
+
+                    {/* Feature Highlights */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '22px' }}>
+                      {cat.highlights.map((h, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '0.78rem',
+                            color: '#e2e8f0'
+                          }}
+                        >
+                          <span style={{ color: '#FFD72E', fontSize: '0.72rem', flexShrink: 0 }}>✦</span>
+                          <span>{h}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
+                    <button
+                      onClick={() => navigate('calculator', { product: cat.targetProduct })}
+                      className="btn-gold"
+                      style={{
+                        flex: 1,
+                        padding: '11px 16px',
+                        fontSize: '0.86rem',
+                        borderRadius: '8px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Configure & Quote →
+                    </button>
+
+                    <button
+                      onClick={() => navigate('collections')}
+                      className="btn-outline-gold"
+                      style={{
+                        padding: '11px 16px',
+                        fontSize: '0.86rem',
+                        borderRadius: '8px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Wholesale Catalog Link Banner */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(215, 134, 0, 0.12) 0%, rgba(34, 35, 32, 0.8) 100%)',
+              border: '1px solid #454545',
+              borderRadius: '16px',
+              padding: '24px 32px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '18px'
+            }}
+          >
+            <div>
+              <h4 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '4px', fontWeight: 800 }}>
+                Looking for Detailed Specifications & Tiered Factory Pricing?
+              </h4>
+              <p style={{ fontSize: '0.88rem', color: '#cbd5e1', margin: 0 }}>
+                Filter products by minimum order quantities, paper GSM, sizes, and instant tiered volume discounts.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => navigate('collections')}
+                className="btn-gold"
+                style={{ padding: '12px 24px', fontSize: '0.9rem' }}
+              >
+                View Full Wholesale Catalog →
+              </button>
+              <button
+                onClick={onOpenSampleKit}
+                className="btn-outline-gold"
+                style={{ padding: '12px 20px', fontSize: '0.9rem' }}
+              >
+                Request Swatch Kit
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -150,7 +447,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                   position: 'relative'
                 }}
               >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-gold-bright)', opacity: 0.8, marginBottom: '10px' }}>
+                <div className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, marginBottom: '10px' }}>
                   {s.step}
                 </div>
                 <h4 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>{s.title}</h4>
@@ -218,13 +515,13 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
               >
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '0.82rem', color: 'var(--accent-gold-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                    <span className="gold-gradient-text" style={{ fontSize: '0.82rem', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
                       {study.units}
                     </span>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{study.finish}</span>
                   </div>
                   <h4 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '4px' }}>{study.client}</h4>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--accent-gold-bright)', marginBottom: '14px' }}>{study.project}</p>
+                  <p className="gold-gradient-text" style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '14px' }}>{study.project}</p>
                   <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.6', fontStyle: 'italic', marginBottom: '18px' }}>
                     "{study.quote}"
                   </p>
@@ -334,7 +631,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>{settings.factoryName || 'Amazing Ads Sivakasi'}</h3>
-                    <p style={{ fontSize: '0.75rem', color: '#FFD72E', fontFamily: 'var(--font-mono)' }}>
+                    <p className="gold-gradient-text" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
                       Official Portal: {settings.websiteUrl || 'amazingads.in'}
                     </p>
                   </div>
@@ -348,7 +645,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📞 Direct Phone Lines:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: '#FFD72E' }}>
+                    <span className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
                       {settings.phone || '+91 97904 72767'}{settings.secondaryPhone ? ` / ${settings.secondaryPhone}` : ''}
                     </span>
                   </div>
@@ -415,6 +712,20 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       </section>
 
       <style>{`
+        .product-cat-card {
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .product-cat-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(215, 134, 0, 0.35) !important;
+          border-color: #D78600 !important;
+        }
+        .product-cat-img {
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .product-cat-card:hover .product-cat-img {
+          transform: scale(1.06);
+        }
         .dept-card {
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }

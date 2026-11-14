@@ -222,7 +222,7 @@ export const CorporateInquiry = () => {
                   {confirmation.message}
                 </p>
 
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-gold-bright)', marginBottom: '20px' }}>
+                <div className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 800, marginBottom: '20px' }}>
                   CASE REF: {confirmation.inquiryId}
                 </div>
 

@@ -1,5 +1,18 @@
 [
   {
+    "id": "MSG-4282",
+    "name": "Siva",
+    "phone": "9578457152",
+    "email": "",
+    "product": "Stone Art Sculptural Calendars (Lord Balaji Edition), Stone Art Sculptural Calendars (Lord Balaji Edition)",
+    "size": "14 × 20 inches, 18 × 24 inches",
+    "quantity": 4,
+    "notes": "Total: ₹1350. Notes: RJPM",
+    "message": "Catalog Cart Order (4 units, Est. Total: ₹1,350):\n1. Stone Art Sculptural Calendars (Lord Balaji Edition) (14 × 20 inches) × 2 units @ ₹280 = ₹560\n2. Stone Art Sculptural Calendars (Lord Balaji Edition) (18 × 24 inches) × 2 units @ ₹395 = ₹790\nCustomer Notes: RJPM",
+    "createdAt": "2026-11-14T10:11:34.282Z",
+    "status": "New"
+  },
+  {
     "id": "MSG-5578",
     "name": "Kala",
     "phone": "9857645123",
@@ -36,7 +49,7 @@
     "notes": "Sample kit received. We want to place order for Deepavali gifts.",
     "message": "Direct Factory Inquiry:\nRequesting formal proforma invoice for 1,000 units of Gold / Silver PET Foil Calendar (12 × 18 in). Delivery to Coimbatore.",
     "createdAt": "2026-11-14T04:15:00.000Z",
-    "status": "New"
+    "status": "Replied"
   },
   {
     "id": "INQ-9010",

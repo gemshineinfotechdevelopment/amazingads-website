@@ -144,7 +144,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                   }}
                 >
                   <span style={{ fontSize: '1.6rem', display: 'block', marginBottom: '6px' }}>{item.icon}</span>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.6rem', fontWeight: 800, color: 'var(--accent-gold-bright)' }}>
+                  <div className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontSize: '1.6rem', fontWeight: 800 }}>
                     {item.stat}
                   </div>
                   <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>

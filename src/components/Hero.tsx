@@ -62,14 +62,13 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
       <div className="container">
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 0.8fr',
-            gap: '60px',
-            alignItems: 'center'
+            maxWidth: '820px',
+            position: 'relative',
+            zIndex: 2
           }}
-          className="hero-grid"
+          className="hero-content"
         >
-          {/* Left Column: Editorial Headline & Copy */}
+          {/* Editorial Headline & Copy */}
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <span className="foil-badge">
@@ -83,12 +82,14 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             <h1
               className="hero-headline"
               style={{
-                fontSize: 'clamp(2.1rem, 5.2vw, 4.4rem)',
-                lineHeight: '1.05',
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(2.3rem, 5.2vw, 4.4rem)',
+                lineHeight: '1.1',
                 color: '#ffffff',
                 fontWeight: 800,
                 marginBottom: '18px',
-                letterSpacing: '-0.035em'
+                letterSpacing: '-0.025em',
+                textShadow: '0 2px 20px rgba(0, 0, 0, 0.85)'
               }}
             >
               Precision <span className="gold-gradient-text">Calendar & Promo Press</span>.
@@ -97,11 +98,13 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             <p
               className="hero-subtext"
               style={{
-                fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
-                lineHeight: '1.6',
-                color: 'var(--text-secondary)',
-                maxWidth: '560px',
-                marginBottom: '20px'
+                fontSize: 'clamp(1rem, 2vw, 1.18rem)',
+                lineHeight: '1.65',
+                color: '#ffffff',
+                opacity: 0.94,
+                maxWidth: '680px',
+                marginBottom: '26px',
+                textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)'
               }}
             >
               {settings.tagline || "India’s premier manufacturing atelier for Gold/Silver PET Foil Calendars, Custom 5D Holographic Calendars, Stone Art Calendars, Hand Fans & Special Products."}
@@ -113,17 +116,17 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 <span
                   key={p.id}
                   style={{
-                    background: 'rgba(215, 134, 0, 0.14)',
-                    border: '1px solid rgba(215, 134, 0, 0.4)',
-                    color: '#FFD72E',
-                    padding: '4px 12px',
+                    background: 'rgba(215, 134, 0, 0.16)',
+                    border: '1px solid rgba(215, 134, 0, 0.45)',
+                    padding: '5px 14px',
                     borderRadius: '20px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.02em'
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)'
                   }}
                 >
-                  ✦ {p.name}
+                  <span className="gold-gradient-text">✦ {p.name}</span>
                 </span>
               ))}
             </div>
@@ -162,7 +165,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
               }}
             >
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
+                <p className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 800 }}>
                   {stats.calendarsPrintedYearToDate || '14M+'}
                 </p>
                 <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -180,7 +183,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
               </div>
 
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
+                <p className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 800 }}>
                   100%
                 </p>
                 <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -198,145 +201,38 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
               </div>
             </div>
           </div>
-
-          {/* Right Column: Layered Tactile Mockup Preview Showcase */}
-          <div style={{ position: 'relative' }}>
-            <div
-              className="hero-preview-box"
-              style={{
-                position: 'relative',
-                background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
-                borderRadius: 'var(--radius-xl)',
-                border: '1px solid #454545',
-                padding: '24px',
-                boxShadow: '0 25px 50px -12px rgba(3, 3, 3, 0.8), 0 0 35px rgba(215, 134, 0, 0.2)',
-                overflow: 'hidden'
-              }}
-            >
-              {/* Top Bar with Binding Simulation */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingBottom: '16px',
-                  borderBottom: '1px solid #454545'
-                }}
-              >
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <div
-                      key={i}
-                      style={{
-                        width: '12px',
-                        height: '14px',
-                        borderRadius: '3px',
-                        background: 'linear-gradient(180deg, #FFD72E 0%, #D78600 100%)',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
-                      }}
-                    />
-                  ))}
-                </div>
-                <span style={{ fontSize: '0.72rem', color: '#FFD72E', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>
-                  SPEC: 350 GSM LINEN • TWIN WIRE-O
-                </span>
-              </div>
-
-              {/* Main Calendar Card Visual */}
-              <div
-                style={{
-                  marginTop: '16px',
-                  borderRadius: 'var(--radius-md)',
-                  overflow: 'hidden',
-                  position: 'relative',
-                  border: '1px solid #454545',
-                  boxShadow: '0 16px 36px rgba(0, 0, 0, 0.65)',
-                  background: '#030303'
-                }}
-              >
-                <img
-                  src="/images/luxury-scenic-calendar-2026.jpg"
-                  alt={`November 2026 Luxury Scenic Wall Calendar - ${brandName} Sivakasi`}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    display: 'block',
-                    objectFit: 'cover'
-                  }}
-                />
-
-                {/* Floating 24K Hot Foil Tag */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    background: 'linear-gradient(135deg, #FFD72E 0%, #D78600 100%)',
-                    color: '#030303',
-                    padding: '4px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    letterSpacing: '0.08em',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.6)',
-                    backdropFilter: 'blur(6px)'
-                  }}
-                >
-                  NOVEMBER 2026 EDITION
-                </div>
-              </div>
-
-              {/* Floating Swatch Accent Badge */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '16px',
-                  right: '16px',
-                  background: 'rgba(3, 3, 3, 0.95)',
-                  border: '1px solid #454545',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '8px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.6)'
-                }}
-              >
-                <div
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: '50%',
-                    background: 'conic-gradient(#FFD72E, #D78600, #FFD72E)'
-                  }}
-                />
-                <div>
-                  <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#fff' }}>Physical Proofing</p>
-                  <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Included With Every Order</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
       <style>{`
         .hero-section {
-          padding: 80px 0 100px;
+          position: relative;
+          overflow: hidden;
+          padding: 95px 0 115px;
+          background-image: 
+            linear-gradient(180deg, rgba(3, 3, 3, 0.72) 0%, rgba(20, 22, 24, 0.78) 50%, rgba(46, 47, 43, 0.92) 100%),
+            url('/images/Luxurious%202026%20Calendar%20Showcase.png');
+          background-size: cover;
+          background-position: center center;
+          background-repeat: no-repeat;
+          border-bottom: 1px solid #454545;
+        }
+
+        .hero-content {
+          max-width: 820px;
         }
 
         @media (max-width: 960px) {
           .hero-section {
-            padding: 40px 0 60px;
+            padding: 50px 0 70px;
           }
-          .hero-grid {
-            grid-template-columns: 1fr !important;
-            gap: 36px !important;
+          .hero-content {
+            max-width: 100%;
           }
         }
         @media (max-width: 640px) {
           .hero-section {
-            padding: 28px 0 44px;
+            padding: 36px 0 50px;
           }
           .hero-cta-group {
             flex-direction: column !important;
@@ -349,9 +245,6 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
           .hero-badges-row, .hero-stats-grid {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 14px !important;
-          }
-          .hero-preview-box {
-            padding: 16px !important;
           }
         }
       `}</style>

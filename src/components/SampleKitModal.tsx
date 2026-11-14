@@ -276,7 +276,7 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
             </h3>
 
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '24px' }}>
-              Thank you, <strong style={{ color: '#fff' }}>{result.name}</strong>. Your sample request is registered under Tracking ID <strong style={{ color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>{result.sampleId}</strong>.
+              Thank you, <strong style={{ color: '#fff' }}>{result.name}</strong>. Your sample request is registered under Tracking ID <strong className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800 }}>{result.sampleId}</strong>.
             </p>
 
             <div
