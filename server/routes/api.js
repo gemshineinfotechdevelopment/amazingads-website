@@ -1,13 +1,73 @@
 import { Router } from 'express';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import { Quote } from '../models/Quote.js';
 import { SampleKit } from '../models/SampleKit.js';
 import { Inquiry } from '../models/Inquiry.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.resolve(__dirname, '../data');
+const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
+const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
+
+// Mongoose Schemas for MongoDB Atlas
+const productSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  name: String,
+  subtitle: String,
+  category: String,
+  tag: String,
+  startingPrice: Number,
+  currency: { type: String, default: '₹' },
+  minOrder: Number,
+  standardGsm: String,
+  binding: String,
+  dimensions: String,
+  leadTime: String,
+  accentColor: String,
+  coverFinish: String,
+  description: String,
+  features: [String],
+  mockupImg: String,
+  sizes: [String]
+}, { timestamps: true });
+
+let ProductModel;
+try {
+  ProductModel = mongoose.model('CalendarProduct', productSchema);
+} catch {
+  ProductModel = mongoose.models.CalendarProduct;
+}
+
+const messageSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  name: String,
+  phone: String,
+  message: String,
+  status: { type: String, default: 'New' },
+  createdAt: { type: String }
+}, { timestamps: true });
+
+let MessageModel;
+try {
+  MessageModel = mongoose.model('CustomerMessage', messageSchema);
+} catch {
+  MessageModel = mongoose.models.CustomerMessage;
+}
+
+function ensureDataDir() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
 const router = Router();
 
 // Authentic Amazing Ads Sivakasi Calendar Catalog & Specifications
-const calendarCatalog = [
+const DEFAULT_CALENDAR_CATALOG = [
   {
     id: 'pet-foil-calendar',
     name: 'Gold / Silver PET Foil Calendar',
@@ -31,7 +91,12 @@ const calendarCatalog = [
       'Spacious Top & Bottom Header Area for Corporate Branding / Logo / Phone',
       'Individual Corrugated Protection Box for Safe All-India Shipping'
     ],
-    mockupImg: '/images/gods/mahalakshmi.jpg'
+    mockupImg: '/images/gods/mahalakshmi.jpg',
+    sizes: [
+      '15 × 20 inches (Standard Wall)',
+      '17 × 27 inches (Jumbo Royal Wall)',
+      '12 × 18 inches (Compact Office)'
+    ]
   },
   {
     id: 'custom-5d-calendar',
@@ -56,11 +121,16 @@ const calendarCatalog = [
       'Tear-off daily panchangam block or 12-month card slot at base',
       'High-retention corporate gift guaranteed to remain on wall for years'
     ],
-    mockupImg: '/images/gods/murugan.jpg'
+    mockupImg: '/images/gods/murugan.jpg',
+    sizes: [
+      '12 × 18 inches (Standard 5D Frame)',
+      '16 × 24 inches (Executive Deluxe)',
+      '18 × 28 inches (Grand Temple)'
+    ]
   },
   {
     id: 'stone-art-calendar',
-    name: 'Stone Art Calendars (Lord Shiva Edition)',
+    name: 'Stone Art Sculptural Calendars (Lord Balaji Edition)',
     subtitle: 'Sculptural Textured Relief with Handcrafted Stone-Finish Elegance',
     category: 'Stone Art Calendars',
     tag: 'Artisan Heritage Craft',
@@ -81,7 +151,12 @@ const calendarCatalog = [
       'Fitted with daily tear-off panchangam pad or 12-month sliding sheet',
       'Premium wedding, housewarming, and New Year VIP executive gift'
     ],
-    mockupImg: '/images/gods/sivan.jpg'
+    mockupImg: '/images/stone-art-calendar-real.jpg',
+    sizes: [
+      '14 × 20 inches (Royal Stone Frame)',
+      '18 × 24 inches (Imperial Mandir Cut)',
+      '11 × 16 inches (Compact Wall)'
+    ]
   },
   {
     id: 'hand-fan',
@@ -107,7 +182,12 @@ const calendarCatalog = [
       'Custom contour die-cut shapes available (Round, Leaf, Brand Mascot)',
       'High retention and viral brand exposure across crowd gatherings'
     ],
-    mockupImg: '/images/gods/ganesha.jpg'
+    mockupImg: '/images/gods/ganesha.jpg',
+    sizes: [
+      '8 × 8 inches (Standard Round)',
+      '9 × 10 inches (Jumbo Leaf)',
+      'Custom Shape Die-Cut'
+    ]
   },
   {
     id: 'special-products',
@@ -132,13 +212,137 @@ const calendarCatalog = [
       'Custom rigid box packaging with magnetic closure and satin lining',
       'Dedicated branding plate with laser engraved company emblem'
     ],
-    mockupImg: '/images/gods/ayyappan.jpg'
+    mockupImg: '/images/gods/ayyappan.jpg',
+    sizes: [
+      'A4 Executive Desk (8.5 × 11 in)',
+      'A5 Compact Desk (6 × 8.5 in)',
+      'VIP Gift Box Set (12 × 15 in)'
+    ]
   }
 ];
+
+function loadProductsFromDisk() {
+  ensureDataDir();
+  try {
+    if (fs.existsSync(PRODUCTS_FILE)) {
+      const raw = fs.readFileSync(PRODUCTS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('[Storage] Error reading products.json:', err.message);
+  }
+  try {
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(DEFAULT_CALENDAR_CATALOG, null, 2), 'utf-8');
+  } catch {}
+  return JSON.parse(JSON.stringify(DEFAULT_CALENDAR_CATALOG));
+}
+
+function saveProductsToDisk(products) {
+  ensureDataDir();
+  try {
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[Storage] Error writing products.json:', err.message);
+  }
+}
+
+function loadMessagesFromDisk() {
+  ensureDataDir();
+  try {
+    if (fs.existsSync(MESSAGES_FILE)) {
+      const raw = fs.readFileSync(MESSAGES_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('[Storage] Error reading messages.json:', err.message);
+  }
+  const defaultMessages = [
+    {
+      id: 'MSG-1001',
+      name: 'Karthik Raja',
+      phone: '+91 98401 23456',
+      message: 'Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our company name printed at the top.',
+      createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+      status: 'New'
+    },
+    {
+      id: 'MSG-1002',
+      name: 'Lakshmi Narayanan',
+      phone: '+91 97904 88765',
+      message: 'Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?',
+      createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+      status: 'Replied'
+    }
+  ];
+  try {
+    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(defaultMessages, null, 2), 'utf-8');
+  } catch {}
+  return defaultMessages;
+}
+
+function saveMessagesToDisk(messages) {
+  ensureDataDir();
+  try {
+    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[Storage] Error writing messages.json:', err.message);
+  }
+}
+
+let calendarCatalog = loadProductsFromDisk();
 
 let quoteRequests = [];
 let sampleKitRequests = [];
 let corporateInquiries = [];
+let customerMessages = loadMessagesFromDisk();
+
+// Initialize MongoDB sync if connected
+if (mongoose.connection) {
+  mongoose.connection.on('connected', async () => {
+    try {
+      if (ProductModel) {
+        const count = await ProductModel.countDocuments();
+        if (count === 0) {
+          await ProductModel.insertMany(calendarCatalog);
+          console.log('[MongoDB] Seeded products collection from disk cache');
+        } else {
+          const mongoProducts = await ProductModel.find().lean();
+          if (mongoProducts && mongoProducts.length > 0) {
+            calendarCatalog = mongoProducts.map(p => {
+              const { _id, __v, ...rest } = p;
+              return rest;
+            });
+            saveProductsToDisk(calendarCatalog);
+            console.log('[MongoDB] Synced products from MongoDB Atlas to disk cache');
+          }
+        }
+      }
+      if (MessageModel) {
+        const count = await MessageModel.countDocuments();
+        if (count === 0 && customerMessages.length > 0) {
+          await MessageModel.insertMany(customerMessages);
+        } else {
+          const mongoMessages = await MessageModel.find().sort({ createdAt: -1 }).lean();
+          if (mongoMessages && mongoMessages.length > 0) {
+            customerMessages = mongoMessages.map(m => {
+              const { _id, __v, ...rest } = m;
+              return rest;
+            });
+            saveMessagesToDisk(customerMessages);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[MongoDB] Init sync notice:', err.message);
+    }
+  });
+}
 
 // 1. Health & Server Status
 router.get('/health', (req, res) => {
@@ -173,6 +377,253 @@ router.get('/calendar-products', (req, res) => {
     total: items.length,
     data: items
   });
+});
+
+// 2b. Update Catalog Product (Admin)
+router.put('/calendar-products/:id', async (req, res) => {
+  const { id } = req.params;
+  const index = calendarCatalog.findIndex(p => p.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      message: `Product with ID '${id}' not found`
+    });
+  }
+
+  const current = calendarCatalog[index];
+  const updated = {
+    ...current,
+    ...req.body,
+    id: current.id, // preserve ID
+    startingPrice: req.body.startingPrice !== undefined ? Number(req.body.startingPrice) : current.startingPrice,
+    minOrder: req.body.minOrder !== undefined ? Number(req.body.minOrder) : current.minOrder,
+    sizes: Array.isArray(req.body.sizes) ? req.body.sizes : current.sizes
+  };
+
+  calendarCatalog[index] = updated;
+  saveProductsToDisk(calendarCatalog);
+
+  if (mongoose.connection.readyState === 1 && ProductModel) {
+    try {
+      await ProductModel.findOneAndUpdate({ id: updated.id }, updated, { upsert: true });
+    } catch (err) {
+      console.warn('[MongoDB] Update product error:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Product updated successfully',
+    data: updated
+  });
+});
+
+// 2c. Create New Product (Admin)
+router.post('/calendar-products', async (req, res) => {
+  const newProduct = {
+    id: req.body.id || `product-${Date.now()}`,
+    name: req.body.name || 'New Calendar Product',
+    subtitle: req.body.subtitle || 'Custom Sivakasi Manufacturing Edition',
+    category: req.body.category || 'Special Products',
+    tag: req.body.tag || 'New Arrival',
+    startingPrice: Number(req.body.startingPrice) || 120,
+    currency: '₹',
+    minOrder: Number(req.body.minOrder) || 100,
+    standardGsm: req.body.standardGsm || '400 GSM Rigid Kappa Board',
+    binding: req.body.binding || 'Deluxe Frame / Tin Mount',
+    dimensions: req.body.dimensions || '14 × 20 inches',
+    leadTime: req.body.leadTime || '4–6 Business Days',
+    accentColor: req.body.accentColor || '#cfa84e',
+    coverFinish: req.body.coverFinish || '24K Heated Gold Foil & Multi-stage Emboss',
+    description: req.body.description || 'Precision crafted at Amazing Ads Sivakasi Works.',
+    features: Array.isArray(req.body.features) && req.body.features.length > 0 ? req.body.features : [
+      'Authentic Sivakasi Direct Factory Finish',
+      'High Quality Moisture Resistant Substrate',
+      'Full Color HD Print & Hot Stamping'
+    ],
+    mockupImg: req.body.mockupImg || '/images/stone-art-calendar-real.jpg',
+    sizes: Array.isArray(req.body.sizes) && req.body.sizes.length > 0 ? req.body.sizes : [
+      '14 × 20 inches (Standard)',
+      '18 × 24 inches (Deluxe)'
+    ]
+  };
+
+  calendarCatalog.push(newProduct);
+  saveProductsToDisk(calendarCatalog);
+
+  if (mongoose.connection.readyState === 1 && ProductModel) {
+    try {
+      await ProductModel.findOneAndUpdate({ id: newProduct.id }, newProduct, { upsert: true });
+    } catch (err) {
+      console.warn('[MongoDB] Create product error:', err.message);
+    }
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Product created successfully',
+    data: newProduct
+  });
+});
+
+// 2d. Delete Product (Admin)
+router.delete('/calendar-products/:id', async (req, res) => {
+  const { id } = req.params;
+  const initialLength = calendarCatalog.length;
+  calendarCatalog = calendarCatalog.filter(p => p.id !== id);
+
+  if (calendarCatalog.length === initialLength) {
+    return res.status(404).json({
+      success: false,
+      message: `Product with ID '${id}' not found`
+    });
+  }
+
+  saveProductsToDisk(calendarCatalog);
+
+  if (mongoose.connection.readyState === 1 && ProductModel) {
+    try {
+      await ProductModel.deleteOne({ id });
+    } catch (err) {
+      console.warn('[MongoDB] Delete product error:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Product deleted successfully',
+    deletedId: id
+  });
+});
+
+// 2e. Reset Catalog to Defaults (Admin)
+router.post('/calendar-products/reset', async (req, res) => {
+  calendarCatalog = JSON.parse(JSON.stringify(DEFAULT_CALENDAR_CATALOG));
+  saveProductsToDisk(calendarCatalog);
+
+  if (mongoose.connection.readyState === 1 && ProductModel) {
+    try {
+      await ProductModel.deleteMany({});
+      await ProductModel.insertMany(calendarCatalog);
+    } catch (err) {
+      console.warn('[MongoDB] Reset products error:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Catalog reset to original Sivakasi master specifications',
+    data: calendarCatalog
+  });
+});
+
+// 2f. Admin Dashboard Overview & Activity Feed
+router.get('/admin/overview', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      totalProducts: calendarCatalog.length,
+      totalQuotesGenerated: quoteRequests.length,
+      totalSampleKitsRequested: sampleKitRequests.length,
+      totalCorporateInquiries: corporateInquiries.length,
+      totalCustomerMessages: customerMessages.length,
+      recentQuotes: quoteRequests.slice(-10).reverse(),
+      recentSampleKits: sampleKitRequests.slice(-10).reverse(),
+      recentInquiries: corporateInquiries.slice(-10).reverse(),
+      recentMessages: customerMessages.slice(-10).reverse()
+    }
+  });
+});
+
+// 2g. Admin Login Endpoint
+router.post('/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  const validUser = (username === 'admin' || username === 'amazingads') && (password === 'admin' || password === 'amazingads2026');
+
+  if (validUser) {
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      token: `token-${Date.now()}`,
+      admin: {
+        username: 'admin',
+        role: 'Master Press Administrator',
+        hub: 'Sivakasi Works'
+      }
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    message: 'Invalid administrator credentials. Please check your username and password.'
+  });
+});
+
+// 2h. Customer WhatsApp Messages (Create & Retrieve)
+router.post('/messages', async (req, res) => {
+  const { name, phone, message } = req.body;
+  if (!name || !message) {
+    return res.status(400).json({
+      success: false,
+      message: 'Name and message are required'
+    });
+  }
+
+  const newMessage = {
+    id: `MSG-${Date.now().toString().slice(-4)}`,
+    name: name.trim(),
+    phone: phone ? phone.trim() : 'Not provided',
+    message: message.trim(),
+    createdAt: new Date().toISOString(),
+    status: 'New'
+  };
+
+  customerMessages.unshift(newMessage);
+  saveMessagesToDisk(customerMessages);
+
+  if (mongoose.connection.readyState === 1 && MessageModel) {
+    try {
+      await MessageModel.create(newMessage);
+    } catch (err) {
+      console.warn('[MongoDB] Create message error:', err.message);
+    }
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Message routed to factory manager successfully',
+    data: newMessage
+  });
+});
+
+router.get('/messages', (req, res) => {
+  res.json({
+    success: true,
+    total: customerMessages.length,
+    data: customerMessages
+  });
+});
+
+router.put('/messages/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const msg = customerMessages.find(m => m.id === id);
+  if (msg) {
+    msg.status = status || 'Replied';
+    saveMessagesToDisk(customerMessages);
+
+    if (mongoose.connection.readyState === 1 && MessageModel) {
+      try {
+        await MessageModel.updateOne({ id }, { status: msg.status });
+      } catch (err) {
+        console.warn('[MongoDB] Update message status error:', err.message);
+      }
+    }
+
+    return res.json({ success: true, data: msg });
+  }
+  res.status(404).json({ success: false, message: 'Message not found' });
 });
 
 // 3. Dynamic Quote Calculator Engine for Amazing Ads Sivakasi

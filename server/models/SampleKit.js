@@ -62,3 +62,4 @@ const sampleKitSchema = new mongoose.Schema(
 );
 
 export const SampleKit = mongoose.models.SampleKit || mongoose.model('SampleKit', sampleKitSchema);
+

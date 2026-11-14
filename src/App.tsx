@@ -3,7 +3,7 @@ import { RouterProvider, useRouter } from './context/RouterContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { SampleKitModal } from './components/SampleKitModal';
-import { FloatingConcierge } from './components/FloatingConcierge';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 
 // Dedicated Standalone Pages
 import { HomePage } from './pages/HomePage';
@@ -15,10 +15,16 @@ import { CraftPage } from './pages/CraftPage';
 import { CorporatePage } from './pages/CorporatePage';
 import { ContactPage } from './pages/ContactPage';
 import { DielinesPage } from './pages/DielinesPage';
+import { AdminPage } from './pages/AdminPage';
 
 const AppContent = () => {
   const { currentPage } = useRouter();
   const [isSampleKitOpen, setIsSampleKitOpen] = useState(false);
+
+  // If viewing the Admin side, render the standalone, dedicated Admin Portal
+  if (currentPage === 'admin') {
+    return <AdminPage />;
+  }
 
   const renderActivePage = () => {
     switch (currentPage) {
@@ -63,10 +69,8 @@ const AppContent = () => {
         onClose={() => setIsSampleKitOpen(false)}
       />
 
-      {/* Floating Direct Press Hotline & Quick Actions */}
-      <FloatingConcierge
-        onOpenSampleKit={() => setIsSampleKitOpen(true)}
-      />
+      {/* Floating Direct WhatsApp Action */}
+      <FloatingWhatsApp />
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useRouter } from '../context/RouterContext';
-import { submitCorporateInquiry } from '../services/api';
+import { submitCorporateInquiry, getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface ContactPageProps {
   onOpenSampleKit?: () => void;
@@ -8,6 +8,20 @@ interface ContactPageProps {
 
 export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) {
+        setSettings(custom.detail);
+      } else {
+        setSettings(getStoredFactorySettings());
+      }
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -96,7 +110,7 @@ className="contact-card contact-box"
                 ✦ HEADQUARTERS & PRESS WORKS
               </span>
               <h2 style={{ fontSize: '1.6rem', color: '#fff', marginBottom: '20px' }}>
-                Amazing Ads Sivakasi Works
+                {settings.factoryName || 'Amazing Ads Sivakasi Works'}
               </h2>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '0.92rem' }}>
@@ -105,8 +119,7 @@ className="contact-card contact-box"
                   <div>
                     <strong style={{ color: '#fff', display: 'block' }}>Factory Address:</strong>
                     <span style={{ color: 'var(--text-secondary)' }}>
-                      3/1, Vannakara Street, Chairman P.K.S.A. Arumugam Road,<br />
-                      Sivakasi 626189, Tamil Nadu, India.
+                      {settings.address || '3/1, Vannakara Street, Chairman P.K.S.A. Arumugam Road, Sivakasi 626189, Tamil Nadu, India.'}
                     </span>
                   </div>
                 </div>
@@ -126,11 +139,13 @@ className="contact-card contact-box"
                   <div>
                     <strong style={{ color: '#fff', display: 'block' }}>Direct Factory Hotline & WhatsApp:</strong>
                     <span style={{ color: 'var(--accent-gold-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                      +91 97904 72767 / +91 97904 27670
+                      {settings.phone} {settings.secondaryPhone ? `/ ${settings.secondaryPhone}` : ''}
                     </span>
-                    <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Management: +91 98400 55220
-                    </span>
+                    {settings.whatsapp && (
+                      <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        WhatsApp Business: {settings.whatsapp}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -139,7 +154,7 @@ className="contact-card contact-box"
                   <div>
                     <strong style={{ color: '#fff', display: 'block' }}>Email Support:</strong>
                     <span style={{ color: 'var(--text-secondary)' }}>
-                      aamazingads@gmail.com • www.amazingads.in
+                      {settings.email} • {settings.websiteUrl || 'www.amazingads.in'}
                     </span>
                   </div>
                 </div>
@@ -149,7 +164,7 @@ className="contact-card contact-box"
                   <div>
                     <strong style={{ color: '#fff', display: 'block' }}>Working Hours:</strong>
                     <span style={{ color: 'var(--text-secondary)' }}>
-                      Monday – Saturday: 9:00 AM – 8:30 PM IST
+                      {settings.operatingHours || 'Monday – Saturday: 8:30 AM – 8:30 PM IST'}
                     </span>
                   </div>
                 </div>

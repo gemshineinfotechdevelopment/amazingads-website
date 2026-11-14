@@ -421,4 +421,67 @@ label {
 
   .mobile-full-btn, .btn-gold, .btn-outline-gold {
     width: 100%;
+  }
+}
+
+/* Dedicated Admin Portal Layout & Mobile Responsiveness */
+@media (max-width: 900px) {
+  .admin-mobile-toggle {
+    display: inline-flex !important;
+  }
+  .admin-sidebar {
+    position: fixed !important;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.85);
+  }
+  .admin-sidebar.open {
+    left: 0 !important;
+  }
+}
+
+/* Hide increase/decrease stepper arrows on number inputs in admin */
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button,
+input[type="number"].no-spinners::-webkit-outer-spin-button,
+input[type="number"].no-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type="number"].no-spinners {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+/* Admin Portal Inputs & Textareas - Always Dark Crisp High-Contrast Text */
+.admin-portal-root input,
+.admin-portal-root textarea,
+.admin-portal-root select,
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+.admin-portal-root input::placeholder,
+.admin-portal-root textarea::placeholder,
+.admin-modal input::placeholder,
+.admin-modal textarea::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* Dedicated Admin Layout Non-Scrolling Sidebar */
+.admin-fixed-sidebar {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  flex-shrink: 0 !important;
+  position: sticky !important;
+  top: 0 !important;
+}
 

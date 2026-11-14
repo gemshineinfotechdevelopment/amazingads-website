@@ -1,5 +1,6 @@
-import type { CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface FooterProps {
   onOpenSampleKit: () => void;
@@ -7,6 +8,20 @@ interface FooterProps {
 
 export const Footer = ({ onOpenSampleKit }: FooterProps) => {
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) {
+        setSettings(custom.detail);
+      } else {
+        setSettings(getStoredFactorySettings());
+      }
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
 
   return (
     <footer
@@ -35,22 +50,21 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
               onClick={() => navigate('home')}
               style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', cursor: 'pointer' }}
             >
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '6px',
-                  background: 'linear-gradient(135deg, #2a2210 0%, #151821 100%)',
-                  border: '1px solid var(--accent-gold)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <span style={{ fontFamily: 'var(--font-heading)', fontSize: '16px', color: 'var(--accent-gold-bright)', fontWeight: 800 }}>
-                  AA
-                </span>
-              </div>
+              {settings.logoUrl && (
+                <img
+                  src={settings.logoUrl}
+                  alt="Logo"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '6px',
+                    objectFit: 'contain',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    padding: '2px',
+                    border: '1px solid var(--accent-gold)'
+                  }}
+                />
+              )}
               <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.04em', color: '#fff' }}>
                 AMAZING ADS
               </span>
@@ -110,7 +124,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
               <div>
                 <strong style={{ color: '#fff', display: 'block' }}>Sivakasi Manufacturing Hub:</strong>
-                <span>3/1, Vannakara Street, Chairman P.K.S.A. Arumugam Road, Sivakasi 626189, Tamil Nadu</span>
+                <span>{settings.address || '3/1, Vannakara Street, Chairman P.K.S.A. Arumugam Road, Sivakasi 626189, Tamil Nadu'}</span>
               </div>
               <div>
                 <strong style={{ color: '#fff', display: 'block' }}>Branch Offices:</strong>
@@ -118,10 +132,10 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
               </div>
               <div style={{ marginTop: '4px' }}>
                 <strong style={{ color: 'var(--accent-gold-bright)', display: 'block' }}>Direct Factory Hotline & WhatsApp:</strong>
-                <span style={{ fontFamily: 'var(--font-mono)' }}>+91 97904 72767 / +91 97904 27670 / +91 98400 55220</span>
+                <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.phone} {settings.secondaryPhone ? `• ${settings.secondaryPhone}` : ''}</span>
               </div>
               <div>
-                <span>aamazingads@gmail.com • www.amazingads.in</span>
+                <span>{settings.email} • {settings.websiteUrl || 'www.amazingads.in'}</span>
               </div>
             </div>
           </div>

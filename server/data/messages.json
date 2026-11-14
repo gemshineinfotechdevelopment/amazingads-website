@@ -1,0 +1,38 @@
+[
+  {
+    "id": "MSG-1001",
+    "name": "Karthik Raja",
+    "phone": "+91 98401 23456",
+    "message": "Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our company name printed at the top.",
+    "status": "New",
+    "createdAt": "2026-11-14T03:43:03.097Z",
+    "updatedAt": "2026-11-14T05:47:04.295Z"
+  },
+  {
+    "id": "MSG-1001",
+    "name": "Karthik Raja",
+    "phone": "+91 98401 23456",
+    "message": "Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our company name printed at the top.",
+    "status": "New",
+    "createdAt": "2026-11-14T03:43:03.097Z",
+    "updatedAt": "2026-11-14T05:47:04.312Z"
+  },
+  {
+    "id": "MSG-1002",
+    "name": "Lakshmi Narayanan",
+    "phone": "+91 97904 88765",
+    "message": "Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?",
+    "status": "Replied",
+    "createdAt": "2026-11-14T00:43:03.097Z",
+    "updatedAt": "2026-11-14T05:47:04.295Z"
+  },
+  {
+    "id": "MSG-1002",
+    "name": "Lakshmi Narayanan",
+    "phone": "+91 97904 88765",
+    "message": "Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?",
+    "status": "Replied",
+    "createdAt": "2026-11-14T00:43:03.097Z",
+    "updatedAt": "2026-11-14T05:47:04.312Z"
+  }
+]
