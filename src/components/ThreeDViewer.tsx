@@ -242,12 +242,12 @@ className="scroll-pills-row threed-tabs-wrapper threed-tabs-nav"
         }}
       >
         {[
-          { id: 'pet-foil', label: '✦ 24K Gold Foil (Mahalakshmi)', icon: '🌸' },
-          { id: 'murugan-5d', label: '🌀 5D Lenticular (Murugan ↔ Ayyappan)', icon: '🦚' },
-          { id: 'ayyappan-frame', label: '🛕 Swami Ayyappan (24K Gold Frame)', icon: '✨' },
-          { id: 'sivan-stone', label: '👑 Lord Balaji (Stone Art Sculptural)', icon: '👑' },
-          { id: 'daily-panchangam', label: '📅 Daily Calendar (Tear-Off Leaves)', icon: '📜' },
-          { id: 'hand-fan', label: '🪭 Temple Promo Hand Fan (Ganesha)', icon: '🪭' }
+          { id: 'pet-foil', label: '24K Gold Foil', icon: '✦' },
+          { id: 'murugan-5d', label: '5D Lenticular', icon: '🌀' },
+          { id: 'ayyappan-frame', label: 'Devotional Frame', icon: '🛕' },
+          { id: 'sivan-stone', label: 'Stone Art 3D', icon: '👑' },
+          { id: 'daily-panchangam', label: 'Daily Panchangam', icon: '📅' },
+          { id: 'hand-fan', label: 'Promo Hand Fan', icon: '🪭' }
         ].map((tab) => (
           <button
             key={tab.id}
@@ -292,8 +292,8 @@ className="scroll-pills-row threed-tabs-wrapper threed-tabs-nav"
           border: '1px solid var(--border-subtle)'
         }}
       >
-<span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-          ✦ Custom Branding Imprint (Live Foil):
+        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          ✦ Live Custom Imprint:
         </span>
         <input
           type="text"

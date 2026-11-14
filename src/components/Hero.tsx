@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
   getStoredFactorySettings,
-  getStoredCatalog,
-  SIVAKASI_CATALOG,
   getPressStats,
   type FactorySettings,
-  type CalendarProduct,
   type PressStats
 } from '../services/api';
 
@@ -16,10 +13,6 @@ interface HeroProps {
 
 export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
-  const [products, setProducts] = useState<CalendarProduct[]>(() => {
-    const stored = getStoredCatalog();
-    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
-  });
   const [stats, setStats] = useState<PressStats>({
     calendarsPrintedYearToDate: '14,205,000+',
     corporateClientsServed: '4,500+',
@@ -41,17 +34,9 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
       else setSettings(getStoredFactorySettings());
     };
 
-    const handleCatalogUpdate = () => {
-      const stored = getStoredCatalog();
-      if (stored && stored.length > 0) setProducts(stored);
-    };
-
     window.addEventListener('factory-settings-updated', handleSettingsUpdate);
-    window.addEventListener('catalog-updated', handleCatalogUpdate);
-
     return () => {
       window.removeEventListener('factory-settings-updated', handleSettingsUpdate);
-      window.removeEventListener('catalog-updated', handleCatalogUpdate);
     };
   }, []);
 
@@ -101,32 +86,11 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 lineHeight: '1.6',
                 color: 'var(--text-secondary)',
                 maxWidth: '560px',
-                marginBottom: '20px'
+                marginBottom: '26px'
               }}
             >
-              {settings.tagline || "India’s premier manufacturing atelier for Gold/Silver PET Foil Calendars, Custom 5D Holographic Calendars, Stone Art Calendars, Hand Fans & Special Products."}
+              Direct manufacturing press based in Sivakasi, Tamil Nadu. Specializing in 24K Gold Foil Stamped Wall Calendars, 5D Holographic Motion, Daily Sheet Panchangam, and Luxury Tabletop Easels.
             </p>
-
-            {/* Product Quick-Tag Highlights */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
-              {products.slice(0, 5).map((p) => (
-                <span
-                  key={p.id}
-                  style={{
-                    background: 'rgba(215, 134, 0, 0.14)',
-                    border: '1px solid rgba(215, 134, 0, 0.4)',
-                    color: '#FFD72E',
-                    padding: '4px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.02em'
-                  }}
-                >
-                  ✦ {p.name}
-                </span>
-              ))}
-            </div>
 
             {/* CTAs */}
             <div className="hero-cta-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '36px' }}>

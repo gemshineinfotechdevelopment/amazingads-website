@@ -27,7 +27,7 @@ export const CollectionsPage = () => {
             The <span className="gold-gradient-text">Collection</span>
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '540px', margin: '0 auto' }}>
-            Five signature editions: Gold/Silver PET Foil Calendar, Special Products, Custom 5D Calendars, Stone Art Calendars, and Hand Fan.
+            Explore our signature wholesale editions pressed on Heidelberg lines in Sivakasi with 24K metallic foils.
           </p>
         </div>
 
