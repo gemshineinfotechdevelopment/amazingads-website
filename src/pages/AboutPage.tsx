@@ -42,7 +42,8 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
   }, []);
 
   const estYear = settings.establishedYear || stats.establishedYear || 2008;
-  const yearsOfCraftsmanship = `${new Date().getFullYear() - estYear}+`;
+  const currentYear = new Date().getFullYear();
+  const yearsOfCraftsmanship = `${currentYear - estYear}+`;
   const brandName = settings.factoryName || 'Amazing Ads';
 
   const statItems = [

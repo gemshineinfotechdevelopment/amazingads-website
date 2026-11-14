@@ -455,7 +455,7 @@ if (mongoose.connection) {
           await SettingsModel.create({ key: 'factory_settings', ...factorySettings });
           console.log('[MongoDB] Seeded factory settings into Atlas database');
         } else {
-          const { _id, __v, key, ...rest } = found;
+          const { _id, __v, key: _key, ...rest } = found;
           factorySettings = { ...DEFAULT_FACTORY_SETTINGS, ...rest };
           saveSettingsToDisk(factorySettings);
           console.log('[MongoDB] Synced factory settings from Atlas to disk cache');
