@@ -178,7 +178,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-<div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
+          <div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
             {[
               {
                 client: 'Tata Motors & Titan',
@@ -244,7 +244,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       <section style={{ padding: '60px 0', position: 'relative' }}>
         <div className="container">
           <div
-className="about-banner-card home-about-box"
+            className="about-banner-card home-about-box"
             style={{
               background: 'linear-gradient(145deg, #131720 0%, #0c0f15 100%)',
               border: '1px solid var(--border-gold)',
@@ -384,7 +384,7 @@ className="about-banner-card home-about-box"
       <section style={{ padding: '60px 0 0' }}>
         <div className="container">
           <div
-className="swatch-banner-card home-swatch-box"
+            className="swatch-banner-card home-swatch-box"
             style={{
               background: 'linear-gradient(145deg, #1f190e 0%, #12151c 100%)',
               border: '1px solid var(--border-gold)',
@@ -434,7 +434,7 @@ className="swatch-banner-card home-swatch-box"
           }
         }
         @media (max-width: 768px) {
-.advantages-grid, .steps-grid, .clients-grid {
+          .advantages-grid, .steps-grid, .clients-grid {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
