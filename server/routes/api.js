@@ -3,12 +3,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
+import { Quote } from '../models/Quote.js';
+import { SampleKit } from '../models/SampleKit.js';
+import { Inquiry } from '../models/Inquiry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_DIR = path.resolve(__dirname, '../data');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
+const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 
 // Mongoose Schemas for MongoDB Atlas
 const productSchema = new mongoose.Schema({
@@ -59,6 +63,33 @@ try {
   MessageModel = mongoose.model('CustomerMessage', messageSchema);
 } catch {
   MessageModel = mongoose.models.CustomerMessage;
+}
+
+const settingsSchema = new mongoose.Schema({
+  key: { type: String, default: 'factory_settings', unique: true },
+  factoryName: { type: String, default: 'Amazing Ads Sivakasi Works' },
+  tagline: { type: String, default: "India's Premier Manufacturer of PET Foil, 5D Holographic & Stone Art Devotional Calendars" },
+  logoUrl: { type: String, default: '' },
+  address: { type: String, default: '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Tamil Nadu' },
+  phone: { type: String, default: '+91 97904 72767' },
+  secondaryPhone: { type: String, default: '+91 97904 27670' },
+  whatsapp: { type: String, default: '+91 97904 72767' },
+  email: { type: String, default: 'aamazingads@gmail.com' },
+  supportEmail: { type: String, default: 'sales@amazingads.in' },
+  websiteUrl: { type: String, default: 'www.amazingads.in' },
+  operatingHours: { type: String, default: 'Mon – Sat: 8:30 AM – 8:30 PM IST' },
+  gstNumber: { type: String, default: '33AABCA1234F1Z8' },
+  standardLeadTime: { type: String, default: '3–5 Business Days' },
+  bulkLeadTime: { type: String, default: '6–8 Business Days (2,000+ units)' },
+  carriers: { type: String, default: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service' },
+  discountTiers: { type: Array, default: [] }
+}, { timestamps: true });
+
+let SettingsModel;
+try {
+  SettingsModel = mongoose.model('FactorySettings', settingsSchema);
+} catch {
+  SettingsModel = mongoose.models.FactorySettings;
 }
 
 function ensureDataDir() {
@@ -321,7 +352,61 @@ function saveMessagesToDisk(messages) {
   }
 }
 
+const DEFAULT_DISCOUNT_TIERS = [
+  { id: 'tier-1', minQty: 200, maxQty: '499', discountPercentage: 8, label: 'Tier 1 Standard Wholesale' },
+  { id: 'tier-2', minQty: 500, maxQty: '999', discountPercentage: 15, label: 'Tier 2 Volume Wholesale' },
+  { id: 'tier-3', minQty: 1000, maxQty: '2,499', discountPercentage: 22, label: 'Tier 3 Corporate Batch' },
+  { id: 'tier-4', minQty: 2500, maxQty: '4,999', discountPercentage: 28, label: 'Tier 4 Super Volume' },
+  { id: 'tier-5', minQty: 5000, maxQty: '9,999', discountPercentage: 35, label: 'Tier 5 Export Mega Lot' },
+  { id: 'tier-6', minQty: 10000, maxQty: '10,000+', discountPercentage: 42, label: 'Tier 6 Master Press Contract' }
+];
+
+const DEFAULT_FACTORY_SETTINGS = {
+  factoryName: 'Amazing Ads Sivakasi Works',
+  tagline: "India's Premier Manufacturer of PET Foil, 5D Holographic & Stone Art Devotional Calendars",
+  logoUrl: '',
+  address: '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Tamil Nadu',
+  phone: '+91 97904 72767',
+  secondaryPhone: '+91 97904 27670',
+  whatsapp: '+91 97904 72767',
+  email: 'aamazingads@gmail.com',
+  supportEmail: 'sales@amazingads.in',
+  websiteUrl: 'www.amazingads.in',
+  operatingHours: 'Mon – Sat: 8:30 AM – 8:30 PM IST',
+  gstNumber: '33AABCA1234F1Z8',
+  standardLeadTime: '3–5 Business Days',
+  bulkLeadTime: '6–8 Business Days (2,000+ units)',
+  carriers: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service',
+  discountTiers: DEFAULT_DISCOUNT_TIERS
+};
+
+function loadSettingsFromDisk() {
+  ensureDataDir();
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const raw = fs.readFileSync(SETTINGS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return { ...DEFAULT_FACTORY_SETTINGS, ...parsed };
+      }
+    }
+  } catch (err) {
+    console.warn('[Storage] Error reading settings.json:', err.message);
+  }
+  return { ...DEFAULT_FACTORY_SETTINGS };
+}
+
+function saveSettingsToDisk(settings) {
+  ensureDataDir();
+  try {
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[Storage] Error writing settings.json:', err.message);
+  }
+}
+
 let calendarCatalog = loadProductsFromDisk();
+let factorySettings = loadSettingsFromDisk();
 
 let quoteRequests = [];
 let sampleKitRequests = [];
@@ -364,6 +449,18 @@ if (mongoose.connection) {
           }
         }
       }
+      if (SettingsModel) {
+        const found = await SettingsModel.findOne({ key: 'factory_settings' }).lean();
+        if (!found) {
+          await SettingsModel.create({ key: 'factory_settings', ...factorySettings });
+          console.log('[MongoDB] Seeded factory settings into Atlas database');
+        } else {
+          const { _id, __v, key, ...rest } = found;
+          factorySettings = { ...DEFAULT_FACTORY_SETTINGS, ...rest };
+          saveSettingsToDisk(factorySettings);
+          console.log('[MongoDB] Synced factory settings from Atlas to disk cache');
+        }
+      }
     } catch (err) {
       console.warn('[MongoDB] Init sync notice:', err.message);
     }
@@ -372,9 +469,16 @@ if (mongoose.connection) {
 
 // 1. Health & Server Status
 router.get('/health', (req, res) => {
+  const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  const dbState = dbStates[mongoose.connection.readyState] || 'unknown';
   res.json({
     status: 'online',
     system: 'Amazing Ads Sivakasi - Master Printing Press Engine',
+    database: {
+      provider: 'MongoDB Atlas',
+      state: dbState,
+      connected: mongoose.connection.readyState === 1
+    },
     port: process.env.PORT || 5000,
     hub: 'Sivakasi, Tamil Nadu (Printing Capital of India)',
     version: '3.0.0',
@@ -540,18 +644,59 @@ router.post('/calendar-products/reset', async (req, res) => {
 });
 
 // 2f. Admin Dashboard Overview & Activity Feed
-router.get('/admin/overview', (req, res) => {
+router.get('/admin/overview', async (req, res) => {
+  let quotesCount = quoteRequests.length;
+  let sampleKitsCount = sampleKitRequests.length;
+  let inquiriesCount = corporateInquiries.length;
+  let messagesCount = customerMessages.length;
+  let recentQuotes = quoteRequests.slice(-10).reverse();
+  let recentSampleKits = sampleKitRequests.slice(-10).reverse();
+  let recentInquiries = corporateInquiries.slice(-10).reverse();
+
+  if (mongoose.connection.readyState === 1) {
+    try {
+      const [qCount, skCount, inqCount, dbQuotes, dbKits, dbInqs] = await Promise.all([
+        Quote.countDocuments(),
+        SampleKit.countDocuments(),
+        Inquiry.countDocuments(),
+        Quote.find().sort({ createdAt: -1 }).limit(10).lean(),
+        SampleKit.find().sort({ createdAt: -1 }).limit(10).lean(),
+        Inquiry.find().sort({ createdAt: -1 }).limit(10).lean()
+      ]);
+      quotesCount = qCount;
+      sampleKitsCount = skCount;
+      inquiriesCount = inqCount;
+      if (dbQuotes && dbQuotes.length > 0) {
+        recentQuotes = dbQuotes.map(q => ({
+          id: q.quoteId || q.id,
+          clientName: q.client?.name || q.clientName || 'Customer',
+          company: q.client?.company || q.company || 'Corporate Client',
+          phone: q.client?.phone || q.phone || 'Direct',
+          product: q.format || 'Calendar Spec',
+          quantity: q.quantity || 100,
+          totalPrice: q.subtotal || 0,
+          date: q.createdAt ? new Date(q.createdAt).toLocaleDateString() : 'Recent',
+          status: 'New'
+        }));
+      }
+      if (dbKits && dbKits.length > 0) recentSampleKits = dbKits;
+      if (dbInqs && dbInqs.length > 0) recentInquiries = dbInqs;
+    } catch (err) {
+      console.warn('[MongoDB] Overview fetch warning:', err.message);
+    }
+  }
+
   res.json({
     success: true,
     data: {
       totalProducts: calendarCatalog.length,
-      totalQuotesGenerated: quoteRequests.length,
-      totalSampleKitsRequested: sampleKitRequests.length,
-      totalCorporateInquiries: corporateInquiries.length,
-      totalCustomerMessages: customerMessages.length,
-      recentQuotes: quoteRequests.slice(-10).reverse(),
-      recentSampleKits: sampleKitRequests.slice(-10).reverse(),
-      recentInquiries: corporateInquiries.slice(-10).reverse(),
+      totalQuotesGenerated: quotesCount,
+      totalSampleKitsRequested: sampleKitsCount,
+      totalCorporateInquiries: inquiriesCount,
+      totalCustomerMessages: messagesCount,
+      recentQuotes,
+      recentSampleKits,
+      recentInquiries,
       recentMessages: customerMessages.slice(-10).reverse()
     }
   });
@@ -727,8 +872,75 @@ router.delete('/messages/:id', async (req, res) => {
   });
 });
 
+// 2i. Factory Settings & Contact Info (Admin & Website Sync)
+router.get('/settings', (req, res) => {
+  res.json({
+    success: true,
+    data: factorySettings
+  });
+});
+
+router.put('/settings', async (req, res) => {
+  factorySettings = {
+    ...factorySettings,
+    ...req.body,
+    discountTiers: req.body.discountTiers || factorySettings.discountTiers || DEFAULT_DISCOUNT_TIERS
+  };
+  saveSettingsToDisk(factorySettings);
+
+  if (mongoose.connection.readyState === 1 && SettingsModel) {
+    try {
+      await SettingsModel.findOneAndUpdate(
+        { key: 'factory_settings' },
+        { $set: factorySettings },
+        { upsert: true, new: true }
+      );
+    } catch (err) {
+      console.warn('[MongoDB] Update settings error:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Factory settings updated successfully',
+    data: factorySettings
+  });
+});
+
+// 2j. Factory Wholesale Discount Tiers (Admin & Quote Sync)
+router.get('/discounts', (req, res) => {
+  res.json({
+    success: true,
+    data: factorySettings.discountTiers || DEFAULT_DISCOUNT_TIERS
+  });
+});
+
+router.put('/discounts', async (req, res) => {
+  const tiers = Array.isArray(req.body) ? req.body : req.body.tiers || DEFAULT_DISCOUNT_TIERS;
+  factorySettings.discountTiers = tiers;
+  saveSettingsToDisk(factorySettings);
+
+  if (mongoose.connection.readyState === 1 && SettingsModel) {
+    try {
+      await SettingsModel.findOneAndUpdate(
+        { key: 'factory_settings' },
+        { $set: { discountTiers: tiers } },
+        { upsert: true }
+      );
+    } catch (err) {
+      console.warn('[MongoDB] Update discounts error:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Wholesale discount tiers updated successfully',
+    data: tiers
+  });
+});
+
 // 3. Dynamic Quote Calculator Engine for Amazing Ads Sivakasi
-router.post('/quote-calculator', (req, res) => {
+router.post('/quote-calculator', async (req, res) => {
   const {
     productId,
     format,
@@ -744,10 +956,26 @@ router.post('/quote-calculator', (req, res) => {
 
   const qty = parseInt(quantity, 10) || 100;
 
-  // Real Sivakasi base pricing per unit (allows size-specific base rate)
+  // Dynamic Sivakasi Base Pricing per Unit (Syncs with Admin catalog updates & allows size-specific base rate)
+  let matchedProduct = null;
+  if (productId) {
+    matchedProduct = calendarCatalog.find(p => p.id === productId);
+  }
+  if (!matchedProduct && format) {
+    const fLower = format.toLowerCase();
+    matchedProduct = calendarCatalog.find(p =>
+      p.name.toLowerCase().includes(fLower) ||
+      p.category.toLowerCase().includes(fLower) ||
+      fLower.includes(p.category.toLowerCase()) ||
+      fLower.includes(p.name.toLowerCase())
+    );
+  }
+
   let baseUnitPrice = 110;
   if (req.body.customUnitPrice && Number(req.body.customUnitPrice) > 0) {
     baseUnitPrice = Number(req.body.customUnitPrice);
+  } else if (matchedProduct) {
+    baseUnitPrice = (req.body.size && matchedProduct.sizePrices && matchedProduct.sizePrices[req.body.size]) || matchedProduct.startingPrice;
   } else if (format?.includes('PET Foil') || format?.includes('Gold Foil')) baseUnitPrice = 145;
   else if (format?.includes('5D') || format?.includes('3D')) baseUnitPrice = 220;
   else if (format?.includes('Stone Art') || format?.includes('Kundan')) baseUnitPrice = 280;
@@ -771,14 +999,18 @@ router.post('/quote-calculator', (req, res) => {
   else if (binding === 'Heavy-Gauge Anti-Rust Tin Plate' || binding?.includes('Tin Plate')) bindingCost = 12;
   else if (binding === 'Twin Wire-O Gold Spiral') bindingCost = 15;
 
-  // Real Sivakasi Wholesale Volume Tiered Discounts
+  // Dynamic Sivakasi Wholesale Volume Tiered Discounts (from Admin settings)
   let discountPercentage = 0;
-  if (qty >= 10000) discountPercentage = 42;
-  else if (qty >= 5000) discountPercentage = 35;
-  else if (qty >= 2500) discountPercentage = 28;
-  else if (qty >= 1000) discountPercentage = 22;
-  else if (qty >= 500) discountPercentage = 15;
-  else if (qty >= 200) discountPercentage = 8;
+  const tiers = (factorySettings.discountTiers && factorySettings.discountTiers.length > 0)
+    ? factorySettings.discountTiers
+    : DEFAULT_DISCOUNT_TIERS;
+  const sortedTiers = [...tiers].sort((a, b) => b.minQty - a.minQty);
+  for (const t of sortedTiers) {
+    if (qty >= t.minQty) {
+      discountPercentage = t.discountPercentage;
+      break;
+    }
+  }
 
   const rawUnit = baseUnitPrice + finishSurcharge + bindingCost;
   const unitPrice = Math.max(25, Math.round(rawUnit * (1 - discountPercentage / 100)));
@@ -839,6 +1071,16 @@ router.post('/quote-calculator', (req, res) => {
     }
   }
 
+  // Persist to MongoDB Atlas
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await Quote.create(quoteSummary);
+      console.log(`[MongoDB] Quote ${quoteId} saved to Atlas database.`);
+    }
+  } catch (err) {
+    console.error(`[MongoDB] Failed to persist quote: ${err.message}`);
+  }
+
   res.status(200).json({
     success: true,
     message: `Official Amazing Ads Sivakasi Quote ${quoteId} generated successfully.`,
@@ -847,7 +1089,7 @@ router.post('/quote-calculator', (req, res) => {
 });
 
 // 4. Sample Kit Request Endpoint
-router.post('/sample-kit', (req, res) => {
+router.post(['/sample-kit', '/request-sample-kit'], async (req, res) => {
   const { name, email, company, phone, shippingAddress, preferredStyles } = req.body;
 
   if (!name || !email || !shippingAddress) {
@@ -899,6 +1141,16 @@ router.post('/sample-kit', (req, res) => {
     try { MessageModel.create(sampleInquiry); } catch {}
   }
 
+  // Persist to MongoDB Atlas
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await SampleKit.create(sampleOrder);
+      console.log(`[MongoDB] Sample Kit ${sampleOrder.sampleId} saved to Atlas database.`);
+    }
+  } catch (err) {
+    console.error(`[MongoDB] Failed to persist sample kit: ${err.message}`);
+  }
+
   console.log(`[Amazing Ads Sample Kit] Dispatched to ${sampleOrder.name} (${sampleOrder.company}) at ${sampleOrder.shippingAddress}`);
 
   res.status(201).json({
@@ -909,7 +1161,7 @@ router.post('/sample-kit', (req, res) => {
 });
 
 // 5. Corporate Bespoke Consultation / Contact
-router.post('/contact', (req, res) => {
+router.post(['/contact', '/corporate-inquiry'], async (req, res) => {
   const { name, email, company, quantityNeeded, targetDate, message, specs } = req.body;
 
   if (!name || !email || !message) {
@@ -957,6 +1209,16 @@ router.post('/contact', (req, res) => {
     }
   }
 
+  // Persist to MongoDB Atlas
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await Inquiry.create(inquiry);
+      console.log(`[MongoDB] Inquiry ${inquiry.inquiryId} saved to Atlas database.`);
+    }
+  } catch (err) {
+    console.error(`[MongoDB] Failed to persist inquiry: ${err.message}`);
+  }
+
   console.log(`[Amazing Ads Sivakasi Inquiry] ${inquiry.company} - ${inquiry.name}: ${inquiry.message}`);
 
   res.status(201).json({
@@ -977,12 +1239,52 @@ router.get('/stats', (req, res) => {
       onTimeDeliveryRate: '99.8%',
       foilPressTolerances: '0.05 mm Micro-registration',
       establishedYear: 2008,
-      pressHQ: '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189',
-      factoryPhone: '+91 97904 72767 / +91 97904 27670',
-      hotlinePhone: '+91 98400 55220',
-      factoryEmail: 'aamazingads@gmail.com'
+      pressHQ: factorySettings.address || '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189',
+      factoryPhone: `${factorySettings.phone || '+91 97904 72767'}${factorySettings.secondaryPhone ? ` / ${factorySettings.secondaryPhone}` : ''}`,
+      hotlinePhone: factorySettings.secondaryPhone || '+91 98400 55220',
+      factoryEmail: factorySettings.email || 'aamazingads@gmail.com',
+      dispatchPartners: ['BlueDart Express', 'VRL Logistics', 'ST Courier', 'Professional Courier']
     }
   });
+});
+
+// 7. Get Recent Inquiries from MongoDB / In-Memory (Admin)
+router.get('/inquiries', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const dbInquiries = await Inquiry.find().sort({ createdAt: -1 }).limit(100);
+      return res.json({ success: true, count: dbInquiries.length, data: dbInquiries });
+    }
+    res.json({ success: true, count: corporateInquiries.length, data: corporateInquiries });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 8. Get Recent Sample Kit Requests from MongoDB / In-Memory (Admin)
+router.get('/sample-kits', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const dbKits = await SampleKit.find().sort({ createdAt: -1 }).limit(100);
+      return res.json({ success: true, count: dbKits.length, data: dbKits });
+    }
+    res.json({ success: true, count: sampleKitRequests.length, data: sampleKitRequests });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9. Get Recent Quotes from MongoDB / In-Memory (Admin)
+router.get('/quotes', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const dbQuotes = await Quote.find().sort({ createdAt: -1 }).limit(100);
+      return res.json({ success: true, count: dbQuotes.length, data: dbQuotes });
+    }
+    res.json({ success: true, count: quoteRequests.length, data: quoteRequests });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // 7. Vector Dielines & Template Archive

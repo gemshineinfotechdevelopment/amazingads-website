@@ -82,16 +82,16 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
             />
           )}
           <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
               <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff', whiteSpace: 'nowrap' }}>
-                AMAZING ADS
+                {brandSettings.factoryName || 'AMAZING ADS'}
               </span>
               <span style={{ fontSize: '0.68rem', color: '#D78600', letterSpacing: '0.08em', fontWeight: 700, whiteSpace: 'nowrap' }}>
                 SIVAKASI
               </span>
             </div>
-            <p className="navbar-brand-sub" style={{ fontSize: '0.64rem', letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Gold Foil & Calendar Press Works
+            <p className="navbar-tagline navbar-brand-sub" style={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {brandSettings.tagline || 'Gold Foil & Calendar Manufacturing Hub'}
             </p>
           </div>
         </div>
@@ -109,37 +109,35 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Toggle Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="mobile-toggle"
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-subtle)',
+              background: mobileMenuOpen ? 'rgba(207, 168, 78, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              border: `1px solid ${mobileMenuOpen ? 'var(--accent-gold)' : 'var(--border-subtle)'}`,
               borderRadius: '8px',
-              color: 'var(--text-primary)',
+              color: mobileMenuOpen ? 'var(--accent-gold-bright)' : 'var(--text-primary)',
               cursor: 'pointer',
               display: 'none',
               padding: '8px 10px',
-              transition: 'background 0.2s'
+              transition: 'all 0.2s ease'
             }}
             aria-label="Toggle navigation menu"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              {mobileMenuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </>
-              )}
-            </svg>
+            {mobileMenuOpen ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            )}
           </button>
         </div>
       </div>
@@ -149,13 +147,14 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         <div
           className="mobile-menu-drawer"
           style={{
-            background: 'var(--bg-secondary)',
+            background: 'rgba(13, 16, 22, 0.98)',
+            backdropFilter: 'blur(20px)',
             borderTop: '1px solid var(--border-gold)',
-            padding: '16px 18px',
+            padding: '16px 18px 24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
-            boxShadow: '0 12px 30px rgba(0,0,0,0.8)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.9)',
             animation: 'slideDownMobile 0.25s ease'
           }}
         >
@@ -164,39 +163,49 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
               key={item.id}
               onClick={() => { navigate(item.id); setMobileMenuOpen(false); }} 
               className={`nav-link-btn ${currentPage === item.id ? 'active' : ''}`}
-              style={{ textAlign: 'left', width: '100%', padding: '12px 14px', fontSize: '0.92rem' }}
+              style={{
+                textAlign: 'left',
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '0.95rem',
+                borderRadius: '8px'
+              }}
             >
               {item.label}
             </button>
           ))}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
             <a
-              href="tel:+919790472767"
+              href={`tel:${(brandSettings.phone || '+919790472767').replace(/[^0-9+]/g, '')}`}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
+                flex: 1,
+                padding: '12px',
+                borderRadius: 'var(--radius-sm)',
                 background: 'rgba(215, 134, 0, 0.16)',
                 border: '1px solid #D78600',
                 color: '#FFD72E',
-                padding: '12px',
-                borderRadius: 'var(--radius-sm)',
-                fontWeight: 700,
+                textDecoration: 'none',
                 fontSize: '0.9rem',
-                textDecoration: 'none'
+                fontWeight: 700,
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
               }}
             >
-              📞 Call Factory: +91 97904 72767
+              📞 Call Factory: {brandSettings.phone || '+91 97904 72767'}
             </a>
-            <button 
-              onClick={() => { onOpenSampleKit(); setMobileMenuOpen(false); }} 
-              className="btn-gold" 
-              style={{ width: '100%', padding: '12px' }}
-            >
-              Request Free Swatch Kit
-            </button>
           </div>
+
+          <button 
+            onClick={() => { onOpenSampleKit(); setMobileMenuOpen(false); }} 
+            className="btn-gold" 
+            style={{ width: '100%', marginTop: '6px', padding: '13px' }}
+          >
+            Request Master Swatch Kit →
+          </button>
         </div>
       )}
 
@@ -207,7 +216,10 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         }
         @media (max-width: 1040px) {
           .desktop-nav { display: none !important; }
-          .mobile-toggle { display: block !important; }
+          .mobile-toggle { display: flex !important; align-items: center; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+          .navbar-tagline { display: none; }
         }
         @media (max-width: 480px) {
           .navbar-brand-title {

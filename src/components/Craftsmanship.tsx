@@ -83,7 +83,7 @@ export const Craftsmanship = () => {
       <div className="container">
         {/* Paper Swatches Interactive Exploration */}
         <div
-          className="craft-paper-box"
+          className="craft-container-card craft-paper-box"
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-card)',
@@ -104,7 +104,7 @@ export const Craftsmanship = () => {
           </div>
 
           {/* Swatch Navigation Tabs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '28px' }}>
+          <div className="craft-swatches-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '28px' }}>
             {PAPERS.map((p, idx) => {
               const active = activePaperIdx === idx;
               return (
@@ -160,7 +160,7 @@ export const Craftsmanship = () => {
                 gap: '30px',
                 alignItems: 'center'
               }}
-              className="paper-detail-grid"
+              className="paper-detail-card paper-detail-grid"
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
@@ -256,9 +256,16 @@ export const Craftsmanship = () => {
             grid-template-columns: 1fr !important;
           }
         }
-        @media (max-width: 640px) {
-          .craft-paper-box {
+        @media (max-width: 768px) {
+          .craft-container-card, .craft-paper-box {
             padding: 22px 16px !important;
+          }
+          .paper-detail-card {
+            padding: 20px 16px !important;
+          }
+          .craft-swatches-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
           }
         }
       `}</style>

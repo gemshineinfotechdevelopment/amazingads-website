@@ -1,5 +1,11 @@
-import { useState, type FormEvent } from 'react';
-import { requestSampleKit, type SampleKitResult } from '../services/api';
+import { useState, useEffect, type FormEvent } from 'react';
+import {
+  requestSampleKit,
+  getStoredCatalog,
+  SIVAKASI_CATALOG,
+  type SampleKitResult,
+  type CalendarProduct
+} from '../services/api';
 
 interface SampleKitModalProps {
   isOpen: boolean;
@@ -7,18 +13,32 @@ interface SampleKitModalProps {
 }
 
 export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
+  const [products, setProducts] = useState<CalendarProduct[]>(() => {
+    const stored = getStoredCatalog();
+    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
+  });
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [phone, setPhone] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
   const [selectedStyles, setSelectedStyles] = useState<string[]>([
-    'Gold/Silver PET Foil Calendar',
+    'Gold / Silver PET Foil Calendar',
     'Custom 5D Calendars'
   ]);
   
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SampleKitResult | null>(null);
+
+  useEffect(() => {
+    const handleCatalogUpdate = () => {
+      const stored = getStoredCatalog();
+      if (stored && stored.length > 0) setProducts(stored);
+    };
+    window.addEventListener('catalog-updated', handleCatalogUpdate);
+    return () => window.removeEventListener('catalog-updated', handleCatalogUpdate);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -43,7 +63,7 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
         company,
         phone,
         shippingAddress,
-        preferredStyles: selectedStyles
+        preferredStyles: selectedStyles.length > 0 ? selectedStyles : products.slice(0, 2).map(p => p.name)
       });
       setResult(res);
       setSubmitting(false);
@@ -52,6 +72,8 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
       setSubmitting(false);
     }
   };
+
+  const availableProductNames = products.map(p => p.name);
 
   return (
     <div
@@ -69,7 +91,7 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
       onClick={() => !submitting && onClose()}
     >
       <div
-        className="sample-kit-box"
+        className="sample-kit-card sample-kit-box"
         style={{
           background: 'var(--bg-secondary)',
           border: '1px solid var(--border-gold)',
@@ -130,11 +152,11 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
                 📦 Sivakasi Works Sample Box Contents:
               </strong>
               <ul style={{ paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <li>Gold / Silver PET Foil Calendar Specimen (15 × 20 in)</li>
-                <li>Custom 5D Holographic Lenticular Motion Swatch</li>
-                <li>Stone Art Sculptural Relief Texture Sample</li>
-                <li>Promotional Advertising Hand Fan Specimen with Handle</li>
-                <li>Special Products & Bespoke Executive Gift Swatch Book</li>
+                {products.slice(0, 5).map((p) => (
+                  <li key={p.id}>
+                    {p.name} ({p.standardGsm || p.coverFinish || 'Premium Press Specimen'})
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -197,13 +219,7 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
               <div>
                 <label>Products of Interest</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '6px' }}>
-                  {[
-                    'Gold/Silver PET Foil Calendar',
-                    'Special Products',
-                    'Custom 5D Calendars',
-                    'Stone Art Calendars',
-                    'Hand Fan'
-                  ].map(style => (
+                  {availableProductNames.map((style) => (
                     <button
                       key={style}
                       type="button"
@@ -296,8 +312,9 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
 
       <style>{`
         @media (max-width: 600px) {
-          .sample-kit-box {
-            padding: 24px 18px !important;
+          .sample-kit-card, .sample-kit-box {
+            padding: 22px 16px !important;
+            border-radius: 16px !important;
           }
           .modal-input-grid {
             grid-template-columns: 1fr !important;

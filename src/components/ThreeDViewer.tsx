@@ -1,4 +1,5 @@
-import { useState, useRef, type MouseEvent, type TouchEvent } from 'react';
+import { useState, useRef, useEffect, type MouseEvent, type TouchEvent } from 'react';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 type ThreeDMode =
   | 'pet-foil'
@@ -124,6 +125,7 @@ const DAILY_LEAVES = [
 ];
 
 export const ThreeDViewer = () => {
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
   const [activeMode, setActiveMode] = useState<ThreeDMode>('pet-foil');
   const [selectedGod, setSelectedGod] = useState<GodKey>('mahalakshmi');
   const [rotateX, setRotateX] = useState(0);
@@ -136,6 +138,16 @@ export const ThreeDViewer = () => {
   const [isPeeling, setIsPeeling] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
 
   // When switching modes, auto-select the iconic god matching that calendar type
   const handleModeChange = (mode: ThreeDMode) => {
@@ -219,15 +231,14 @@ export const ThreeDViewer = () => {
 
   return (
     <div style={{ width: '100%', padding: '10px 0 30px' }}>
-      {/* 1. Main Calendar Model Category Tabs */}
+      {/* 1. Main Calendar Model Category Tabs (Horizontally Scrollable on Mobile) */}
       <div
-        className="threed-tabs-nav"
+className="scroll-pills-row threed-tabs-wrapper threed-tabs-nav"
         style={{
           display: 'flex',
-          justifyContent: 'center',
           gap: '8px',
-          flexWrap: 'wrap',
-          marginBottom: '16px'
+          marginBottom: '16px',
+          justifyContent: 'center'
         }}
       >
         {[
@@ -254,7 +265,8 @@ export const ThreeDViewer = () => {
               alignItems: 'center',
               gap: '6px',
               transition: 'all 0.2s ease',
-              boxShadow: activeMode === tab.id ? '0 0 16px rgba(255, 215, 46, 0.4)' : 'none'
+              boxShadow: activeMode === tab.id ? '0 0 16px rgba(255, 215, 46, 0.4)' : 'none',
+              flexShrink: 0
             }}
           >
             <span>{tab.icon}</span>
@@ -267,6 +279,7 @@ export const ThreeDViewer = () => {
 
       {/* 3. Interactive Imprint Customizer Bar */}
       <div
+        className="threed-imprint-bar"
         style={{
           maxWidth: '560px',
           margin: '0 auto 20px',
@@ -279,7 +292,7 @@ export const ThreeDViewer = () => {
           border: '1px solid var(--border-subtle)'
         }}
       >
-        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap' }}>
+<span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap', flexShrink: 0 }}>
           ✦ Custom Branding Imprint (Live Foil):
         </span>
         <input
@@ -306,9 +319,9 @@ export const ThreeDViewer = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          perspective: '1200px',
+          perspective: '1000px',
           padding: '10px 0',
-          minHeight: '620px'
+          minHeight: '560px'
         }}
       >
         <div
@@ -322,8 +335,8 @@ export const ThreeDViewer = () => {
           className="threed-card-container"
           style={{
             width: '100%',
-            maxWidth: '410px',
-            minHeight: '580px',
+            maxWidth: '390px',
+            minHeight: '540px',
             background: 'var(--bg-card)',
             borderRadius: 'var(--radius-xl)',
             border: '2.5px solid var(--border-gold)',
@@ -338,7 +351,7 @@ export const ThreeDViewer = () => {
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            touchAction: 'none'
+touchAction: 'pan-y'
           }}
         >
           {/* Dynamic Metallic Light Glare / Specular Layer */}
@@ -556,10 +569,10 @@ export const ThreeDViewer = () => {
                   }}
                 >
                   <p style={{ fontSize: '0.72rem', color: 'var(--accent-gold-bright)', fontWeight: 800, letterSpacing: '0.08em' }}>
-                    ★ {customBrand || 'YOUR COMPANY BRAND EMBOSSED HERE'} ★
+                    ★ {customBrand || settings.factoryName || 'YOUR COMPANY BRAND EMBOSSED HERE'} ★
                   </p>
                   <p style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    Sivakasi Heated Die Hot Stamped • Ph: +91 98421 23456
+                    Sivakasi Heated Die Hot Stamped • Ph: {settings.phone || '+91 97904 72767'}
                   </p>
                 </div>
               </div>
@@ -1315,22 +1328,35 @@ export const ThreeDViewer = () => {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          .threed-tabs-nav {
+@media (max-width: 768px) {
+          .threed-tabs-wrapper, .threed-tabs-nav {
             justify-content: flex-start !important;
             overflow-x: auto !important;
             flex-wrap: nowrap !important;
-            padding-bottom: 8px !important;
+            padding: 4px 6px 10px !important;
             -webkit-overflow-scrolling: touch !important;
             scrollbar-width: none !important;
           }
-          .threed-tabs-nav::-webkit-scrollbar {
+          .threed-tabs-wrapper::-webkit-scrollbar, .threed-tabs-nav::-webkit-scrollbar {
             display: none !important;
           }
-          .threed-tabs-nav button {
+          .threed-tabs-wrapper button, .threed-tabs-nav button {
             flex-shrink: 0 !important;
             white-space: nowrap !important;
           }
+          .threed-gods-bar {
+            border-radius: 16px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 10px 12px !important;
+          }
+          .threed-imprint-bar {
+            border-radius: 14px !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 6px !important;
+          }
+        }
         }
       `}</style>
     </div>

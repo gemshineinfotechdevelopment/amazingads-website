@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import apiRoutes from './routes/api.js';
+import { connectDB } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,17 +22,6 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Connect to MongoDB if MONGODB_URI is provided
-const mongoUri = process.env.MONGODB_URI;
-if (mongoUri) {
-  mongoose.connect(mongoUri)
-    .then(() => {
-      console.log('[Database] Connected to MongoDB Atlas successfully.');
-    })
-    .catch((err) => {
-      console.warn('[Database] MongoDB connection notice (using JSON disk persistence):', err.message);
-    });
-}
 
 // Routes
 app.use('/api', apiRoutes);
@@ -42,13 +32,17 @@ app.get('/', (req, res) => {
     message: 'Welcome to Amazing Ads Backend Server API',
     endpoints: {
       health: '/api/health',
-      ads: '/api/ads'
+      catalog: '/api/catalog',
+      quote: '/api/quote (POST)',
+      sampleKit: '/api/sample-kit (POST)',
+      contact: '/api/contact (POST)'
     }
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`[Backend] Server is running on port ${PORT} (http://localhost:${PORT})`);
+// Connect to MongoDB Atlas and start server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`[Backend] Server is running on port ${PORT} (http://localhost:${PORT})`);
+  });
 });
-

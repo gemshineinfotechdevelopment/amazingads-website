@@ -238,10 +238,10 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
       <div className="container">
 
         {/* Top Controls Bar: Categories & Floating Cart Button */}
-        <div className="catalog-controls-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
+        <div className="catalog-top-bar catalog-controls-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
           
           {/* Category Filter Tabs */}
-          <div className="catalog-tabs-wrap" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="scroll-pills-row catalog-category-pills catalog-tabs-wrap" style={{ display: 'flex', gap: '8px' }}>
             {categoryList.map((cat) => (
               <button
                 key={cat}
@@ -256,7 +256,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                   fontWeight: 600,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  letterSpacing: '0.02em'
+                  letterSpacing: '0.02em',
+                  flexShrink: 0
                 }}
               >
                 {cat}
@@ -319,7 +320,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
         {/* Clean E-Commerce Product Grid */}
         <div
-          className="catalog-product-grid"
+          className="catalog-products-grid catalog-product-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
@@ -916,40 +917,41 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           background: var(--bg-primary);
         }
 
-        /* Mobile Responsive Adjustments */
         @media (max-width: 768px) {
-          .catalog-controls-bar {
+          .catalog-top-bar, .catalog-controls-bar {
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 12px !important;
             margin-bottom: 24px !important;
           }
-          .catalog-tabs-wrap {
+          .cart-trigger-pill {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .catalog-products-grid, .catalog-product-grid {
+            grid-template-columns: 1fr !important;
+            gap: 18px !important;
+          }
+          .cart-drawer-panel {
+            max-width: 100% !important;
+            width: 100% !important;
+            border-left: none !important;
+          }
+          .catalog-category-pills, .catalog-tabs-wrap {
             overflow-x: auto !important;
             flex-wrap: nowrap !important;
             padding-bottom: 8px !important;
             -webkit-overflow-scrolling: touch !important;
             scrollbar-width: none !important;
           }
-          .catalog-tabs-wrap::-webkit-scrollbar {
+          .catalog-category-pills::-webkit-scrollbar, .catalog-tabs-wrap::-webkit-scrollbar {
             display: none !important;
           }
-          .catalog-tabs-wrap button {
+          .catalog-category-pills button, .catalog-tabs-wrap button {
             flex-shrink: 0 !important;
             white-space: nowrap !important;
             padding: 7px 15px !important;
             font-size: 0.8rem !important;
-          }
-          .cart-trigger-pill {
-            width: 100% !important;
-            justify-content: center !important;
-          }
-          .catalog-product-grid {
-            grid-template-columns: 1fr !important;
-            gap: 20px !important;
-          }
-          .cart-drawer-panel {
-            max-width: 100% !important;
           }
           .cart-drawer-body {
             padding: 16px !important;
@@ -959,6 +961,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           }
           .product-image-container {
             height: 240px !important;
+          }
           }
         }
       `}</style>

@@ -1,11 +1,25 @@
-import type { CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
 import { ThreeDViewer } from '../components/ThreeDViewer';
 import { ProductCatalog } from '../components/ProductCatalog';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) => {
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
+
+  const targetPhone = (settings.phone || '+919790472767').replace(/[^0-9+]/g, '');
 
   return (
     <div className="page-view" style={{ padding: '0 0 90px' }}>
@@ -68,7 +82,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+          <div className="advantages-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
             <div style={advantageCardStyle}>
               <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🏭</span>
               <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Wholesale Factory Direct</h3>
@@ -119,7 +133,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+          <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             {[
               { step: '01', title: 'Choose Model', desc: 'Select from 24K Gold Foil Wall, Daily Panchangam, Desk Easel, or Devotional Frame.' },
               { step: '02', title: 'Send Branding', desc: 'Share your company name, logo, phone, and address via online quote or inquiry form.' },
@@ -162,7 +176,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
+          <div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
             {[
               {
                 client: 'Tata Motors & Titan',
@@ -228,7 +242,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       <section style={{ padding: '60px 0', position: 'relative' }}>
         <div className="container">
           <div
-            className="home-about-box"
+            className="about-banner-card home-about-box"
             style={{
               background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
               border: '1px solid #454545',
@@ -282,11 +296,11 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                     ⚡ Instant Factory Customizer
                   </button>
                   <a
-                    href="tel:+919790472767"
+                    href={`tel:${targetPhone}`}
                     className="btn-outline-gold"
                     style={{ padding: '12px 22px', fontSize: '0.9rem', textDecoration: 'none' }}
                   >
-                    📞 Call: +91 97904 72767
+                    📞 Call: {settings.phone || '+91 97904 72767'}
                   </a>
                 </div>
               </div>
@@ -319,9 +333,9 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                     AA
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>Amazing Ads Sivakasi</h3>
+                    <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>{settings.factoryName || 'Amazing Ads Sivakasi'}</h3>
                     <p style={{ fontSize: '0.75rem', color: '#FFD72E', fontFamily: 'var(--font-mono)' }}>
-                      Official Portal: amazingads.in
+                      Official Portal: {settings.websiteUrl || 'amazingads.in'}
                     </p>
                   </div>
                 </div>
@@ -329,24 +343,24 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>🏭 Manufacturing Hub & Press Works:</strong>
-                    <span>3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Virudhunagar District, Tamil Nadu</span>
+                    <span>{settings.address || '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Virudhunagar District, Tamil Nadu'}</span>
                   </div>
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📞 Direct Phone Lines:</strong>
                     <span style={{ fontFamily: 'var(--font-mono)', color: '#FFD72E' }}>
-                      +91 97904 72767 / +91 97904 27670
+                      {settings.phone || '+91 97904 72767'}{settings.secondaryPhone ? ` / ${settings.secondaryPhone}` : ''}
                     </span>
                   </div>
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📱 Corporate Management Hotline:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>+91 98400 55220</span>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.secondaryPhone || '+91 98400 55220'}</span>
                   </div>
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>✉️ Official Communications:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>aamazingads@gmail.com</span>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.email || 'aamazingads@gmail.com'}</span>
                   </div>
 
                   <div style={{ borderTop: '1px solid #454545', paddingTop: '14px', marginTop: '6px' }}>
@@ -366,7 +380,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
       <section style={{ padding: '60px 0 0' }}>
         <div className="container">
           <div
-            className="home-swatch-box"
+            className="swatch-banner-card home-swatch-box"
             style={{
               background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
               border: '1px solid #454545',
@@ -416,10 +430,14 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           }
         }
         @media (max-width: 768px) {
-          .home-about-box, .home-swatch-box {
+          .advantages-grid, .steps-grid, .clients-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .about-banner-card, .home-about-box, .swatch-banner-card, .home-swatch-box {
             padding: 24px 18px !important;
           }
-          .home-swatch-box button {
+          .swatch-banner-card button, .home-swatch-box button {
             width: 100% !important;
           }
         }

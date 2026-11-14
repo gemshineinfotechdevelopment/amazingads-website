@@ -369,24 +369,52 @@ label {
   letter-spacing: 0.02em;
 }
 
-/* Global Mobile Media Queries */
+/* 1. Touch Scroll Pill Row (Native App-Like Horizontal Swipe) */
+.scroll-pills-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 2px 8px;
+}
+
+.scroll-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* 2. Responsive Card & Container Mobile Rules */
 @media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
   .page-view {
     padding: 24px 0 60px;
     min-height: calc(100vh - 120px);
   }
 
   .page-header-banner {
-    margin: 0 auto 30px;
+    margin: 0 auto 28px;
   }
 
-  .page-header-banner h1 {
-    font-size: clamp(1.8rem, 7vw, 2.6rem);
+  h1, .page-header-banner h1 {
+    font-size: clamp(1.9rem, 7.5vw, 2.8rem);
   }
 
-  .page-header-banner p {
-    font-size: 0.9rem;
-    padding: 0 8px;
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 2.2rem);
+  }
+
+  h3 {
+    font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+  }
+
+  .foil-badge {
+    font-size: 0.68rem;
+    padding: 4px 12px;
   }
 
   .btn-gold, .btn-outline-gold {
@@ -396,7 +424,7 @@ label {
 
   input, select, textarea {
     font-size: 16px; /* Prevents auto-zoom in iOS Safari */
-    padding: 11px 13px;
+    padding: 12px 14px;
   }
 }
 
@@ -405,7 +433,7 @@ label {
     padding: 0 14px;
   }
 
-  .btn-gold, .btn-outline-gold {
+  .mobile-full-btn, .btn-gold, .btn-outline-gold {
     width: 100%;
   }
 }
@@ -470,6 +498,4 @@ input[type="number"].no-spinners {
   position: sticky !important;
   top: 0 !important;
 }
-
-
 

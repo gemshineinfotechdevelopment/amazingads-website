@@ -12,11 +12,19 @@ import {
   saveStoredFactoryDiscounts,
   getStoredFactorySettings,
   saveStoredFactorySettings,
+  fetchFactorySettings,
+  saveFactorySettingsToBackend,
+  fetchQuotes,
+  fetchInquiries,
+  fetchSampleKits,
   DEFAULT_DISCOUNT_TIERS,
   DEFAULT_FACTORY_SETTINGS,
   type CalendarProduct,
   type CustomerMessage,
-  type FactorySettings
+  type FactorySettings,
+  type StoredQuote,
+  type StoredInquiry,
+  type StoredSampleKit
 } from '../services/api';
 
 type AdminTab = 'messages' | 'catalog' | 'matrix' | 'quotes' | 'settings';
@@ -174,6 +182,11 @@ export const AdminPage = () => {
 
   // Customer Inquiries & Form Messages
   const [messages, setMessages] = useState<CustomerMessage[]>([]);
+  // Online Quotes, Corporate Inquiries & Swatch Kits
+  const [quotesList, setQuotesList] = useState<StoredQuote[]>([]);
+  const [inquiriesList, setInquiriesList] = useState<StoredInquiry[]>([]);
+  const [sampleKitsList, setSampleKitsList] = useState<StoredSampleKit[]>([]);
+  const [leadsSubTab, setLeadsSubTab] = useState<'quotes' | 'inquiries' | 'sampleKits'>('quotes');
 
   // Editable Factory Settings State
   const [factorySettings, setFactorySettings] = useState<FactorySettings>(getStoredFactorySettings());
@@ -189,16 +202,24 @@ export const AdminPage = () => {
   // Toast State
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
-  // Load Products & Messages
+  // Load Products, Messages, Quotes, Inquiries, Kits & Settings
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prods, msgs] = await Promise.all([
+      const [prods, msgs, quotes, settings, inqs, kits] = await Promise.all([
         getCalendarProducts(),
-        fetchCustomerMessages()
+        fetchCustomerMessages(),
+        fetchQuotes(),
+        fetchFactorySettings(),
+        fetchInquiries(),
+        fetchSampleKits()
       ]);
       setProducts(prods);
       setMessages(msgs);
+      if (quotes && quotes.length > 0) setQuotesList(quotes);
+      if (settings) setFactorySettings(settings);
+      if (inqs && inqs.length > 0) setInquiriesList(inqs);
+      if (kits && kits.length > 0) setSampleKitsList(kits);
 
       // Initialize matrix data with frame-size-specific pricing
       const matrixInit: Record<string, { name: string; price: number; sizes: string[]; sizePrices: Record<string, number> }> = {};
@@ -235,6 +256,9 @@ export const AdminPage = () => {
       } else {
         fetchCustomerMessages().then(setMessages);
       }
+      fetchQuotes().then((q) => { if (q && q.length > 0) setQuotesList(q); });
+      fetchInquiries().then((inq) => { if (inq && inq.length > 0) setInquiriesList(inq); });
+      fetchSampleKits().then((kit) => { if (kit && kit.length > 0) setSampleKitsList(kit); });
     };
 
     window.addEventListener('new-customer-message', handleNewMessage);
@@ -562,6 +586,7 @@ export const AdminPage = () => {
     }
   };
 
+
   const handleLogoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -582,9 +607,12 @@ export const AdminPage = () => {
     showToast('Custom logo removed.');
   };
 
-  const handleSaveAllSettings = (e: FormEvent) => {
+  const handleSaveAllSettings = async (e: FormEvent) => {
     e.preventDefault();
     saveStoredFactorySettings(factorySettings);
+    try {
+      await saveFactorySettingsToBackend(factorySettings);
+    } catch {}
     showToast('Company settings, contact details & logo saved successfully!');
   };
 
@@ -1029,9 +1057,11 @@ export const AdminPage = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>📋</span>
-              <span>Quotes & Estimates</span>
+              <span>Quotes & Leads</span>
             </div>
-            <span style={{ fontSize: '0.72rem', color: activeTab === 'quotes' ? '#bae6fd' : '#64748b' }}>{SAMPLE_QUOTES.length}</span>
+            <span style={{ fontSize: '0.72rem', color: activeTab === 'quotes' ? '#bae6fd' : '#64748b' }}>
+              {(quotesList.length > 0 ? quotesList : SAMPLE_QUOTES).length + inquiriesList.length + sampleKitsList.length}
+            </span>
           </button>
 
           {/* 6. COMPANY SETTINGS & CONTACT */}
@@ -1816,70 +1846,359 @@ export const AdminPage = () => {
 
 
 
-          {/* TAB 5: QUOTES & INQUIRIES */}
+          {/* TAB 5: QUOTES & LEADS */}
           {activeTab === 'quotes' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: '0 0 16px' }}>
-                Online Quotes & Estimation Requests
-              </h3>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
-                  <thead>
-                    <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
-                      <th style={{ padding: '10px 12px' }}>Quote ID</th>
-                      <th style={{ padding: '10px 12px' }}>Customer / Company</th>
-                      <th style={{ padding: '10px 12px' }}>Product</th>
-                      <th style={{ padding: '10px 12px' }}>Quantity</th>
-                      <th style={{ padding: '10px 12px' }}>Total Price</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'right' }}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {SAMPLE_QUOTES.map((q) => (
-                      <tr key={q.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '10px 12px', fontWeight: 800, color: '#0284c7' }}>{q.id}</td>
-                        <td style={{ padding: '10px 12px' }}>
-                          <strong style={{ color: '#0f172a' }}>{q.clientName}</strong>
-                          <div style={{ fontSize: '0.74rem', color: '#64748b' }}>{q.company} • {q.phone}</div>
-                        </td>
-                        <td
-                          style={{
-                            padding: '10px 12px',
-                            color: '#0f172a',
-                            fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
-                            fontWeight: 700,
-                            fontSize: '0.92rem'
-                          }}
-                        >
-                          {q.product}
-                        </td>
-                        <td style={{ padding: '10px 12px', fontWeight: 800 }}>{q.quantity} units</td>
-                        <td style={{ padding: '10px 12px', fontWeight: 900, color: '#16a34a' }}>₹{q.totalPrice.toLocaleString()}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                          <a
-                            href={`tel:${q.phone}`}
-                            style={{
-                              background: BLUE_GRADIENT,
-                              color: '#fff',
-                              padding: '7px 16px',
-                              borderRadius: '8px',
-                              fontSize: '0.8rem',
-                              fontWeight: 800,
-                              textDecoration: 'none',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)'
-                            }}
-                          >
-                            <span>📞 Call Customer</span>
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Sub-navigation Pills */}
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', background: '#ffffff', padding: '12px 16px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                <button
+                  type="button"
+                  onClick={() => setLeadsSubTab('quotes')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    background: leadsSubTab === 'quotes' ? BLUE_GRADIENT : '#f1f5f9',
+                    color: leadsSubTab === 'quotes' ? '#ffffff' : '#475569',
+                    boxShadow: leadsSubTab === 'quotes' ? '0 4px 12px rgba(2, 132, 199, 0.25)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  📋 Online Quotes ({(quotesList.length > 0 ? quotesList : SAMPLE_QUOTES).length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLeadsSubTab('inquiries')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    background: leadsSubTab === 'inquiries' ? BLUE_GRADIENT : '#f1f5f9',
+                    color: leadsSubTab === 'inquiries' ? '#ffffff' : '#475569',
+                    boxShadow: leadsSubTab === 'inquiries' ? '0 4px 12px rgba(2, 132, 199, 0.25)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🏢 Corporate & Contact Inquiries ({inquiriesList.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLeadsSubTab('sampleKits')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    background: leadsSubTab === 'sampleKits' ? BLUE_GRADIENT : '#f1f5f9',
+                    color: leadsSubTab === 'sampleKits' ? '#ffffff' : '#475569',
+                    boxShadow: leadsSubTab === 'sampleKits' ? '0 4px 12px rgba(2, 132, 199, 0.25)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  📦 Master Swatch Kits ({sampleKitsList.length})
+                </button>
               </div>
+
+              {/* Sub-view 1: Online Quotes */}
+              {leadsSubTab === 'quotes' && (
+                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                      Online Quotes & Estimation Requests
+                    </h3>
+                    <button
+                      onClick={() => fetchQuotes().then((q) => { if (q && q.length > 0) setQuotesList(q); showToast('Quotes refreshed from backend'); })}
+                      style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      🔄 Refresh
+                    </button>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                      <thead>
+                        <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
+                          <th style={{ padding: '10px 12px' }}>Quote ID</th>
+                          <th style={{ padding: '10px 12px' }}>Customer / Company</th>
+                          <th style={{ padding: '10px 12px' }}>Product</th>
+                          <th style={{ padding: '10px 12px' }}>Quantity</th>
+                          <th style={{ padding: '10px 12px' }}>Total Price</th>
+                          <th style={{ padding: '10px 12px', textAlign: 'right' }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(quotesList.length > 0 ? quotesList : SAMPLE_QUOTES).map((q) => (
+                          <tr key={q.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '10px 12px', fontWeight: 800, color: '#0284c7' }}>{q.id}</td>
+                            <td style={{ padding: '10px 12px' }}>
+                              <strong style={{ color: '#0f172a' }}>{q.clientName}</strong>
+                              <div style={{ fontSize: '0.74rem', color: '#64748b' }}>{q.company} • {q.phone}</div>
+                            </td>
+                            <td
+                              style={{
+                                padding: '10px 12px',
+                                color: '#0f172a',
+                                fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
+                                fontWeight: 700,
+                                fontSize: '0.92rem'
+                              }}
+                            >
+                              {q.product}
+                            </td>
+                            <td style={{ padding: '10px 12px', fontWeight: 800 }}>{q.quantity} units</td>
+                            <td style={{ padding: '10px 12px', fontWeight: 900, color: '#16a34a' }}>₹{q.totalPrice.toLocaleString()}</td>
+                            <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                              <a
+                                href={`tel:${q.phone}`}
+                                style={{
+                                  background: BLUE_GRADIENT,
+                                  color: '#fff',
+                                  padding: '6px 14px',
+                                  borderRadius: '8px',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 800,
+                                  textDecoration: 'none',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)'
+                                }}
+                              >
+                                <span>📞 Call Customer</span>
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-view 2: Corporate & Contact Inquiries */}
+              {leadsSubTab === 'inquiries' && (
+                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                      Corporate Bulk & Contact Inquiries ({inquiriesList.length})
+                    </h3>
+                    <button
+                      onClick={() => fetchInquiries().then((inq) => { if (inq) setInquiriesList(inq); showToast('Inquiries refreshed from backend'); })}
+                      style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      🔄 Refresh
+                    </button>
+                  </div>
+
+                  {inquiriesList.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
+                      <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '8px' }}>🏢</span>
+                      <p style={{ fontWeight: 600 }}>No corporate inquiries received yet.</p>
+                      <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Corporate leads from /corporate and /contact will appear here automatically.</p>
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                        <thead>
+                          <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
+                            <th style={{ padding: '10px 12px' }}>Inquiry ID</th>
+                            <th style={{ padding: '10px 12px' }}>Client / Company</th>
+                            <th style={{ padding: '10px 12px' }}>Quantity & Target</th>
+                            <th style={{ padding: '10px 12px' }}>Message Details</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {inquiriesList.map((inq) => (
+                            <tr key={inq.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                              <td style={{ padding: '10px 12px', fontWeight: 800, color: '#0284c7' }}>
+                                {inq.inquiryId}
+                                <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                                  {inq.receivedAt ? new Date(inq.receivedAt).toLocaleDateString() : 'Recent'}
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 12px' }}>
+                                <strong style={{ color: '#0f172a' }}>{inq.name}</strong>
+                                <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                                  {inq.company} • {inq.email}
+                                </div>
+                                {inq.phone && inq.phone !== 'N/A' && (
+                                  <div style={{ fontSize: '0.74rem', color: '#0284c7', fontWeight: 600 }}>
+                                    Ph: {inq.phone}
+                                  </div>
+                                )}
+                              </td>
+                              <td style={{ padding: '10px 12px' }}>
+                                <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '3px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
+                                  {inq.quantityNeeded}
+                                </span>
+                                <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>
+                                  Target: {inq.targetDate}
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 12px', maxWidth: '300px' }}>
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: '#334155', lineHeight: '1.4', whiteSpace: 'pre-line' }}>
+                                  {inq.message}
+                                </p>
+                              </td>
+                              <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                  {inq.phone && inq.phone !== 'N/A' && (
+                                    <a
+                                      href={`tel:${inq.phone}`}
+                                      style={{
+                                        background: '#0284c7',
+                                        color: '#fff',
+                                        padding: '6px 12px',
+                                        borderRadius: '8px',
+                                        fontSize: '0.76rem',
+                                        fontWeight: 700,
+                                        textDecoration: 'none',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                      }}
+                                    >
+                                      📞 Call
+                                    </a>
+                                  )}
+                                  {inq.email && (
+                                    <a
+                                      href={`mailto:${inq.email}?subject=Amazing Ads Quotation - ${inq.inquiryId}`}
+                                      style={{
+                                        background: '#f1f5f9',
+                                        color: '#334155',
+                                        padding: '6px 10px',
+                                        borderRadius: '8px',
+                                        fontSize: '0.76rem',
+                                        fontWeight: 600,
+                                        textDecoration: 'none'
+                                      }}
+                                    >
+                                      ✉️ Email
+                                    </a>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Sub-view 3: Master Swatch Kits */}
+              {leadsSubTab === 'sampleKits' && (
+                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                      Master Swatch Kit Dispatches ({sampleKitsList.length})
+                    </h3>
+                    <button
+                      onClick={() => fetchSampleKits().then((kit) => { if (kit) setSampleKitsList(kit); showToast('Sample kits refreshed from backend'); })}
+                      style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      🔄 Refresh
+                    </button>
+                  </div>
+
+                  {sampleKitsList.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
+                      <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '8px' }}>📦</span>
+                      <p style={{ fontWeight: 600 }}>No sample kit requests received yet.</p>
+                      <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Requests from the 'Request Free Swatch Kit' modal will appear here with delivery details.</p>
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                        <thead>
+                          <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
+                            <th style={{ padding: '10px 12px' }}>Tracking ID</th>
+                            <th style={{ padding: '10px 12px' }}>Recipient & Organization</th>
+                            <th style={{ padding: '10px 12px' }}>Shipping Address</th>
+                            <th style={{ padding: '10px 12px' }}>Preferred Styles</th>
+                            <th style={{ padding: '10px 12px' }}>Status</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sampleKitsList.map((kit) => (
+                            <tr key={kit.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                              <td style={{ padding: '10px 12px', fontWeight: 800, color: '#0284c7' }}>
+                                {kit.sampleId}
+                                <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                                  {kit.requestedAt ? new Date(kit.requestedAt).toLocaleDateString() : 'Recent'}
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 12px' }}>
+                                <strong style={{ color: '#0f172a' }}>{kit.name}</strong>
+                                <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                                  {kit.company} • {kit.email}
+                                </div>
+                                {kit.phone && kit.phone !== 'N/A' && (
+                                  <div style={{ fontSize: '0.74rem', color: '#0284c7', fontWeight: 600 }}>
+                                    Ph: {kit.phone}
+                                  </div>
+                                )}
+                              </td>
+                              <td style={{ padding: '10px 12px', maxWidth: '240px', fontSize: '0.78rem', color: '#334155' }}>
+                                {kit.shippingAddress}
+                              </td>
+                              <td style={{ padding: '10px 12px' }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                  {kit.preferredStyles.map((style, idx) => (
+                                    <span key={idx} style={{ background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600 }}>
+                                      {style}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 12px' }}>
+                                <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '6px', fontSize: '0.74rem', fontWeight: 700 }}>
+                                  {kit.status}
+                                </span>
+                                <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
+                                  Est: {kit.estimatedDeliveryDays}
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                                {kit.phone && kit.phone !== 'N/A' && (
+                                  <a
+                                    href={`tel:${kit.phone}`}
+                                    style={{
+                                      background: '#0284c7',
+                                      color: '#fff',
+                                      padding: '6px 12px',
+                                      borderRadius: '8px',
+                                      fontSize: '0.76rem',
+                                      fontWeight: 700,
+                                      textDecoration: 'none',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px'
+                                    }}
+                                  >
+                                    📞 Call
+                                  </a>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

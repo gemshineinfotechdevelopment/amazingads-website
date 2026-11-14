@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RouterProvider, useRouter } from './context/RouterContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { SampleKitModal } from './components/SampleKitModal';
+import { fetchFactorySettings, getCalendarProducts, fetchFactoryDiscounts } from './services/api';
 
 // Dedicated Standalone Pages
 import { HomePage } from './pages/HomePage';
@@ -19,6 +20,13 @@ import { AdminPage } from './pages/AdminPage';
 const AppContent = () => {
   const { currentPage } = useRouter();
   const [isSampleKitOpen, setIsSampleKitOpen] = useState(false);
+
+  useEffect(() => {
+    // Initial sync from MongoDB Atlas & backend API
+    fetchFactorySettings();
+    getCalendarProducts();
+    fetchFactoryDiscounts();
+  }, []);
 
   // If viewing the Admin side, render the standalone, dedicated Admin Portal
   if (currentPage === 'admin') {

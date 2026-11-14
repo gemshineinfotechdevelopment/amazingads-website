@@ -2,9 +2,11 @@ import { useState, useEffect, type FormEvent } from 'react';
 import {
   calculateQuote,
   getCalendarProducts,
+  getStoredFactoryDiscounts,
   sendCustomerMessage,
   SIVAKASI_CATALOG,
   type CalendarProduct,
+  type DiscountTier,
   type QuotePayload,
   type QuoteResult
 } from '../services/api';
@@ -125,16 +127,42 @@ export const FINISH_OPTIONS = [
   { id: 'Double-Sided UV Gloss Lamination', label: 'Double-Sided UV Gloss Protection', surcharge: 8, desc: 'Weatherproof high-gloss protective shield for vibrant outdoor durability' }
 ];
 
+const syncFormatOptionsWithCatalog = (catalog: CalendarProduct[]): FormatOption[] => {
+  return FORMAT_OPTIONS.map(opt => {
+    const p = catalog.find(item =>
+      item.id === opt.id ||
+      item.name.toLowerCase().includes(opt.id.toLowerCase()) ||
+      item.category.toLowerCase().includes(opt.id.toLowerCase()) ||
+      opt.id.toLowerCase().includes(item.category.toLowerCase())
+    );
+    if (p) {
+      return {
+        ...opt,
+        base: p.startingPrice || opt.base,
+        size: p.dimensions || opt.size,
+        img: p.mockupImg || opt.img,
+        fullName: p.name || opt.fullName
+      };
+    }
+    return opt;
+  });
+};
+
 export const CalendarCustomizer = () => {
   const { pageParams } = useRouter();
 
   // Live products sync from catalog
   const [liveCatalog, setLiveCatalog] = useState<CalendarProduct[]>(SIVAKASI_CATALOG);
+  const [formatOptions, setFormatOptions] = useState<FormatOption[]>(() => syncFormatOptionsWithCatalog(SIVAKASI_CATALOG));
+  const [discounts, setDiscounts] = useState<DiscountTier[]>(() => getStoredFactoryDiscounts());
 
   useEffect(() => {
     getCalendarProducts()
       .then((data) => {
-        if (data && data.length > 0) setLiveCatalog(data);
+        if (data && data.length > 0) {
+          setLiveCatalog(data);
+          setFormatOptions(syncFormatOptionsWithCatalog(data));
+        }
       })
       .catch(() => {});
 
@@ -142,23 +170,33 @@ export const CalendarCustomizer = () => {
       const custom = e as CustomEvent<CalendarProduct[]>;
       if (custom.detail && Array.isArray(custom.detail)) {
         setLiveCatalog(custom.detail);
+        setFormatOptions(syncFormatOptionsWithCatalog(custom.detail));
       }
     };
+    const handleDiscounts = (e: Event) => {
+      const custom = e as CustomEvent<DiscountTier[]>;
+      if (custom.detail) setDiscounts(custom.detail);
+      else setDiscounts(getStoredFactoryDiscounts());
+    };
     window.addEventListener('catalog-updated', handleCatalogUpdate);
-    return () => window.removeEventListener('catalog-updated', handleCatalogUpdate);
+    window.addEventListener('discounts-updated', handleDiscounts);
+    return () => {
+      window.removeEventListener('catalog-updated', handleCatalogUpdate);
+      window.removeEventListener('discounts-updated', handleDiscounts);
+    };
   }, []);
 
   const getInitialProduct = () => {
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
-      const matched = FORMAT_OPTIONS.find(opt => 
+      const matched = formatOptions.find(opt => 
         opt.id.toLowerCase().includes(p) || 
         opt.label.toLowerCase().includes(p) ||
         p.includes(opt.id.toLowerCase())
       );
       if (matched) return matched;
     }
-    return FORMAT_OPTIONS[0];
+    return formatOptions[0];
   };
 
   const initialOpt = getInitialProduct();
@@ -171,7 +209,7 @@ export const CalendarCustomizer = () => {
   useEffect(() => {
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
-      const matched = FORMAT_OPTIONS.find(opt => 
+      const matched = formatOptions.find(opt => 
         opt.id.toLowerCase().includes(p) || 
         opt.label.toLowerCase().includes(p) ||
         p.includes(opt.id.toLowerCase())
@@ -182,7 +220,7 @@ export const CalendarCustomizer = () => {
         setFinish(matched.defaultFinish);
       }
     }
-  }, [pageParams?.product, format]);
+  }, [pageParams?.product, format, formatOptions]);
 
   // Quote calculation state
   const [quote, setQuote] = useState<QuoteResult | null>(null);
@@ -387,7 +425,7 @@ export const CalendarCustomizer = () => {
           </div>
 
           <div className="format-cards-grid">
-            {FORMAT_OPTIONS.map((opt) => {
+            {formatOptions.map((opt) => {
               const isSelected = format === opt.id;
               return (
                 <div
@@ -546,6 +584,27 @@ export const CalendarCustomizer = () => {
                   </button>
                 ))}
               </div>
+
+              {/* Active Wholesale Tier Badges from Admin */}
+              {discounts && discounts.length > 0 && (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
+                  {discounts.map((t) => (
+                    <span
+                      key={t.id}
+                      style={{
+                        fontSize: '0.72rem',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        background: quantity >= t.minQty ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                        border: `1px solid ${quantity >= t.minQty ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                        color: quantity >= t.minQty ? '#4ade80' : 'var(--text-muted)'
+                      }}
+                    >
+                      {t.minQty}+ pcs: {t.discountPercentage}% OFF
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Discount Callout */}
               {quote && quote.discountPercentage > 0 && (
@@ -766,12 +825,15 @@ export const CalendarCustomizer = () => {
           onClick={() => !calculating && setIsModalOpen(false)}
         >
           <div
+            className="customizer-modal-card"
             style={{
               background: 'var(--bg-secondary)',
               border: '1px solid #454545',
               borderRadius: 'var(--radius-lg)',
               maxWidth: '520px',
               width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
               padding: '36px',
               boxShadow: 'var(--shadow-lg), 0 0 40px rgba(215, 134, 0, 0.25)',
               position: 'relative'
@@ -1421,6 +1483,15 @@ export const CalendarCustomizer = () => {
           }
           .quote-total-price {
             font-size: 1.15rem !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .config-card {
+            padding: 18px 14px !important;
+          }
+          .customizer-modal-card {
+            padding: 22px 16px !important;
+            border-radius: 16px !important;
           }
         }
       `}</style>

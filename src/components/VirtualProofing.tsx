@@ -177,11 +177,12 @@ export const VirtualProofing = () => {
           <div>
             {/* Month Carousel Selector */}
             <div
+              className="scroll-pills-row"
               style={{
                 display: 'flex',
                 gap: '8px',
                 overflowX: 'auto',
-                paddingBottom: '16px',
+                paddingBottom: '12px',
                 marginBottom: '20px'
               }}
             >
@@ -209,7 +210,7 @@ export const VirtualProofing = () => {
 
             {/* The Actual Calendar Sheet Canvas */}
             <div
-              className="proofing-canvas-sheet"
+className="virtual-calendar-sheet proofing-canvas-sheet"
               style={{
                 background: paperTexture === 'kraft' ? '#d5c2a5' : paperTexture === 'cotton' ? '#f5f2e9' : '#faf8f2',
                 color: '#1a1815',
@@ -299,6 +300,7 @@ export const VirtualProofing = () => {
 
                 {/* Days Matrix */}
                 <div
+                  className="virtual-calendar-dates"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(7, 1fr)',
@@ -337,6 +339,7 @@ export const VirtualProofing = () => {
 
               {/* Bottom Client Corporate Branding Area */}
               <div
+                className="virtual-sheet-footer"
                 style={{
                   borderTop: '1px solid rgba(0,0,0,0.1)',
                   paddingTop: '20px',
@@ -392,6 +395,21 @@ export const VirtualProofing = () => {
           .proofing-canvas-sheet {
             padding: 24px 16px !important;
             min-height: 400px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .virtual-calendar-sheet {
+            padding: 24px 14px 20px !important;
+            min-height: auto !important;
+          }
+          .virtual-calendar-dates {
+            gap: 4px !important;
+            font-size: 0.82rem !important;
+          }
+          .virtual-sheet-footer {
+            flex-direction: column !important;
+            gap: 8px !important;
+            align-items: flex-start !important;
           }
         }
       `}</style>

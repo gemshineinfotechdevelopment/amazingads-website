@@ -464,11 +464,28 @@ export async function calculateQuote(payload: QuotePayload): Promise<QuoteResult
     // Proceed to local calculation fallback
   }
 
-  // Local fallback calculation using exact Sivakasi formula
+  // Local fallback calculation using exact Sivakasi formula (Dynamic Admin sync)
   const qty = payload.quantity || 100;
+  const catalog = getStoredCatalog() || SIVAKASI_CATALOG;
+  let matchedProduct: CalendarProduct | undefined;
+  if (payload.productId) {
+    matchedProduct = catalog.find(p => p.id === payload.productId);
+  }
+  if (!matchedProduct && payload.format) {
+    const fLower = payload.format.toLowerCase();
+    matchedProduct = catalog.find(p =>
+      p.name.toLowerCase().includes(fLower) ||
+      p.category.toLowerCase().includes(fLower) ||
+      fLower.includes(p.category.toLowerCase()) ||
+      fLower.includes(p.name.toLowerCase())
+    );
+  }
+
   let baseUnitPrice = 110;
   if (payload.customUnitPrice && payload.customUnitPrice > 0) {
     baseUnitPrice = payload.customUnitPrice;
+  } else if (matchedProduct) {
+    baseUnitPrice = (payload.size && matchedProduct.sizePrices && matchedProduct.sizePrices[payload.size]) || matchedProduct.startingPrice;
   } else if (payload.format.includes('PET Foil') || payload.format.includes('Gold Foil')) baseUnitPrice = 145;
   else if (payload.format.includes('5D') || payload.format.includes('Lenticular') || payload.format.includes('3D')) baseUnitPrice = 220;
   else if (payload.format.includes('Stone Art') || payload.format.includes('Kundan')) baseUnitPrice = 280;
@@ -817,6 +834,7 @@ export interface FactorySettings {
   standardLeadTime: string;
   bulkLeadTime: string;
   carriers: string;
+  establishedYear?: number;
 }
 
 export const DEFAULT_DISCOUNT_TIERS: DiscountTier[] = [
@@ -843,7 +861,8 @@ export const DEFAULT_FACTORY_SETTINGS: FactorySettings = {
   gstNumber: '33AABCA1234F1Z8',
   standardLeadTime: '3–5 Business Days',
   bulkLeadTime: '6–8 Business Days (2,000+ units)',
-  carriers: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service'
+  carriers: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service',
+  establishedYear: 2008
 };
 
 const LOCAL_STORAGE_DISCOUNTS_KEY = 'amazingads_factory_discounts_v1';
@@ -865,6 +884,43 @@ export function saveStoredFactoryDiscounts(tiers: DiscountTier[]) {
     localStorage.setItem(LOCAL_STORAGE_DISCOUNTS_KEY, JSON.stringify(tiers));
     window.dispatchEvent(new CustomEvent('discounts-updated', { detail: tiers }));
   } catch {}
+
+  // Asynchronously sync to backend & MongoDB Atlas
+  fetch(`${API_BASE_URL}/discounts`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(tiers)
+  }).catch(() => {});
+}
+
+export async function fetchFactoryDiscounts(): Promise<DiscountTier[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/discounts`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+        saveStoredFactoryDiscounts(json.data);
+        return json.data;
+      }
+    }
+  } catch {}
+  return getStoredFactoryDiscounts();
+}
+
+export async function saveFactoryDiscountsToBackend(tiers: DiscountTier[]): Promise<DiscountTier[]> {
+  saveStoredFactoryDiscounts(tiers);
+  try {
+    const res = await fetch(`${API_BASE_URL}/discounts`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tiers)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) return json.data;
+    }
+  } catch {}
+  return tiers;
 }
 
 export function getStoredFactorySettings(): FactorySettings {
@@ -883,6 +939,272 @@ export function saveStoredFactorySettings(settings: FactorySettings) {
     localStorage.setItem(LOCAL_STORAGE_FACTORY_KEY, JSON.stringify(settings));
     window.dispatchEvent(new CustomEvent('factory-settings-updated', { detail: settings }));
   } catch {}
+
+  // Asynchronously sync to backend & MongoDB Atlas
+  fetch(`${API_BASE_URL}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings)
+  }).catch(() => {});
+}
+
+export async function fetchFactorySettings(): Promise<FactorySettings> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/settings`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && typeof json.data === 'object') {
+        saveStoredFactorySettings(json.data);
+        return json.data;
+      }
+    }
+  } catch {}
+  return getStoredFactorySettings();
+}
+
+export async function saveFactorySettingsToBackend(settings: FactorySettings): Promise<FactorySettings> {
+  saveStoredFactorySettings(settings);
+  try {
+    const res = await fetch(`${API_BASE_URL}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) return json.data;
+    }
+  } catch {}
+  return settings;
+}
+
+// 9. Stored Quotes from Website (For Admin Quotes Tab)
+export interface StoredQuote {
+  id: string;
+  quoteId?: string;
+  clientName: string;
+  company: string;
+  phone: string;
+  product: string;
+  quantity: number;
+  totalPrice: number;
+  date: string;
+  status: 'New' | 'In Production' | 'Dispatched';
+}
+
+export async function fetchQuotes(): Promise<StoredQuote[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/quotes`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        return json.data.map((q: any) => ({
+          id: q.quoteId || q.id || `AA-Q-${Math.floor(1000 + Math.random() * 9000)}`,
+          clientName: q.client?.name || q.clientName || 'Direct Customer',
+          company: q.client?.company || q.company || 'Corporate Trade',
+          phone: q.client?.phone || q.phone || 'N/A',
+          product: q.format || 'Calendar Product',
+          quantity: q.quantity || 100,
+          totalPrice: q.subtotal || 0,
+          date: q.createdAt
+            ? new Date(q.createdAt).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            : 'Recent',
+          status: 'New'
+        }));
+      }
+    }
+  } catch {}
+  return [];
+}
+
+// 10. Corporate Inquiries & Sample Kits (Real Database Sync)
+export interface StoredInquiry {
+  id: string;
+  inquiryId: string;
+  name: string;
+  email: string;
+  company: string;
+  phone?: string;
+  quantityNeeded: string;
+  targetDate: string;
+  message: string;
+  assignedPrintMaster?: string;
+  receivedAt?: string;
+  createdAt?: string;
+}
+
+export interface StoredSampleKit {
+  id: string;
+  sampleId: string;
+  name: string;
+  email: string;
+  company: string;
+  phone: string;
+  shippingAddress: string;
+  preferredStyles: string[];
+  kitContents: string[];
+  status: string;
+  estimatedDeliveryDays: string;
+  requestedAt?: string;
+  createdAt?: string;
+}
+
+export async function fetchInquiries(): Promise<StoredInquiry[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/inquiries`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        return json.data.map((inq: any) => ({
+          id: inq._id || inq.inquiryId || `AA-INQ-${Math.floor(100000 + Math.random() * 900000)}`,
+          inquiryId: inq.inquiryId || inq.id || 'N/A',
+          name: inq.name || 'Anonymous Client',
+          email: inq.email || '',
+          company: inq.company || 'Direct Account',
+          phone: inq.phone || inq.specs?.phone || inq.message?.match(/\b[6-9]\d{9}\b/)?.[0] || 'N/A',
+          quantityNeeded: inq.quantityNeeded || '500+ Units',
+          targetDate: inq.targetDate || 'Immediate Dispatch',
+          message: inq.message || '',
+          assignedPrintMaster: inq.assignedPrintMaster || 'Amazing Ads Sivakasi Works',
+          receivedAt: inq.receivedAt || inq.createdAt || new Date().toISOString()
+        }));
+      }
+    }
+  } catch {}
+  return [];
+}
+
+export async function fetchSampleKits(): Promise<StoredSampleKit[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/sample-kits`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        return json.data.map((kit: any) => ({
+          id: kit._id || kit.sampleId || `AA-SMP-${Math.floor(100000 + Math.random() * 900000)}`,
+          sampleId: kit.sampleId || kit.id || 'N/A',
+          name: kit.name || 'Client',
+          email: kit.email || '',
+          company: kit.company || 'Corporate Client',
+          phone: kit.phone || 'N/A',
+          shippingAddress: kit.shippingAddress || '',
+          preferredStyles: Array.isArray(kit.preferredStyles) ? kit.preferredStyles : ['Gold Foil Calendars', '5D Tech'],
+          kitContents: Array.isArray(kit.kitContents) ? kit.kitContents : ['24K Gold Foil Die Stamped Proof', '5D Lenticular Swatch', 'Catalog'],
+          status: kit.status || 'Dispatched from Sivakasi Press Hub',
+          estimatedDeliveryDays: kit.estimatedDeliveryDays || '2–3 Business Days',
+          requestedAt: kit.requestedAt || kit.createdAt || new Date().toISOString()
+        }));
+      }
+    }
+  } catch {}
+  return [];
+}
+
+// 11. Vector Dielines Specifications
+export interface DielineSpec {
+  id: string;
+  title: string;
+  format: string;
+  bleed: string;
+  safeZone: string;
+  bindingAllowance: string;
+  colorSpace: string;
+  downloadFormats: string[];
+}
+
+export async function fetchDielines(): Promise<DielineSpec[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/dielines`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+        return json.data;
+      }
+    }
+  } catch {}
+  return [
+    {
+      id: 'dieline-pet-foil-wall',
+      title: 'Gold / Silver PET Foil Calendar Dieline',
+      format: '15 × 20 in & 17 × 27 in (Rigid Kappa Board + PET Film)',
+      bleed: '3.0 mm external bleed on all 4 sides',
+      safeZone: '8.0 mm internal text safety margin',
+      bindingAllowance: '25 mm top margin reserved for tin plate clamping & brass hanger loop',
+      colorSpace: 'CMYK + Separate Vector Layer for Mirror Gold & Silver Foil Die',
+      downloadFormats: ['PDF Template', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    },
+    {
+      id: 'dieline-custom-5d',
+      title: 'Custom 5D Holographic Calendar Dieline',
+      format: '12 × 18 in & 16 × 24 in (75 LPI Lenticular)',
+      bleed: '4.0 mm bleed margin with optical lens pitch alignment marks',
+      safeZone: '6.0 mm internal safety margin',
+      bindingAllowance: '20 mm perimeter for carved synthetic frame mounting cleat',
+      colorSpace: 'Interlaced PSD / Multi-layer Phase A + Phase B Vector Masks',
+      downloadFormats: ['Interlaced PSD', 'Adobe Illustrator (.AI)', 'PDF Specs']
+    },
+    {
+      id: 'dieline-stone-art',
+      title: 'Stone Art Sculptural Frame Dieline',
+      format: '14 × 20 in & 18 × 24 in Carved Frame Mount',
+      bleed: '5.0 mm bleed on relief border frame',
+      safeZone: '10.0 mm relief clearance zone',
+      bindingAllowance: 'Carved synthetic wood moulding allowance with bottom daily block slit',
+      colorSpace: '3D Heightmap Displacement Map + CMYK Antique Color Wash',
+      downloadFormats: ['CAD Dieline (.DXF)', 'Adobe Illustrator (.AI)', 'PDF Template']
+    },
+    {
+      id: 'dieline-hand-fan',
+      title: 'Promotional Advertising Hand Fan Contour Dieline',
+      format: 'Standard 8 × 8 in / Round & Custom Die-Cut Shapes',
+      bleed: '3.0 mm external bleed contour cutting line',
+      safeZone: '5.0 mm text safe zone from fan blade edge',
+      bindingAllowance: 'Handle slot rivet holes with reinforced safety rib zone',
+      colorSpace: 'Double-Sided CMYK Offset / Screen Print Spot Colors',
+      downloadFormats: ['Die-Cut Vector (.EPS)', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    },
+    {
+      id: 'dieline-special-products',
+      title: 'Special Products & Executive Gift Sets Dieline',
+      format: 'Custom Tailored Dimensions (Acrylic LED, Boxes, Desk Sets)',
+      bleed: '3.5 mm bleed margin across clamshell and magnetic flaps',
+      safeZone: '6.0 mm branding area margins',
+      bindingAllowance: 'Groove creasing and magnet inset placement notches',
+      colorSpace: 'CMYK + Spot UV Vector + Laser Etch Cut Lines',
+      downloadFormats: ['Packaging CAD (.ARD)', 'Adobe Illustrator (.AI)', 'Vector PDF']
+    }
+  ];
+}
+
+// 10. Real-time Multi-Tab Synchronizer
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'amazingads_catalog_v2' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('catalog-updated', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+    if (e.key === 'amazingads_factory_settings_v1' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('factory-settings-updated', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+    if (e.key === 'amazingads_factory_discounts_v1' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('discounts-updated', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+    if (e.key === 'amazingads_customer_messages_v1' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('new-customer-message', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+  });
 }
 
 

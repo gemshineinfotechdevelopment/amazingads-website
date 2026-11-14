@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '../context/RouterContext';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface FloatingConciergeProps {
   onOpenSampleKit: () => void;
@@ -8,10 +9,23 @@ interface FloatingConciergeProps {
 export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
+
+  const targetPhone = (settings.phone || '+919790472767').replace(/[^0-9+]/g, '');
 
   return (
     <div
-      className="floating-concierge-wrap"
+      className="floating-concierge-root floating-concierge-wrap"
       style={{
         position: 'fixed',
         bottom: '24px',
@@ -60,9 +74,10 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
             {/* Direct Phone Call */}
             <a
-              href="tel:+919790472767"
+              href={`tel:${targetPhone}`}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -78,7 +93,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
               }}
             >
               <span>📞</span>
-              <span>Call Factory: +91 97904 72767</span>
+              <span>Call Factory: {settings.phone || '+91 97904 72767'}</span>
             </a>
 
             {/* Quick Quote */}
@@ -155,12 +170,13 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
           box-shadow: 0 12px 30px rgba(3, 3, 3, 0.8), 0 0 30px rgba(255, 215, 46, 0.45) !important;
         }
         @media (max-width: 640px) {
-          .floating-concierge-wrap {
+          .floating-concierge-root, .floating-concierge-wrap {
             bottom: 16px !important;
             right: 16px !important;
           }
           .floating-concierge-popover {
             width: calc(100vw - 32px) !important;
+            right: 0 !important;
             padding: 20px 16px !important;
           }
           .floating-btn {

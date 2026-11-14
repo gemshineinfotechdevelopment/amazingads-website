@@ -1,4 +1,11 @@
+import { useState, useEffect } from 'react';
 import { useRouter } from '../context/RouterContext';
+import {
+  getPressStats,
+  getStoredFactorySettings,
+  type FactorySettings,
+  type PressStats
+} from '../services/api';
 
 interface AboutPageProps {
   onOpenSampleKit?: () => void;
@@ -6,6 +13,44 @@ interface AboutPageProps {
 
 export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+  const [stats, setStats] = useState<PressStats>({
+    calendarsPrintedYearToDate: '14,205,000+',
+    corporateClientsServed: '4,500+',
+    fscCertifiedPaperRatio: '100%',
+    onTimeDeliveryRate: '99.4%',
+    foilPressTolerances: '0.05 mm',
+    establishedYear: 2008,
+    pressHQ: 'Sivakasi Works'
+  });
+
+  useEffect(() => {
+    getPressStats().then((data) => {
+      if (data) setStats(data);
+    });
+
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) {
+        setSettings(custom.detail);
+      } else {
+        setSettings(getStoredFactorySettings());
+      }
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
+
+  const estYear = settings.establishedYear || stats.establishedYear || 2008;
+  const yearsOfCraftsmanship = `${new Date().getFullYear() - estYear}+`;
+  const brandName = settings.factoryName || 'Amazing Ads';
+
+  const statItems = [
+    { stat: yearsOfCraftsmanship, label: 'Years of Craftsmanship', icon: '🏛️' },
+    { stat: stats.corporateClientsServed || '4,500+', label: 'Corporate Clients Across India', icon: '🤝' },
+    { stat: stats.calendarsPrintedYearToDate || '14M+', label: 'Calendars & Promos Pressed', icon: '🖨️' },
+    { stat: stats.onTimeDeliveryRate || '99.4%', label: 'On-Time Dispatch Record', icon: '⚡' }
+  ];
 
   return (
     <div className="page-view">
@@ -14,7 +59,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
         <div className="breadcrumb-nav">
           <button onClick={() => navigate('home')}>Home</button>
           <span>/</span>
-          <span className="current">About Amazing Ads</span>
+          <span className="current">About {brandName}</span>
         </div>
 
         {/* Page Banner */}
@@ -23,16 +68,16 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
             ✦ SIVAKASI PRINT HERITAGE
           </span>
           <h1 style={{ fontSize: 'clamp(2.4rem, 4.5vw, 3.8rem)', color: '#fff', marginBottom: '12px' }}>
-            About <span className="gold-gradient-text">Amazing Ads</span>
+            About <span className="gold-gradient-text">{brandName}</span>
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto', lineHeight: '1.7' }}>
-            Direct manufacturer based in Sivakasi — the printing capital of India. Producing 24K Gold Foil Calendars, Daily Panchangam, and Luxury Photo Frames since 2008.
+            Direct manufacturer based in Sivakasi — the printing capital of India. Producing 24K Gold Foil Calendars, Daily Panchangam, and Luxury Photo Frames since {estYear}.
           </p>
         </div>
 
         {/* Story Section */}
         <div
-          className="about-story-box"
+          className="about-story-card about-story-box"
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-card)',
@@ -43,9 +88,10 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
           }}
         >
           <div
+            className="about-story-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
               gap: '36px',
               alignItems: 'center'
             }}
@@ -58,7 +104,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                 Direct Wholesale Press from India's Premier Printing Capital
               </h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', marginBottom: '16px', fontSize: '0.95rem' }}>
-                Operating from Sivakasi, Tamil Nadu, <strong>Amazing Ads</strong> is an established printing and manufacturing company specializing in Real 24K Gold Foil Stamped Wall Calendars, Traditional Daily Sheet Panchangam (Tamil/English with Nalla Neram, Rahu Kalam, Thirukkural), 12-Sheet Monthly Art Calendars, 3D Lenticular Motion Displays, and Devotional Gold Foil Photo Frames.
+                Operating from Sivakasi, Tamil Nadu, <strong>{brandName}</strong> is an established printing and manufacturing company specializing in Real 24K Gold Foil Stamped Wall Calendars, Traditional Daily Sheet Panchangam (Tamil/English with Nalla Neram, Rahu Kalam, Thirukkural), 12-Sheet Monthly Art Calendars, 3D Lenticular Motion Displays, and Devotional Gold Foil Photo Frames.
               </p>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', marginBottom: '24px', fontSize: '0.95rem' }}>
                 Every calendar is pressed, die-stamped, and tin-mounted in-house under stringent quality checks using Heidelberg offset presses, German metallic foils, and virgin kappa board for guaranteed flat hanging throughout the year.
@@ -76,7 +122,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
               </div>
             </div>
 
-            {/* Quick Stats Grid */}
+            {/* Dynamic Stats Grid */}
             <div
               className="about-stats-grid"
               style={{
@@ -85,12 +131,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
                 gap: '16px'
               }}
             >
-              {[
-                { stat: '15+', label: 'Years of Craftsmanship', icon: '🏛️' },
-                { stat: '4,500+', label: 'Corporate Clients Across India', icon: '🤝' },
-                { stat: '12M+', label: 'Calendars & Promos Pressed', icon: '🖨️' },
-                { stat: '99.4%', label: 'On-Time Dispatch Record', icon: '⚡' }
-              ].map((item, idx) => (
+              {statItems.map((item, idx) => (
                 <div
                   key={idx}
                   style={{
@@ -120,11 +161,12 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
             ✦ OUR CAPABILITIES
           </span>
           <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '8px' }}>
-            Why Leading Brands Trust <span className="gold-gradient-text">Amazing Ads</span>
+            Why Leading Brands Trust <span className="gold-gradient-text">{brandName}</span>
           </h2>
         </div>
 
         <div
+          className="about-capabilities-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
@@ -173,10 +215,20 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
       </div>
 
       <style>{`
-        @media (max-width: 640px) {
-          .about-story-box {
-            padding: 24px 18px !important;
+        @media (max-width: 768px) {
+          .about-story-card, .about-story-box {
+            padding: 24px 16px !important;
           }
+          .about-story-grid {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
+          }
+          .about-capabilities-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+        @media (max-width: 640px) {
           .about-stats-grid {
             grid-template-columns: 1fr 1fr !important;
             gap: 12px !important;
@@ -186,4 +238,3 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
     </div>
   );
 };
-
