@@ -1,9 +1,62 @@
+import { useState, useEffect } from 'react';
+import {
+  getStoredFactorySettings,
+  getStoredCatalog,
+  SIVAKASI_CATALOG,
+  getPressStats,
+  type FactorySettings,
+  type CalendarProduct,
+  type PressStats
+} from '../services/api';
+
 interface HeroProps {
   onScrollToCustomizer: () => void;
   onOpenSampleKit: () => void;
 }
 
 export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+  const [products, setProducts] = useState<CalendarProduct[]>(() => {
+    const stored = getStoredCatalog();
+    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
+  });
+  const [stats, setStats] = useState<PressStats>({
+    calendarsPrintedYearToDate: '14,205,000+',
+    corporateClientsServed: '4,500+',
+    fscCertifiedPaperRatio: '100%',
+    onTimeDeliveryRate: '99.8%',
+    foilPressTolerances: '0.05 mm',
+    establishedYear: 2008,
+    pressHQ: 'Sivakasi Works'
+  });
+
+  useEffect(() => {
+    getPressStats().then((data) => {
+      if (data) setStats(data);
+    });
+
+    const handleSettingsUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+
+    const handleCatalogUpdate = () => {
+      const stored = getStoredCatalog();
+      if (stored && stored.length > 0) setProducts(stored);
+    };
+
+    window.addEventListener('factory-settings-updated', handleSettingsUpdate);
+    window.addEventListener('catalog-updated', handleCatalogUpdate);
+
+    return () => {
+      window.removeEventListener('factory-settings-updated', handleSettingsUpdate);
+      window.removeEventListener('catalog-updated', handleCatalogUpdate);
+    };
+  }, []);
+
+  const brandName = settings.factoryName || 'Amazing Ads';
+
   return (
     <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
       <div className="container">
@@ -23,7 +76,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 ✦ 2026 / 2027 EDITIONS
               </span>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                Amazing Ads Sivakasi Works
+                {brandName} Sivakasi Works
               </span>
             </div>
 
@@ -51,20 +104,14 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 marginBottom: '20px'
               }}
             >
-              India’s premier manufacturing atelier for Gold/Silver PET Foil Calendars, Custom 5D Holographic Calendars, Stone Art Calendars, Hand Fans & Special Products.
+              {settings.tagline || "India’s premier manufacturing atelier for Gold/Silver PET Foil Calendars, Custom 5D Holographic Calendars, Stone Art Calendars, Hand Fans & Special Products."}
             </p>
 
             {/* Product Quick-Tag Highlights */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
-              {[
-                'Gold/Silver PET Foil',
-                'Custom 5D Calendars',
-                'Stone Art Calendars',
-                'Hand Fan',
-                'Special Products'
-              ].map((item) => (
+              {products.slice(0, 5).map((p) => (
                 <span
-                  key={item}
+                  key={p.id}
                   style={{
                     background: 'rgba(207, 168, 78, 0.1)',
                     border: '1px solid rgba(207, 168, 78, 0.3)',
@@ -76,7 +123,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                     letterSpacing: '0.02em'
                   }}
                 >
-                  ✦ {item}
+                  ✦ {p.name}
                 </span>
               ))}
             </div>
@@ -116,7 +163,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             >
               <div>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-gold-bright)' }}>
-                  1.4M+
+                  {stats.calendarsPrintedYearToDate || '14M+'}
                 </p>
                 <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Calendars Pressed
@@ -143,7 +190,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
 
               <div>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 700, color: '#fff' }}>
-                  99.8%
+                  {stats.onTimeDeliveryRate || '99.8%'}
                 </p>
                 <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   On-Time Dispatch
@@ -209,7 +256,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
               >
                 <img
                   src="/images/luxury-scenic-calendar-2026.jpg"
-                  alt="November 2026 Luxury Scenic Wall Calendar - Amazing Ads Sivakasi"
+                  alt={`November 2026 Luxury Scenic Wall Calendar - ${brandName} Sivakasi`}
                   style={{
                     width: '100%',
                     height: 'auto',

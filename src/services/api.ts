@@ -731,6 +731,7 @@ export interface FactorySettings {
   standardLeadTime: string;
   bulkLeadTime: string;
   carriers: string;
+  establishedYear?: number;
 }
 
 export const DEFAULT_DISCOUNT_TIERS: DiscountTier[] = [
@@ -757,7 +758,8 @@ export const DEFAULT_FACTORY_SETTINGS: FactorySettings = {
   gstNumber: '33AABCA1234F1Z8',
   standardLeadTime: '3–5 Business Days',
   bulkLeadTime: '6–8 Business Days (2,000+ units)',
-  carriers: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service'
+  carriers: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service',
+  establishedYear: 2008
 };
 
 const LOCAL_STORAGE_DISCOUNTS_KEY = 'amazingads_factory_discounts_v1';
@@ -915,6 +917,165 @@ export async function fetchQuotes(): Promise<StoredQuote[]> {
     }
   } catch {}
   return [];
+}
+
+// 10. Corporate Inquiries & Sample Kits (Real Database Sync)
+export interface StoredInquiry {
+  id: string;
+  inquiryId: string;
+  name: string;
+  email: string;
+  company: string;
+  phone?: string;
+  quantityNeeded: string;
+  targetDate: string;
+  message: string;
+  assignedPrintMaster?: string;
+  receivedAt?: string;
+  createdAt?: string;
+}
+
+export interface StoredSampleKit {
+  id: string;
+  sampleId: string;
+  name: string;
+  email: string;
+  company: string;
+  phone: string;
+  shippingAddress: string;
+  preferredStyles: string[];
+  kitContents: string[];
+  status: string;
+  estimatedDeliveryDays: string;
+  requestedAt?: string;
+  createdAt?: string;
+}
+
+export async function fetchInquiries(): Promise<StoredInquiry[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/inquiries`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        return json.data.map((inq: any) => ({
+          id: inq._id || inq.inquiryId || `AA-INQ-${Math.floor(100000 + Math.random() * 900000)}`,
+          inquiryId: inq.inquiryId || inq.id || 'N/A',
+          name: inq.name || 'Anonymous Client',
+          email: inq.email || '',
+          company: inq.company || 'Direct Account',
+          phone: inq.phone || inq.specs?.phone || inq.message?.match(/\b[6-9]\d{9}\b/)?.[0] || 'N/A',
+          quantityNeeded: inq.quantityNeeded || '500+ Units',
+          targetDate: inq.targetDate || 'Immediate Dispatch',
+          message: inq.message || '',
+          assignedPrintMaster: inq.assignedPrintMaster || 'Amazing Ads Sivakasi Works',
+          receivedAt: inq.receivedAt || inq.createdAt || new Date().toISOString()
+        }));
+      }
+    }
+  } catch {}
+  return [];
+}
+
+export async function fetchSampleKits(): Promise<StoredSampleKit[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/sample-kits`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        return json.data.map((kit: any) => ({
+          id: kit._id || kit.sampleId || `AA-SMP-${Math.floor(100000 + Math.random() * 900000)}`,
+          sampleId: kit.sampleId || kit.id || 'N/A',
+          name: kit.name || 'Client',
+          email: kit.email || '',
+          company: kit.company || 'Corporate Client',
+          phone: kit.phone || 'N/A',
+          shippingAddress: kit.shippingAddress || '',
+          preferredStyles: Array.isArray(kit.preferredStyles) ? kit.preferredStyles : ['Gold Foil Calendars', '5D Tech'],
+          kitContents: Array.isArray(kit.kitContents) ? kit.kitContents : ['24K Gold Foil Die Stamped Proof', '5D Lenticular Swatch', 'Catalog'],
+          status: kit.status || 'Dispatched from Sivakasi Press Hub',
+          estimatedDeliveryDays: kit.estimatedDeliveryDays || '2–3 Business Days',
+          requestedAt: kit.requestedAt || kit.createdAt || new Date().toISOString()
+        }));
+      }
+    }
+  } catch {}
+  return [];
+}
+
+// 11. Vector Dielines Specifications
+export interface DielineSpec {
+  id: string;
+  title: string;
+  format: string;
+  bleed: string;
+  safeZone: string;
+  bindingAllowance: string;
+  colorSpace: string;
+  downloadFormats: string[];
+}
+
+export async function fetchDielines(): Promise<DielineSpec[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/dielines`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+        return json.data;
+      }
+    }
+  } catch {}
+  return [
+    {
+      id: 'dieline-pet-foil-wall',
+      title: 'Gold / Silver PET Foil Calendar Dieline',
+      format: '15 × 20 in & 17 × 27 in (Rigid Kappa Board + PET Film)',
+      bleed: '3.0 mm external bleed on all 4 sides',
+      safeZone: '8.0 mm internal text safety margin',
+      bindingAllowance: '25 mm top margin reserved for tin plate clamping & brass hanger loop',
+      colorSpace: 'CMYK + Separate Vector Layer for Mirror Gold & Silver Foil Die',
+      downloadFormats: ['PDF Template', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    },
+    {
+      id: 'dieline-custom-5d',
+      title: 'Custom 5D Holographic Calendar Dieline',
+      format: '12 × 18 in & 16 × 24 in (75 LPI Lenticular)',
+      bleed: '4.0 mm bleed margin with optical lens pitch alignment marks',
+      safeZone: '6.0 mm internal safety margin',
+      bindingAllowance: '20 mm perimeter for carved synthetic frame mounting cleat',
+      colorSpace: 'Interlaced PSD / Multi-layer Phase A + Phase B Vector Masks',
+      downloadFormats: ['Interlaced PSD', 'Adobe Illustrator (.AI)', 'PDF Specs']
+    },
+    {
+      id: 'dieline-stone-art',
+      title: 'Stone Art Sculptural Frame Dieline',
+      format: '14 × 20 in & 18 × 24 in Carved Frame Mount',
+      bleed: '5.0 mm bleed on relief border frame',
+      safeZone: '10.0 mm relief clearance zone',
+      bindingAllowance: 'Carved synthetic wood moulding allowance with bottom daily block slit',
+      colorSpace: '3D Heightmap Displacement Map + CMYK Antique Color Wash',
+      downloadFormats: ['CAD Dieline (.DXF)', 'Adobe Illustrator (.AI)', 'PDF Template']
+    },
+    {
+      id: 'dieline-hand-fan',
+      title: 'Promotional Advertising Hand Fan Contour Dieline',
+      format: 'Standard 8 × 8 in / Round & Custom Die-Cut Shapes',
+      bleed: '3.0 mm external bleed contour cutting line',
+      safeZone: '5.0 mm text safe zone from fan blade edge',
+      bindingAllowance: 'Handle slot rivet holes with reinforced safety rib zone',
+      colorSpace: 'Double-Sided CMYK Offset / Screen Print Spot Colors',
+      downloadFormats: ['Die-Cut Vector (.EPS)', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    },
+    {
+      id: 'dieline-special-products',
+      title: 'Special Products & Executive Gift Sets Dieline',
+      format: 'Custom Tailored Dimensions (Acrylic LED, Boxes, Desk Sets)',
+      bleed: '3.5 mm bleed margin across clamshell and magnetic flaps',
+      safeZone: '6.0 mm branding area margins',
+      bindingAllowance: 'Groove creasing and magnet inset placement notches',
+      colorSpace: 'CMYK + Spot UV Vector + Laser Etch Cut Lines',
+      downloadFormats: ['Packaging CAD (.ARD)', 'Adobe Illustrator (.AI)', 'Vector PDF']
+    }
+  ];
 }
 
 // 10. Real-time Multi-Tab Synchronizer

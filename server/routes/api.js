@@ -953,7 +953,7 @@ router.post('/quote-calculator', async (req, res) => {
 });
 
 // 4. Sample Kit Request Endpoint
-router.post('/sample-kit', async (req, res) => {
+router.post(['/sample-kit', '/request-sample-kit'], async (req, res) => {
   const { name, email, company, phone, shippingAddress, preferredStyles } = req.body;
 
   if (!name || !email || !shippingAddress) {
@@ -1005,7 +1005,7 @@ router.post('/sample-kit', async (req, res) => {
 });
 
 // 5. Corporate Bespoke Consultation / Contact
-router.post('/contact', async (req, res) => {
+router.post(['/contact', '/corporate-inquiry'], async (req, res) => {
   const { name, email, company, quantityNeeded, targetDate, message, specs } = req.body;
 
   if (!name || !email || !message) {

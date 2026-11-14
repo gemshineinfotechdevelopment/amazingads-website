@@ -1,4 +1,5 @@
-import { useState, useRef, type MouseEvent, type TouchEvent } from 'react';
+import { useState, useRef, useEffect, type MouseEvent, type TouchEvent } from 'react';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 type ThreeDMode =
   | 'pet-foil'
@@ -124,6 +125,7 @@ const DAILY_LEAVES = [
 ];
 
 export const ThreeDViewer = () => {
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
   const [activeMode, setActiveMode] = useState<ThreeDMode>('pet-foil');
   const [selectedGod, setSelectedGod] = useState<GodKey>('mahalakshmi');
   const [rotateX, setRotateX] = useState(0);
@@ -136,6 +138,16 @@ export const ThreeDViewer = () => {
   const [isPeeling, setIsPeeling] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
 
   // When switching modes, auto-select the iconic god matching that calendar type
   const handleModeChange = (mode: ThreeDMode) => {
@@ -605,10 +617,10 @@ touchAction: 'pan-y'
                   }}
                 >
                   <p style={{ fontSize: '0.72rem', color: 'var(--accent-gold-bright)', fontWeight: 800, letterSpacing: '0.08em' }}>
-                    ★ {customBrand || 'YOUR COMPANY BRAND EMBOSSED HERE'} ★
+                    ★ {customBrand || settings.factoryName || 'YOUR COMPANY BRAND EMBOSSED HERE'} ★
                   </p>
                   <p style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    Sivakasi Heated Die Hot Stamped • Ph: +91 98421 23456
+                    Sivakasi Heated Die Hot Stamped • Ph: {settings.phone || '+91 97904 72767'}
                   </p>
                 </div>
               </div>

@@ -1,6 +1,12 @@
 import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
-import { getStoredFactorySettings, type FactorySettings } from '../services/api';
+import {
+  getStoredFactorySettings,
+  getStoredCatalog,
+  SIVAKASI_CATALOG,
+  type FactorySettings,
+  type CalendarProduct
+} from '../services/api';
 
 interface FooterProps {
   onOpenSampleKit: () => void;
@@ -9,6 +15,10 @@ interface FooterProps {
 export const Footer = ({ onOpenSampleKit }: FooterProps) => {
   const { navigate } = useRouter();
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+  const [products, setProducts] = useState<CalendarProduct[]>(() => {
+    const stored = getStoredCatalog();
+    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
+  });
 
   useEffect(() => {
     const handleUpdate = (e: Event) => {
@@ -19,9 +29,23 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
         setSettings(getStoredFactorySettings());
       }
     };
+
+    const handleCatalogUpdate = () => {
+      const stored = getStoredCatalog();
+      if (stored && stored.length > 0) setProducts(stored);
+    };
+
     window.addEventListener('factory-settings-updated', handleUpdate);
-    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+    window.addEventListener('catalog-updated', handleCatalogUpdate);
+
+    return () => {
+      window.removeEventListener('factory-settings-updated', handleUpdate);
+      window.removeEventListener('catalog-updated', handleCatalogUpdate);
+    };
   }, []);
+
+  const estYear = settings.establishedYear || 2008;
+  const brandName = settings.factoryName || 'AMAZING ADS';
 
   return (
     <footer
@@ -66,12 +90,14 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
                 />
               )}
               <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.04em', color: '#fff' }}>
-                AMAZING ADS
+                {brandName}
               </span>
             </div>
 
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '20px' }}>
-              India's premier calendar manufacturing and gold foil press works based in <strong>Sivakasi, Tamil Nadu</strong>. Delivering high-precision daily, monthly, and 3D lenticular calendars across India.
+              {settings.tagline || (
+                <>India's premier calendar manufacturing and gold foil press works based in <strong>Sivakasi, Tamil Nadu</strong>. Delivering high-precision daily, monthly, and 3D lenticular calendars across India.</>
+              )}
             </p>
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -79,7 +105,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
                 Sivakasi Print Hub
               </span>
               <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}>
-                Est. 2008
+                Est. {estYear}
               </span>
               <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}>
                 BNI Certified
@@ -87,17 +113,22 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
             </div>
           </div>
 
-          {/* Column 2: Collections */}
+          {/* Column 2: Dynamic Catalog Products */}
           <div>
             <h4 style={{ fontSize: '0.9rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '18px' }}>
               Products
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Gold/Silver PET Foil Calendar</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Special Products</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Custom 5D Calendars</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Stone Art Calendars</button></li>
-              <li><button onClick={() => navigate('collections')} style={footerLinkStyle}>Promotional Hand Fan</button></li>
+              {products.slice(0, 6).map((p) => (
+                <li key={p.id}>
+                  <button
+                    onClick={() => navigate('calculator', { product: p.name })}
+                    style={footerLinkStyle}
+                  >
+                    {p.name}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -107,7 +138,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
               Press Studio
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-              <li><button onClick={() => navigate('about')} style={footerLinkStyle}>About Amazing Ads</button></li>
+              <li><button onClick={() => navigate('about')} style={footerLinkStyle}>About {brandName}</button></li>
               <li><button onClick={() => navigate('proofing')} style={footerLinkStyle}>Virtual Proofing Studio</button></li>
               <li><button onClick={() => navigate('corporate')} style={footerLinkStyle}>Corporate Bulk (B2B)</button></li>
               <li><button onClick={() => navigate('calculator')} style={footerLinkStyle}>Quote Configurator</button></li>
@@ -157,7 +188,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
           }}
         >
           <div>
-            © 2008–2027 Amazing Ads Sivakasi (amazingads.in). All Rights Reserved.
+            © {estYear}–{new Date().getFullYear()} {brandName} ({settings.websiteUrl?.replace(/^https?:\/\//, '') || 'amazingads.in'}). All Rights Reserved.
           </div>
           <div style={{ display: 'flex', gap: '20px' }}>
             <span>Sivakasi Printing Works</span>

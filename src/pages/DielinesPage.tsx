@@ -1,18 +1,8 @@
-import { useState, type ChangeEvent } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import { useRouter } from '../context/RouterContext';
+import { fetchDielines, type DielineSpec } from '../services/api';
 
-interface DielineItem {
-  id: string;
-  title: string;
-  format: string;
-  bleed: string;
-  safeZone: string;
-  bindingAllowance: string;
-  colorSpace: string;
-  formats: string[];
-}
-
-const DIELINES: DielineItem[] = [
+const FALLBACK_DIELINES: DielineSpec[] = [
   {
     id: 'dieline-pet-foil-wall',
     title: 'Gold / Silver PET Foil Calendar Dieline',
@@ -21,7 +11,7 @@ const DIELINES: DielineItem[] = [
     safeZone: '8.0 mm internal text safety margin',
     bindingAllowance: '25 mm top margin reserved for tin plate clamping & brass hanger loop',
     colorSpace: 'CMYK + Separate Vector Layer for Mirror Gold & Silver Foil Die',
-    formats: ['PDF Template', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    downloadFormats: ['PDF Template', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
   },
   {
     id: 'dieline-custom-5d',
@@ -31,7 +21,7 @@ const DIELINES: DielineItem[] = [
     safeZone: '6.0 mm internal safety margin',
     bindingAllowance: '20 mm perimeter for carved synthetic frame mounting cleat',
     colorSpace: 'Interlaced PSD / Multi-layer Phase A + Phase B Vector Masks',
-    formats: ['Interlaced PSD', 'Adobe Illustrator (.AI)', 'PDF Specs']
+    downloadFormats: ['Interlaced PSD', 'Adobe Illustrator (.AI)', 'PDF Specs']
   },
   {
     id: 'dieline-stone-art',
@@ -41,7 +31,7 @@ const DIELINES: DielineItem[] = [
     safeZone: '10.0 mm relief clearance zone',
     bindingAllowance: 'Carved synthetic wood moulding allowance with bottom daily block slit',
     colorSpace: '3D Heightmap Displacement Map + CMYK Antique Color Wash',
-    formats: ['CAD Dieline (.DXF)', 'Adobe Illustrator (.AI)', 'PDF Template']
+    downloadFormats: ['CAD Dieline (.DXF)', 'Adobe Illustrator (.AI)', 'PDF Template']
   },
   {
     id: 'dieline-hand-fan',
@@ -51,7 +41,7 @@ const DIELINES: DielineItem[] = [
     safeZone: '5.0 mm text safe zone from fan blade edge',
     bindingAllowance: 'Handle slot rivet holes with reinforced safety rib zone',
     colorSpace: 'Double-Sided CMYK Offset / Screen Print Spot Colors',
-    formats: ['Die-Cut Vector (.EPS)', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
+    downloadFormats: ['Die-Cut Vector (.EPS)', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)']
   },
   {
     id: 'dieline-special-products',
@@ -61,12 +51,13 @@ const DIELINES: DielineItem[] = [
     safeZone: '6.0 mm branding area margins',
     bindingAllowance: 'Groove creasing and magnet inset placement notches',
     colorSpace: 'CMYK + Spot UV Vector + Laser Etch Cut Lines',
-    formats: ['Packaging CAD (.ARD)', 'Adobe Illustrator (.AI)', 'Vector PDF']
+    downloadFormats: ['Packaging CAD (.ARD)', 'Adobe Illustrator (.AI)', 'Vector PDF']
   }
 ];
 
 export const DielinesPage = () => {
   const { navigate } = useRouter();
+  const [dielines, setDielines] = useState<DielineSpec[]>(FALLBACK_DIELINES);
   const [downloadedId, setDownloadedId] = useState<string | null>(null);
   const [analyzingFile, setAnalyzingFile] = useState(false);
   const [fileAnalysisResult, setFileAnalysisResult] = useState<{
@@ -75,10 +66,54 @@ export const DielinesPage = () => {
     checks: { name: string; status: 'pass' | 'warning'; detail: string }[];
   } | null>(null);
 
-  const handleDownload = (id: string, formatName: string) => {
-    setDownloadedId(id);
-    setTimeout(() => setDownloadedId(null), 3000);
-    alert(`Downloading verified vector dieline package: ${formatName}`);
+  useEffect(() => {
+    fetchDielines().then((specs) => {
+      if (specs && specs.length > 0) {
+        setDielines(specs);
+      }
+    });
+  }, []);
+
+  const handleDownload = (d: DielineSpec, formatName: string) => {
+    setDownloadedId(d.id);
+    setTimeout(() => setDownloadedId(null), 3500);
+
+    const specText = `================================================================================
+AMAZING ADS SIVAKASI - MASTER VECTOR DIELINE TECHNICAL SPECIFICATION
+================================================================================
+Product Title        : ${d.title}
+Specification ID     : ${d.id}
+Requested Package    : ${formatName}
+Finished Dimensions  : ${d.format}
+External Bleed Line  : ${d.bleed}
+Internal Safe Zone   : ${d.safeZone}
+Binding Clearance    : ${d.bindingAllowance}
+Target Color Profile : ${d.colorSpace}
+Press Calibration    : Heidelberg Speedmaster XL 106 (300 DPI CMYK ISO Coated v2)
+Foil Stamping Die    : 130°C Heated Brass/Magnesium Embossing Die
+Production Center    : Amazing Ads Sivakasi Works, Tamil Nadu, India
+
+PRE-PRESS OPERATIONAL RULES:
+1. CUTTING CONTOUR (CutLine)   : 100% Spot Magenta (Stroke: 0.5 pt).
+2. SCORING & CREASING (Crease) : 100% Spot Cyan dashed (Stroke: 0.5 pt).
+3. 24K FOIL DIE LAYER          : Spot Color named "FOIL_DIE_HOT_STAMP".
+4. TEXT MARGINS                : Keep all contact/brand typography within safe zone.
+5. MINIMUM BITMAP RESOLUTION   : 300 DPI true optical resolution at 1:1 scale.
+
+Direct Pre-Press Hotline & Proof Approval:
+Amazing Ads Sivakasi - Direct Production Desk
+================================================================================`;
+
+    const blob = new Blob([specText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const sanitizedName = `${d.id}-${formatName.toLowerCase().replace(/[^a-z0-9]/g, '_')}.txt`;
+    link.download = sanitizedName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleSimulateFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -138,76 +173,79 @@ export const DielinesPage = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <h3 style={{ fontSize: '1.4rem', color: '#fff' }}>Official Scale Dieline Packages</h3>
 
-            {DIELINES.map((d) => (
-              <div
-                key={d.id}
-                style={{
-                  background: 'var(--bg-card)',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--border-card)',
-                  padding: '28px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  boxShadow: 'var(--shadow-md)',
-                  transition: 'border-color 0.2s ease'
-                }}
-                className="dieline-card"
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '1.15rem', color: '#fff' }}>{d.title}</h4>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
-                    {d.format}
-                  </span>
-                </div>
-
+            {dielines.map((d) => {
+              const formats = d.downloadFormats || ['PDF Spec', 'Adobe Illustrator (.AI)', 'CorelDRAW (.CDR)'];
+              return (
                 <div
-                  className="dieline-info-box"
+                  key={d.id}
                   style={{
-                    background: 'var(--bg-input)',
-                    borderRadius: 'var(--radius-sm)',
-                    padding: '14px',
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '10px',
-                    fontSize: '0.8rem',
-                    color: 'var(--text-secondary)'
+                    background: 'var(--bg-card)',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '1px solid var(--border-card)',
+                    padding: '28px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    boxShadow: 'var(--shadow-md)',
+                    transition: 'border-color 0.2s ease'
                   }}
+                  className="dieline-card"
                 >
-                  <div>
-                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Bleed Margin:</span>
-                    <strong style={{ color: '#fff' }}>{d.bleed}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Safe Text Zone:</span>
-                    <strong style={{ color: '#fff' }}>{d.safeZone}</strong>
-                  </div>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Binding Clearance:</span>
-                    <strong style={{ color: 'var(--accent-gold-bright)' }}>{d.bindingAllowance}</strong>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '6px' }}>Downloads:</span>
-                  {d.formats.map((fmt) => (
-                    <button
-                      key={fmt}
-                      onClick={() => handleDownload(d.id, `${d.title} (${fmt})`)}
-                      className="btn-outline-gold"
-                      style={{ padding: '6px 14px', fontSize: '0.78rem' }}
-                    >
-                      ↓ {fmt}
-                    </button>
-                  ))}
-                  {downloadedId === d.id && (
-                    <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
-                      ✓ Package Ready
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '8px' }}>
+                    <h4 style={{ fontSize: '1.15rem', color: '#fff' }}>{d.title}</h4>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
+                      {d.format}
                     </span>
-                  )}
+                  </div>
+
+                  <div
+                    className="dieline-info-box"
+                    style={{
+                      background: 'var(--bg-input)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '14px',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '10px',
+                      fontSize: '0.8rem',
+                      color: 'var(--text-secondary)'
+                    }}
+                  >
+                    <div>
+                      <span style={{ color: 'var(--text-muted)', display: 'block' }}>Bleed Margin:</span>
+                      <strong style={{ color: '#fff' }}>{d.bleed}</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)', display: 'block' }}>Safe Text Zone:</span>
+                      <strong style={{ color: '#fff' }}>{d.safeZone}</strong>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <span style={{ color: 'var(--text-muted)', display: 'block' }}>Binding Clearance:</span>
+                      <strong style={{ color: 'var(--accent-gold-bright)' }}>{d.bindingAllowance}</strong>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '6px' }}>Downloads:</span>
+                    {formats.map((fmt) => (
+                      <button
+                        key={fmt}
+                        onClick={() => handleDownload(d, fmt)}
+                        className="btn-outline-gold"
+                        style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                      >
+                        ↓ {fmt}
+                      </button>
+                    ))}
+                    {downloadedId === d.id && (
+                      <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                        ✓ Spec Package Downloaded
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Right Column: Pre-Flight Artwork Inspector */}
