@@ -84,14 +84,14 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
               <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff', whiteSpace: 'nowrap' }}>
-                AMAZING ADS
+                {brandSettings.factoryName || 'AMAZING ADS'}
               </span>
               <span style={{ fontSize: '0.68rem', color: 'var(--accent-gold)', letterSpacing: '0.08em', fontWeight: 700, background: 'rgba(207, 168, 78, 0.1)', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(207, 168, 78, 0.3)', whiteSpace: 'nowrap' }}>
                 SIVAKASI
               </span>
             </div>
             <p className="navbar-tagline navbar-brand-sub" style={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Gold Foil & Calendar Manufacturing Hub
+              {brandSettings.tagline || 'Gold Foil & Calendar Manufacturing Hub'}
             </p>
           </div>
         </div>
@@ -177,7 +177,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
             <a
-              href="tel:+919790472767"
+              href={`tel:${(brandSettings.phone || '+919790472767').replace(/[^0-9+]/g, '')}`}
               style={{
                 flex: 1,
                 padding: '11px',
@@ -198,7 +198,7 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
               📞 Call Factory
             </a>
             <a
-              href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote"
+              href={`https://wa.me/${(brandSettings.whatsapp || '919790472767').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello Amazing Ads Sivakasi, I would like to get a calendar quote')}`}
               target="_blank"
               rel="noreferrer"
               style={{

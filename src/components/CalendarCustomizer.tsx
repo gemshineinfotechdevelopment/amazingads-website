@@ -1,5 +1,15 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { calculateQuote, type QuotePayload, type QuoteResult } from '../services/api';
+import {
+  calculateQuote,
+  getStoredCatalog,
+  getStoredFactorySettings,
+  getStoredFactoryDiscounts,
+  type QuotePayload,
+  type QuoteResult,
+  type CalendarProduct,
+  type FactorySettings,
+  type DiscountTier
+} from '../services/api';
 import { useRouter } from '../context/RouterContext';
 
 export interface FormatOption {
@@ -113,20 +123,78 @@ const BINDING_OPTIONS = [
   { id: 'Custom Luxury Magnetic Rigid Box', label: 'Bespoke Executive Desk Box / Stand', desc: 'Prestige packaging for Special Products and corporate gifts' }
 ];
 
+const syncFormatOptionsWithCatalog = (catalog: CalendarProduct[]): FormatOption[] => {
+  return FORMAT_OPTIONS.map(opt => {
+    const p = catalog.find(item =>
+      item.id === opt.id ||
+      item.name.toLowerCase().includes(opt.id.toLowerCase()) ||
+      item.category.toLowerCase().includes(opt.id.toLowerCase()) ||
+      opt.id.toLowerCase().includes(item.category.toLowerCase())
+    );
+    if (p) {
+      return {
+        ...opt,
+        base: p.startingPrice || opt.base,
+        size: p.dimensions || opt.size,
+        img: p.mockupImg || opt.img,
+        fullName: p.name || opt.fullName
+      };
+    }
+    return opt;
+  });
+};
+
 export const CalendarCustomizer = () => {
   const { pageParams } = useRouter();
+
+  // Dynamic state synchronized with Admin Portal updates
+  const [formatOptions, setFormatOptions] = useState<FormatOption[]>(() => {
+    const stored = getStoredCatalog();
+    return stored ? syncFormatOptionsWithCatalog(stored) : FORMAT_OPTIONS;
+  });
+  const [factorySettings, setFactorySettings] = useState<FactorySettings>(getStoredFactorySettings());
+  const [discounts, setDiscounts] = useState<DiscountTier[]>(getStoredFactoryDiscounts());
+
+  useEffect(() => {
+    const handleCatalog = (e: Event) => {
+      const custom = e as CustomEvent<CalendarProduct[]>;
+      const cat = custom.detail || getStoredCatalog();
+      if (cat && Array.isArray(cat)) {
+        setFormatOptions(syncFormatOptionsWithCatalog(cat));
+      }
+    };
+    const handleSettings = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setFactorySettings(custom.detail);
+      else setFactorySettings(getStoredFactorySettings());
+    };
+    const handleDiscounts = (e: Event) => {
+      const custom = e as CustomEvent<DiscountTier[]>;
+      if (custom.detail) setDiscounts(custom.detail);
+      else setDiscounts(getStoredFactoryDiscounts());
+    };
+
+    window.addEventListener('catalog-updated', handleCatalog);
+    window.addEventListener('factory-settings-updated', handleSettings);
+    window.addEventListener('discounts-updated', handleDiscounts);
+    return () => {
+      window.removeEventListener('catalog-updated', handleCatalog);
+      window.removeEventListener('factory-settings-updated', handleSettings);
+      window.removeEventListener('discounts-updated', handleDiscounts);
+    };
+  }, []);
 
   const getInitialProduct = () => {
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
-      const matched = FORMAT_OPTIONS.find(opt => 
+      const matched = formatOptions.find(opt => 
         opt.id.toLowerCase().includes(p) || 
         opt.label.toLowerCase().includes(p) ||
         p.includes(opt.id.toLowerCase())
       );
       if (matched) return matched;
     }
-    return FORMAT_OPTIONS[0];
+    return formatOptions[0];
   };
 
   const initialOpt = getInitialProduct();
@@ -140,7 +208,7 @@ export const CalendarCustomizer = () => {
   useEffect(() => {
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
-      const matched = FORMAT_OPTIONS.find(opt => 
+      const matched = formatOptions.find(opt => 
         opt.id.toLowerCase().includes(p) || 
         opt.label.toLowerCase().includes(p) ||
         p.includes(opt.id.toLowerCase())
@@ -152,7 +220,7 @@ export const CalendarCustomizer = () => {
         setBinding(matched.defaultBinding);
       }
     }
-  }, [pageParams?.product, format]);
+  }, [pageParams?.product, format, formatOptions]);
 
   // Quote calculation state
   const [quote, setQuote] = useState<QuoteResult | null>(null);
@@ -204,7 +272,7 @@ export const CalendarCustomizer = () => {
     setBinding(opt.defaultBinding);
   };
 
-  const selectedFormatObj = FORMAT_OPTIONS.find(f => f.id === format) || FORMAT_OPTIONS[0];
+  const selectedFormatObj = formatOptions.find(f => f.id === format) || formatOptions[0];
   const selectedPaper = PAPER_OPTIONS.find(p => p.id === paperGsm) || PAPER_OPTIONS[0];
   const selectedFinish = FINISH_OPTIONS.find(f => f.id === finish) || FINISH_OPTIONS[0];
   const selectedBinding = BINDING_OPTIONS.find(b => b.id === binding) || BINDING_OPTIONS[0];
@@ -223,7 +291,9 @@ export const CalendarCustomizer = () => {
       `• *Estimated Total:* ₹${quote.subtotal.toLocaleString()}\n` +
       `• *Quote Ref:* ${quote.quoteId}\n\n` +
       `Please share the final factory approval, proof confirmation schedule, and dispatch timeline.`;
-    return `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
+    const cleanNumber = (factorySettings.whatsapp || '919790472767').replace(/[^0-9]/g, '');
+    const targetNumber = cleanNumber.length === 10 ? `91${cleanNumber}` : cleanNumber;
+    return `https://wa.me/${targetNumber}?text=${encodeURIComponent(text)}`;
   };
 
   const handleFinalSubmit = async (e: FormEvent) => {
@@ -271,7 +341,7 @@ export const CalendarCustomizer = () => {
           </div>
 
           <div className="format-cards-grid">
-            {FORMAT_OPTIONS.map((opt) => {
+            {formatOptions.map((opt) => {
               const isSelected = format === opt.id;
               return (
                 <div
@@ -439,6 +509,27 @@ export const CalendarCustomizer = () => {
                   </button>
                 ))}
               </div>
+
+              {/* Active Wholesale Tier Badges from Admin */}
+              {discounts && discounts.length > 0 && (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
+                  {discounts.map((t) => (
+                    <span
+                      key={t.id}
+                      style={{
+                        fontSize: '0.72rem',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        background: quantity >= t.minQty ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                        border: `1px solid ${quantity >= t.minQty ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                        color: quantity >= t.minQty ? '#4ade80' : 'var(--text-muted)'
+                      }}
+                    >
+                      {t.minQty}+ pcs: {t.discountPercentage}% OFF
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Discount Callout */}
               {quote && quote.discountPercentage > 0 && (

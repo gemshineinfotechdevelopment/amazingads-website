@@ -12,12 +12,18 @@ import {
   saveStoredFactoryDiscounts,
   getStoredFactorySettings,
   saveStoredFactorySettings,
+  fetchFactorySettings,
+  saveFactorySettingsToBackend,
+  fetchFactoryDiscounts,
+  saveFactoryDiscountsToBackend,
+  fetchQuotes,
   DEFAULT_DISCOUNT_TIERS,
   DEFAULT_FACTORY_SETTINGS,
   type CalendarProduct,
   type CustomerMessage,
   type DiscountTier,
-  type FactorySettings
+  type FactorySettings,
+  type StoredQuote
 } from '../services/api';
 
 type AdminTab = 'messages' | 'catalog' | 'matrix' | 'discounts' | 'quotes' | 'settings';
@@ -196,6 +202,8 @@ export const AdminPage = () => {
 
   // Customer WhatsApp Messages
   const [messages, setMessages] = useState<CustomerMessage[]>([]);
+  // Online Quotes & Estimation Requests
+  const [quotesList, setQuotesList] = useState<StoredQuote[]>([]);
 
   // Editable Factory & Discounts State
   const [discountTiers, setDiscountTiers] = useState<DiscountTier[]>(getStoredFactoryDiscounts());
@@ -211,16 +219,22 @@ export const AdminPage = () => {
   // Toast State
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
-  // Load Products & Messages
+  // Load Products, Messages, Quotes & Settings
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prods, msgs] = await Promise.all([
+      const [prods, msgs, quotes, settings, discounts] = await Promise.all([
         getCalendarProducts(),
-        fetchCustomerMessages()
+        fetchCustomerMessages(),
+        fetchQuotes(),
+        fetchFactorySettings(),
+        fetchFactoryDiscounts()
       ]);
       setProducts(prods);
       setMessages(msgs);
+      if (quotes && quotes.length > 0) setQuotesList(quotes);
+      if (settings) setFactorySettings(settings);
+      if (discounts && discounts.length > 0) setDiscountTiers(discounts);
 
       // Initialize matrix data
       const matrixInit: Record<string, { name: string; price: number; sizes: string[] }> = {};
@@ -523,16 +537,24 @@ export const AdminPage = () => {
     setDiscountTiers(prev => prev.filter(t => t.id !== tierId));
   };
 
-  const handleSaveDiscountTiers = () => {
-    saveStoredFactoryDiscounts(discountTiers);
-    showToast('Wholesale discount tiers updated & synced with Quote Calculator!');
+  const handleSaveDiscountTiers = async () => {
+    try {
+      await saveFactoryDiscountsToBackend(discountTiers);
+      showToast('Wholesale discount tiers updated & synced with Quote Calculator!');
+    } catch {
+      showToast('Error syncing discounts to database, saved locally', 'info');
+    }
   };
 
   // Editable Factory & Brand Settings Handlers
-  const handleSaveFactorySettings = (e: FormEvent) => {
+  const handleSaveFactorySettings = async (e: FormEvent) => {
     e.preventDefault();
-    saveStoredFactorySettings(factorySettings);
-    showToast('Sivakasi factory and dispatch logistics settings saved successfully!');
+    try {
+      await saveFactorySettingsToBackend(factorySettings);
+      showToast('Sivakasi factory and dispatch logistics settings saved to database & website!');
+    } catch {
+      showToast('Error syncing settings to database, saved locally', 'info');
+    }
   };
 
   const handleLogoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -1029,7 +1051,7 @@ export const AdminPage = () => {
               <span>📋</span>
               <span>Quotes & Estimates</span>
             </div>
-            <span style={{ fontSize: '0.72rem', color: activeTab === 'quotes' ? '#bae6fd' : '#64748b' }}>{SAMPLE_QUOTES.length}</span>
+            <span style={{ fontSize: '0.72rem', color: activeTab === 'quotes' ? '#bae6fd' : '#64748b' }}>{(quotesList.length > 0 ? quotesList : SAMPLE_QUOTES).length}</span>
           </button>
 
           {/* 6. COMPANY SETTINGS & CONTACT */}
@@ -2079,7 +2101,7 @@ export const AdminPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {SAMPLE_QUOTES.map((q) => (
+                    {(quotesList.length > 0 ? quotesList : SAMPLE_QUOTES).map((q) => (
                       <tr key={q.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                         <td style={{ padding: '10px 12px', fontWeight: 800, color: '#0284c7' }}>{q.id}</td>
                         <td style={{ padding: '10px 12px' }}>

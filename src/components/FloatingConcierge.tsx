@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '../context/RouterContext';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface FloatingConciergeProps {
   onOpenSampleKit: () => void;
@@ -8,6 +9,21 @@ interface FloatingConciergeProps {
 export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
+
+  const cleanNumber = (settings.whatsapp || '919790472767').replace(/[^0-9]/g, '');
+  const targetWhatsApp = cleanNumber.length === 10 ? `91${cleanNumber}` : cleanNumber;
+  const targetPhone = (settings.phone || '+919790472767').replace(/[^0-9+]/g, '');
 
   return (
     <div
@@ -62,7 +78,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* WhatsApp Link */}
             <a
-              href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote"
+              href={`https://wa.me/${targetWhatsApp}?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20get%20a%20calendar%20quote`}
               target="_blank"
               rel="noreferrer"
               style={{
@@ -81,12 +97,12 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
               }}
             >
               <span>💬</span>
-              <span>WhatsApp: +91 97904 72767</span>
+              <span>WhatsApp: {settings.whatsapp || '+91 97904 72767'}</span>
             </a>
 
             {/* Direct Phone Call */}
             <a
-              href="tel:+919790472767"
+              href={`tel:${targetPhone}`}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -102,7 +118,7 @@ export const FloatingConcierge = ({ onOpenSampleKit }: FloatingConciergeProps) =
               }}
             >
               <span>📞</span>
-              <span>Call Factory: +91 97904 72767</span>
+              <span>Call Factory: {settings.phone || '+91 97904 72767'}</span>
             </a>
 
             {/* Quick Quote */}

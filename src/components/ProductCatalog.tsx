@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCalendarProducts, SIVAKASI_CATALOG, type CalendarProduct } from '../services/api';
+import { getCalendarProducts, getStoredFactorySettings, SIVAKASI_CATALOG, type CalendarProduct, type FactorySettings } from '../services/api';
 
 interface ProductCatalogProps {
   onSelectProduct?: (productName: string) => void;
@@ -74,6 +74,17 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [factorySettings, setFactorySettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleSettingsUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setFactorySettings(custom.detail);
+      else setFactorySettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleSettingsUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleSettingsUpdate);
+  }, []);
 
   useEffect(() => {
     const loadProducts = () => {
@@ -200,7 +211,9 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
       text += `${idx + 1}. *${ci.name}*\n   • Size: ${ci.size}\n   • Qty: ${ci.quantity}\n   • Est. Rate: ₹${ci.price}/unit (₹${ci.price * ci.quantity})\n\n`;
     });
     text += `*Total Order Items:* ${totalCartCount}\n*Estimated Base Total:* ₹${totalCartAmount}\n\nPlease share the final factory wholesale quotation and delivery timeline.`;
-    return `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
+    const cleanNumber = (factorySettings.whatsapp || '919790472767').replace(/[^0-9]/g, '');
+    const targetNumber = cleanNumber.length === 10 ? `91${cleanNumber}` : cleanNumber;
+    return `https://wa.me/${targetNumber}?text=${encodeURIComponent(text)}`;
   };
 
   const categoryList = Array.from(new Set(['All', ...CATEGORIES.filter(c => c !== 'All'), ...products.map(p => p.category).filter(Boolean)]));

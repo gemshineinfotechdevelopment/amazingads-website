@@ -436,18 +436,35 @@ export async function calculateQuote(payload: QuotePayload): Promise<QuoteResult
     // Proceed to local calculation fallback
   }
 
-  // Local fallback calculation using exact Sivakasi formula
+  // Local fallback calculation using exact Sivakasi formula (Dynamic Admin sync)
   const qty = payload.quantity || 100;
-  let baseUnitPrice = 110;
-  if (payload.format.includes('PET Foil') || payload.format.includes('Gold Foil')) baseUnitPrice = 145;
-  else if (payload.format.includes('5D') || payload.format.includes('Lenticular') || payload.format.includes('3D')) baseUnitPrice = 220;
-  else if (payload.format.includes('Stone Art') || payload.format.includes('Kundan')) baseUnitPrice = 280;
-  else if (payload.format.includes('Hand Fan')) baseUnitPrice = 28;
-  else if (payload.format.includes('Special Products') || payload.format.includes('Special')) baseUnitPrice = 195;
-  else if (payload.format.includes('Daily Sheet')) baseUnitPrice = 65;
-  else if (payload.format.includes('Monthly Wall')) baseUnitPrice = 110;
-  else if (payload.format.includes('Tabletop') || payload.format.includes('Desk')) baseUnitPrice = 95;
-  else if (payload.format.includes('Photo Frame') || payload.format.includes('Frame')) baseUnitPrice = 180;
+  const catalog = getStoredCatalog() || SIVAKASI_CATALOG;
+  let matchedProduct: CalendarProduct | undefined;
+  if (payload.productId) {
+    matchedProduct = catalog.find(p => p.id === payload.productId);
+  }
+  if (!matchedProduct && payload.format) {
+    const fLower = payload.format.toLowerCase();
+    matchedProduct = catalog.find(p =>
+      p.name.toLowerCase().includes(fLower) ||
+      p.category.toLowerCase().includes(fLower) ||
+      fLower.includes(p.category.toLowerCase()) ||
+      fLower.includes(p.name.toLowerCase())
+    );
+  }
+
+  let baseUnitPrice = matchedProduct ? matchedProduct.startingPrice : 110;
+  if (!matchedProduct) {
+    if (payload.format.includes('PET Foil') || payload.format.includes('Gold Foil')) baseUnitPrice = 145;
+    else if (payload.format.includes('5D') || payload.format.includes('Lenticular') || payload.format.includes('3D')) baseUnitPrice = 220;
+    else if (payload.format.includes('Stone Art') || payload.format.includes('Kundan')) baseUnitPrice = 280;
+    else if (payload.format.includes('Hand Fan')) baseUnitPrice = 28;
+    else if (payload.format.includes('Special Products') || payload.format.includes('Special')) baseUnitPrice = 195;
+    else if (payload.format.includes('Daily Sheet')) baseUnitPrice = 65;
+    else if (payload.format.includes('Monthly Wall')) baseUnitPrice = 110;
+    else if (payload.format.includes('Tabletop') || payload.format.includes('Desk')) baseUnitPrice = 95;
+    else if (payload.format.includes('Photo Frame') || payload.format.includes('Frame')) baseUnitPrice = 180;
+  }
 
   let finishSurcharge = 0;
   if (payload.finish.includes('24K')) finishSurcharge = 22;
@@ -762,6 +779,43 @@ export function saveStoredFactoryDiscounts(tiers: DiscountTier[]) {
     localStorage.setItem(LOCAL_STORAGE_DISCOUNTS_KEY, JSON.stringify(tiers));
     window.dispatchEvent(new CustomEvent('discounts-updated', { detail: tiers }));
   } catch {}
+
+  // Asynchronously sync to backend & MongoDB Atlas
+  fetch(`${API_BASE_URL}/discounts`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(tiers)
+  }).catch(() => {});
+}
+
+export async function fetchFactoryDiscounts(): Promise<DiscountTier[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/discounts`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+        saveStoredFactoryDiscounts(json.data);
+        return json.data;
+      }
+    }
+  } catch {}
+  return getStoredFactoryDiscounts();
+}
+
+export async function saveFactoryDiscountsToBackend(tiers: DiscountTier[]): Promise<DiscountTier[]> {
+  saveStoredFactoryDiscounts(tiers);
+  try {
+    const res = await fetch(`${API_BASE_URL}/discounts`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tiers)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) return json.data;
+    }
+  } catch {}
+  return tiers;
 }
 
 export function getStoredFactorySettings(): FactorySettings {
@@ -780,6 +834,113 @@ export function saveStoredFactorySettings(settings: FactorySettings) {
     localStorage.setItem(LOCAL_STORAGE_FACTORY_KEY, JSON.stringify(settings));
     window.dispatchEvent(new CustomEvent('factory-settings-updated', { detail: settings }));
   } catch {}
+
+  // Asynchronously sync to backend & MongoDB Atlas
+  fetch(`${API_BASE_URL}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings)
+  }).catch(() => {});
+}
+
+export async function fetchFactorySettings(): Promise<FactorySettings> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/settings`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && typeof json.data === 'object') {
+        saveStoredFactorySettings(json.data);
+        return json.data;
+      }
+    }
+  } catch {}
+  return getStoredFactorySettings();
+}
+
+export async function saveFactorySettingsToBackend(settings: FactorySettings): Promise<FactorySettings> {
+  saveStoredFactorySettings(settings);
+  try {
+    const res = await fetch(`${API_BASE_URL}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) return json.data;
+    }
+  } catch {}
+  return settings;
+}
+
+// 9. Stored Quotes from Website (For Admin Quotes Tab)
+export interface StoredQuote {
+  id: string;
+  quoteId?: string;
+  clientName: string;
+  company: string;
+  phone: string;
+  product: string;
+  quantity: number;
+  totalPrice: number;
+  date: string;
+  status: 'New' | 'In Production' | 'Dispatched';
+}
+
+export async function fetchQuotes(): Promise<StoredQuote[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/quotes`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        return json.data.map((q: any) => ({
+          id: q.quoteId || q.id || `AA-Q-${Math.floor(1000 + Math.random() * 9000)}`,
+          clientName: q.client?.name || q.clientName || 'Direct Customer',
+          company: q.client?.company || q.company || 'Corporate Trade',
+          phone: q.client?.phone || q.phone || 'N/A',
+          product: q.format || 'Calendar Product',
+          quantity: q.quantity || 100,
+          totalPrice: q.subtotal || 0,
+          date: q.createdAt
+            ? new Date(q.createdAt).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            : 'Recent',
+          status: 'New'
+        }));
+      }
+    }
+  } catch {}
+  return [];
+}
+
+// 10. Real-time Multi-Tab Synchronizer
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'amazingads_catalog_v2' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('catalog-updated', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+    if (e.key === 'amazingads_factory_settings_v1' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('factory-settings-updated', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+    if (e.key === 'amazingads_factory_discounts_v1' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('discounts-updated', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+    if (e.key === 'amazingads_customer_messages_v1' && e.newValue) {
+      try {
+        window.dispatchEvent(new CustomEvent('new-customer-message', { detail: JSON.parse(e.newValue) }));
+      } catch {}
+    }
+  });
 }
 
 

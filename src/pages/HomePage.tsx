@@ -1,11 +1,27 @@
-import type { CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
 import { ThreeDViewer } from '../components/ThreeDViewer';
 import { ProductCatalog } from '../components/ProductCatalog';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) => {
   const { navigate } = useRouter();
+  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) setSettings(custom.detail);
+      else setSettings(getStoredFactorySettings());
+    };
+    window.addEventListener('factory-settings-updated', handleUpdate);
+    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+  }, []);
+
+  const cleanNumber = (settings.whatsapp || '919790472767').replace(/[^0-9]/g, '');
+  const targetWhatsApp = cleanNumber.length === 10 ? `91${cleanNumber}` : cleanNumber;
+  const targetPhone = (settings.phone || '+919790472767').replace(/[^0-9+]/g, '');
 
   return (
     <div className="page-view" style={{ padding: '0 0 90px' }}>
@@ -275,7 +291,7 @@ className="about-banner-card home-about-box"
 
                 <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
                   <a
-                    href="https://wa.me/919790472767?text=Hello%20Amazing%20Ads%20Sivakasi,%20I%20would%20like%20to%20place%20a%20calendar%20and%20frames%20order"
+                    href={`https://wa.me/${targetWhatsApp}?text=${encodeURIComponent('Hello Amazing Ads Sivakasi, I would like to place a calendar and frames order')}`}
                     target="_blank"
                     rel="noreferrer"
                     className="btn-gold"
@@ -284,11 +300,11 @@ className="about-banner-card home-about-box"
                     💬 Direct WhatsApp Press Desk
                   </a>
                   <a
-                    href="tel:+919790472767"
+                    href={`tel:${targetPhone}`}
                     className="btn-outline-gold"
                     style={{ padding: '12px 22px', fontSize: '0.9rem', textDecoration: 'none' }}
                   >
-                    📞 Call: +91 97904 72767
+                    📞 Call: {settings.phone || '+91 97904 72767'}
                   </a>
                 </div>
               </div>
@@ -321,9 +337,9 @@ className="about-banner-card home-about-box"
                     AA
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>Amazing Ads Sivakasi</h3>
+                    <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>{settings.factoryName || 'Amazing Ads Sivakasi'}</h3>
                     <p style={{ fontSize: '0.75rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
-                      Official Portal: amazingads.in
+                      Official Portal: {settings.websiteUrl || 'amazingads.in'}
                     </p>
                   </div>
                 </div>
@@ -331,24 +347,24 @@ className="about-banner-card home-about-box"
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>🏭 Manufacturing Hub & Press Works:</strong>
-                    <span>3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Virudhunagar District, Tamil Nadu</span>
+                    <span>{settings.address || '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Virudhunagar District, Tamil Nadu'}</span>
                   </div>
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📞 Direct Phone Lines:</strong>
                     <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold-bright)' }}>
-                      +91 97904 72767 / +91 97904 27670
+                      {settings.phone || '+91 97904 72767'}{settings.secondaryPhone ? ` / ${settings.secondaryPhone}` : ''}
                     </span>
                   </div>
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📱 Corporate Management Hotline:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>+91 98400 55220</span>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.secondaryPhone || '+91 98400 55220'}</span>
                   </div>
 
                   <div>
                     <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>✉️ Official Communications:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>aamazingads@gmail.com</span>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.email || 'aamazingads@gmail.com'}</span>
                   </div>
 
                   <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px', marginTop: '6px' }}>
