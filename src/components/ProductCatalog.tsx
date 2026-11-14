@@ -76,17 +76,39 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    getCalendarProducts(activeCategory)
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch(() => {
+    const loadProducts = () => {
+      getCalendarProducts(activeCategory)
+        .then((data) => {
+          setProducts(data);
+        })
+        .catch(() => {
+          if (activeCategory === 'All') {
+            setProducts(SIVAKASI_CATALOG);
+          } else {
+            setProducts(SIVAKASI_CATALOG.filter(p => p.category === activeCategory));
+          }
+        });
+    };
+
+    loadProducts();
+
+    const handleCatalogUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<CalendarProduct[]>;
+      if (customEvent.detail && Array.isArray(customEvent.detail)) {
         if (activeCategory === 'All') {
-          setProducts(SIVAKASI_CATALOG);
+          setProducts(customEvent.detail);
         } else {
-          setProducts(SIVAKASI_CATALOG.filter(p => p.category === activeCategory));
+          setProducts(customEvent.detail.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase()));
         }
-      });
+      } else {
+        loadProducts();
+      }
+    };
+
+    window.addEventListener('catalog-updated', handleCatalogUpdated);
+    return () => {
+      window.removeEventListener('catalog-updated', handleCatalogUpdated);
+    };
   }, [activeCategory]);
 
   const handleSizeChange = (productId: string, size: string) => {
@@ -111,7 +133,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   };
 
   const handleAddToCart = (item: CalendarProduct) => {
-    const size = selectedSizes[item.id] || (PRODUCT_SIZES[item.id] ? PRODUCT_SIZES[item.id][0] : item.dimensions);
+    const itemSizes = (item.sizes && item.sizes.length > 0) ? item.sizes : (PRODUCT_SIZES[item.id] || [item.dimensions || 'Standard Size']);
+    const size = selectedSizes[item.id] || itemSizes[0];
     const qty = Math.max(1, itemQuantities[item.id] || 1);
     const cartItemId = `${item.id}-${size}`;
 
@@ -180,6 +203,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
     return `https://wa.me/919790472767?text=${encodeURIComponent(text)}`;
   };
 
+  const categoryList = Array.from(new Set(['All', ...CATEGORIES.filter(c => c !== 'All'), ...products.map(p => p.category).filter(Boolean)]));
+
   return (
     <section id="catalog" style={{ padding: '0 0 60px', position: 'relative' }}>
       <div className="container">
@@ -189,7 +214,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           
           {/* Category Filter Tabs */}
           <div className="catalog-tabs-wrap" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {CATEGORIES.map((cat) => (
+            {categoryList.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
@@ -274,7 +299,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           }}
         >
           {products.map((item) => {
-            const sizes = PRODUCT_SIZES[item.id] || [item.dimensions || 'Standard Size'];
+            const sizes = (item.sizes && item.sizes.length > 0) ? item.sizes : (PRODUCT_SIZES[item.id] || [item.dimensions || 'Standard Size']);
             const currentSize = selectedSizes[item.id] || sizes[0];
             const isAdded = recentlyAddedId === item.id;
 

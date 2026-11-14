@@ -9,7 +9,8 @@ export type PageRoute =
   | 'craft'
   | 'corporate'
   | 'contact'
-  | 'dielines';
+  | 'dielines'
+  | 'admin';
 
 interface RouterContextType {
   currentPage: PageRoute;
@@ -34,7 +35,8 @@ function getInitialPage(): PageRoute {
     'craft',
     'corporate',
     'contact',
-    'dielines'
+    'dielines',
+    'admin'
   ];
   if (validPages.includes(hash as PageRoute)) {
     return hash as PageRoute;

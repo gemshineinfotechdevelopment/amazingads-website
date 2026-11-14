@@ -18,6 +18,7 @@ export interface CalendarProduct {
   description: string;
   features: string[];
   mockupImg: string;
+  sizes?: string[];
 }
 
 export interface QuotePayload {
@@ -115,7 +116,12 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Spacious Top & Bottom Header Area for Corporate Branding / Logo / Phone',
       'Individual Corrugated Protection Box for Safe All-India Shipping'
     ],
-    mockupImg: '/images/gods/mahalakshmi.jpg'
+    mockupImg: '/images/gods/mahalakshmi.jpg',
+    sizes: [
+      '15 × 20 inches (Standard Wall)',
+      '17 × 27 inches (Jumbo Royal Wall)',
+      '12 × 18 inches (Compact Office)'
+    ]
   },
   {
     id: 'custom-5d-calendar',
@@ -140,11 +146,16 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Tear-off daily panchangam block or 12-month card slot at base',
       'High-retention corporate gift guaranteed to remain on wall for years'
     ],
-    mockupImg: '/images/gods/murugan.jpg'
+    mockupImg: '/images/gods/murugan.jpg',
+    sizes: [
+      '12 × 18 inches (Standard 5D Frame)',
+      '16 × 24 inches (Executive Deluxe)',
+      '18 × 28 inches (Grand Temple)'
+    ]
   },
   {
     id: 'stone-art-calendar',
-    name: 'Stone Art Calendars (Lord Shiva Edition)',
+    name: 'Stone Art Sculptural Calendars (Lord Balaji Edition)',
     subtitle: 'Sculptural Textured Relief with Handcrafted Stone-Finish Elegance',
     category: 'Stone Art Calendars',
     tag: 'Artisan Heritage Craft',
@@ -165,7 +176,12 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Fitted with daily tear-off panchangam pad or 12-month sliding sheet',
       'Premium wedding, housewarming, and New Year VIP executive gift'
     ],
-    mockupImg: '/images/gods/sivan.jpg'
+    mockupImg: '/images/stone-art-calendar-real.jpg',
+    sizes: [
+      '14 × 20 inches (Sculpted Relief)',
+      '18 × 24 inches (Royal Teak Frame)',
+      '20 × 30 inches (Collector Frame)'
+    ]
   },
   {
     id: 'hand-fan',
@@ -190,7 +206,12 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Custom contour die-cut shapes available (Round, Leaf, Brand Mascot)',
       'High retention and viral brand exposure across crowd gatherings'
     ],
-    mockupImg: '/images/gods/ganesha.jpg'
+    mockupImg: '/images/gods/ganesha.jpg',
+    sizes: [
+      '8 × 8 inches (Standard Circle)',
+      '9 × 9 inches (Large Leaf Cut)',
+      'Custom Contour Die-Cut'
+    ]
   },
   {
     id: 'special-products',
@@ -215,7 +236,12 @@ export const SIVAKASI_CATALOG: CalendarProduct[] = [
       'Custom rigid box packaging with magnetic closure and satin lining',
       'Dedicated branding plate with laser engraved company emblem'
     ],
-    mockupImg: '/images/gods/ayyappan.jpg'
+    mockupImg: '/images/gods/ayyappan.jpg',
+    sizes: [
+      'A4 Executive Desk (8.5 × 11 in)',
+      'A5 Compact Desk (6 × 8.5 in)',
+      'VIP Gift Box Set (12 × 15 in)'
+    ]
   }
 ];
 
@@ -235,7 +261,40 @@ export async function getBackendHealth(): Promise<{ status: string; system: stri
   }
 }
 
-// 2. Products with seamless fallback
+// 2. Local Storage Sync & Catalog Storage Helpers
+const LOCAL_STORAGE_CATALOG_KEY = 'amazingads_catalog_v2';
+
+export function getStoredCatalog(): CalendarProduct[] | null {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_CATALOG_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+export function saveStoredCatalog(catalog: CalendarProduct[]) {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_CATALOG_KEY, JSON.stringify(catalog));
+    window.dispatchEvent(new CustomEvent('catalog-updated', { detail: catalog }));
+  } catch {
+    // If quota exceeded, optimize large base64 thumbnails to safely preserve all product metadata
+    try {
+      const sanitized = catalog.map(p => ({
+        ...p,
+        mockupImg: (p.mockupImg && p.mockupImg.startsWith('data:image') && p.mockupImg.length > 25000)
+          ? '/images/stone-art-calendar-real.jpg'
+          : p.mockupImg
+      }));
+      localStorage.setItem(LOCAL_STORAGE_CATALOG_KEY, JSON.stringify(sanitized));
+      window.dispatchEvent(new CustomEvent('catalog-updated', { detail: catalog }));
+    } catch {}
+  }
+}
+
+// Products with seamless fallback
 export async function getCalendarProducts(category?: string): Promise<CalendarProduct[]> {
   try {
     const url = new URL(`${API_BASE_URL}/calendar-products`, window.location.origin);
@@ -246,16 +305,116 @@ export async function getCalendarProducts(category?: string): Promise<CalendarPr
     if (res.ok) {
       const json = await res.json();
       if (json.data && json.data.length > 0) {
+        if (!category || category === 'All') {
+          saveStoredCatalog(json.data);
+        }
         return json.data;
       }
     }
   } catch {
-    // Graceful fallback to static Sivakasi catalog
+    // Graceful fallback to local storage or static Sivakasi catalog
   }
 
+  const stored = getStoredCatalog() || SIVAKASI_CATALOG;
   if (category && category !== 'All') {
-    return SIVAKASI_CATALOG.filter((item) => item.category === category);
+    return stored.filter((item) => item.category.toLowerCase() === category.toLowerCase());
   }
+  return stored;
+}
+
+// Update Product
+export async function updateCalendarProduct(id: string, updates: Partial<CalendarProduct>): Promise<CalendarProduct> {
+  let updatedProduct: CalendarProduct | null = null;
+  try {
+    const res = await fetch(`${API_BASE_URL}/calendar-products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) updatedProduct = json.data;
+    }
+  } catch {}
+
+  const currentCatalog = getStoredCatalog() || [...SIVAKASI_CATALOG];
+  const idx = currentCatalog.findIndex(p => p.id === id);
+  if (idx !== -1) {
+    const merged = { ...currentCatalog[idx], ...updates };
+    currentCatalog[idx] = merged;
+    saveStoredCatalog(currentCatalog);
+    return updatedProduct || merged;
+  }
+
+  if (updatedProduct) return updatedProduct;
+  throw new Error('Product not found to update');
+}
+
+// Create Product
+export async function createCalendarProduct(product: Partial<CalendarProduct>): Promise<CalendarProduct> {
+  const newProduct: CalendarProduct = {
+    id: product.id || `custom-${Date.now()}`,
+    name: product.name || 'New Calendar Edition',
+    subtitle: product.subtitle || 'Custom Sivakasi Manufacturing Specification',
+    category: product.category || 'Special Products',
+    tag: product.tag || 'New Arrival',
+    startingPrice: Number(product.startingPrice) || 120,
+    currency: '₹',
+    minOrder: Number(product.minOrder) || 100,
+    standardGsm: product.standardGsm || '400 GSM Rigid Kappa Board',
+    binding: product.binding || 'Deluxe Mounting',
+    dimensions: product.dimensions || '14 × 20 inches',
+    leadTime: product.leadTime || '4–6 Business Days',
+    accentColor: product.accentColor || '#cfa84e',
+    coverFinish: product.coverFinish || '24K Gold Foil & Emboss',
+    description: product.description || 'Custom crafted at Amazing Ads Sivakasi press works.',
+    features: product.features || ['Sivakasi Direct Manufacturing', 'Quality Checked'],
+    mockupImg: product.mockupImg || '/images/stone-art-calendar-real.jpg',
+    sizes: product.sizes && product.sizes.length > 0 ? product.sizes : ['Standard 14 × 20 in', 'Large 18 × 24 in']
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/calendar-products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newProduct)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) {
+        const stored = getStoredCatalog() || [...SIVAKASI_CATALOG];
+        stored.push(json.data);
+        saveStoredCatalog(stored);
+        return json.data;
+      }
+    }
+  } catch {}
+
+  const stored = getStoredCatalog() || [...SIVAKASI_CATALOG];
+  stored.push(newProduct);
+  saveStoredCatalog(stored);
+  return newProduct;
+}
+
+// Delete Product
+export async function deleteCalendarProduct(id: string): Promise<boolean> {
+  try {
+    await fetch(`${API_BASE_URL}/calendar-products/${id}`, { method: 'DELETE' });
+  } catch {}
+
+  const stored = getStoredCatalog() || [...SIVAKASI_CATALOG];
+  const filtered = stored.filter(p => p.id !== id);
+  saveStoredCatalog(filtered);
+  return true;
+}
+
+// Reset Catalog to Defaults
+export async function resetCalendarProducts(): Promise<CalendarProduct[]> {
+  try {
+    await fetch(`${API_BASE_URL}/calendar-products/reset`, { method: 'POST' });
+  } catch {}
+
+  saveStoredCatalog([...SIVAKASI_CATALOG]);
   return SIVAKASI_CATALOG;
 }
 
@@ -302,12 +461,23 @@ export async function calculateQuote(payload: QuotePayload): Promise<QuoteResult
   else if (payload.binding.includes('Wire-O')) bindingCost = 15;
 
   let discountPercentage = 0;
-  if (qty >= 10000) discountPercentage = 42;
-  else if (qty >= 5000) discountPercentage = 35;
-  else if (qty >= 2500) discountPercentage = 28;
-  else if (qty >= 1000) discountPercentage = 22;
-  else if (qty >= 500) discountPercentage = 15;
-  else if (qty >= 200) discountPercentage = 8;
+  try {
+    const tiers = getStoredFactoryDiscounts();
+    const sortedTiers = [...tiers].sort((a, b) => b.minQty - a.minQty);
+    for (const t of sortedTiers) {
+      if (qty >= t.minQty) {
+        discountPercentage = t.discountPercentage;
+        break;
+      }
+    }
+  } catch {
+    if (qty >= 10000) discountPercentage = 42;
+    else if (qty >= 5000) discountPercentage = 35;
+    else if (qty >= 2500) discountPercentage = 28;
+    else if (qty >= 1000) discountPercentage = 22;
+    else if (qty >= 500) discountPercentage = 15;
+    else if (qty >= 200) discountPercentage = 8;
+  }
 
   const rawUnit = baseUnitPrice + finishSurcharge + bindingCost;
   const unitPrice = Math.max(35, Math.round(rawUnit * (1 - discountPercentage / 100)));
@@ -410,3 +580,206 @@ export async function getPressStats(): Promise<PressStats> {
     pressHQ: 'Sivakasi, Tamil Nadu, India'
   };
 }
+
+// 7. Customer WhatsApp Messages
+export interface CustomerMessage {
+  id: string;
+  name: string;
+  phone: string;
+  message: string;
+  createdAt: string;
+  status: 'New' | 'Replied';
+}
+
+const LOCAL_STORAGE_MESSAGES_KEY = 'amazingads_customer_messages_v1';
+
+export function getStoredCustomerMessages(): CustomerMessage[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_MESSAGES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {}
+  return [
+    {
+      id: 'MSG-8821',
+      name: 'Karthik Raja',
+      phone: '+91 98401 23456',
+      message: 'Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our shop name printed at top.',
+      createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+      status: 'New'
+    },
+    {
+      id: 'MSG-8819',
+      name: 'Lakshmi Narayanan',
+      phone: '+91 97904 88765',
+      message: 'Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?',
+      createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+      status: 'Replied'
+    }
+  ];
+}
+
+export function saveStoredCustomerMessages(messages: CustomerMessage[]) {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_MESSAGES_KEY, JSON.stringify(messages));
+    window.dispatchEvent(new CustomEvent('new-customer-message', { detail: messages }));
+  } catch {}
+}
+
+export async function sendCustomerMessage(name: string, phone: string, message: string): Promise<CustomerMessage> {
+  const newMsg: CustomerMessage = {
+    id: `MSG-${Date.now().toString().slice(-4)}`,
+    name: name.trim(),
+    phone: phone.trim() || 'Not specified',
+    message: message.trim(),
+    createdAt: new Date().toISOString(),
+    status: 'New'
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newMsg)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) {
+        const stored = getStoredCustomerMessages();
+        stored.unshift(json.data);
+        saveStoredCustomerMessages(stored);
+        return json.data;
+      }
+    }
+  } catch {}
+
+  const stored = getStoredCustomerMessages();
+  stored.unshift(newMsg);
+  saveStoredCustomerMessages(stored);
+  return newMsg;
+}
+
+export async function fetchCustomerMessages(): Promise<CustomerMessage[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/messages`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        saveStoredCustomerMessages(json.data);
+        return json.data;
+      }
+    }
+  } catch {}
+  return getStoredCustomerMessages();
+}
+
+export async function updateMessageStatus(id: string, status: 'New' | 'Replied'): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/messages/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+  } catch {}
+
+  const stored = getStoredCustomerMessages();
+  const updated = stored.map(m => m.id === id ? { ...m, status } : m);
+  saveStoredCustomerMessages(updated);
+}
+
+// 8. Editable Factory Settings & Wholesale Discount Tiers
+export interface DiscountTier {
+  id: string;
+  minQty: number;
+  maxQty: string;
+  discountPercentage: number;
+  label: string;
+}
+
+export interface FactorySettings {
+  factoryName: string;
+  tagline?: string;
+  logoUrl?: string;
+  address: string;
+  phone: string;
+  secondaryPhone?: string;
+  whatsapp: string;
+  email: string;
+  supportEmail?: string;
+  websiteUrl?: string;
+  operatingHours?: string;
+  gstNumber?: string;
+  standardLeadTime: string;
+  bulkLeadTime: string;
+  carriers: string;
+}
+
+export const DEFAULT_DISCOUNT_TIERS: DiscountTier[] = [
+  { id: 'tier-1', minQty: 200, maxQty: '499', discountPercentage: 8, label: 'Tier 1 Standard Wholesale' },
+  { id: 'tier-2', minQty: 500, maxQty: '999', discountPercentage: 15, label: 'Tier 2 Volume Wholesale' },
+  { id: 'tier-3', minQty: 1000, maxQty: '2,499', discountPercentage: 22, label: 'Tier 3 Corporate Batch' },
+  { id: 'tier-4', minQty: 2500, maxQty: '4,999', discountPercentage: 28, label: 'Tier 4 Super Volume' },
+  { id: 'tier-5', minQty: 5000, maxQty: '9,999', discountPercentage: 35, label: 'Tier 5 Export Mega Lot' },
+  { id: 'tier-6', minQty: 10000, maxQty: '10,000+', discountPercentage: 42, label: 'Tier 6 Master Press Contract' }
+];
+
+export const DEFAULT_FACTORY_SETTINGS: FactorySettings = {
+  factoryName: 'Amazing Ads Sivakasi Works',
+  tagline: "India's Premier Manufacturer of PET Foil, 5D Holographic & Stone Art Devotional Calendars",
+  logoUrl: '',
+  address: '3/1, Vannakara Street, Chairman P.K.S.A. Arumugam Road, Sivakasi 626189, Tamil Nadu',
+  phone: '+91 97904 72767',
+  secondaryPhone: '+91 97904 27670',
+  whatsapp: '+91 97904 72767',
+  email: 'aamazingads@gmail.com',
+  supportEmail: 'sales@amazingads.in',
+  websiteUrl: 'www.amazingads.in',
+  operatingHours: 'Mon – Sat: 8:30 AM – 8:30 PM IST',
+  gstNumber: '33AABCA1234F1Z8',
+  standardLeadTime: '3–5 Business Days',
+  bulkLeadTime: '6–8 Business Days (2,000+ units)',
+  carriers: 'BlueDart Express, VRL Logistics, TCI Freight, ARC Parcel Service'
+};
+
+const LOCAL_STORAGE_DISCOUNTS_KEY = 'amazingads_factory_discounts_v1';
+const LOCAL_STORAGE_FACTORY_KEY = 'amazingads_factory_settings_v1';
+
+export function getStoredFactoryDiscounts(): DiscountTier[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_DISCOUNTS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return [...DEFAULT_DISCOUNT_TIERS];
+}
+
+export function saveStoredFactoryDiscounts(tiers: DiscountTier[]) {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_DISCOUNTS_KEY, JSON.stringify(tiers));
+    window.dispatchEvent(new CustomEvent('discounts-updated', { detail: tiers }));
+  } catch {}
+}
+
+export function getStoredFactorySettings(): FactorySettings {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_FACTORY_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch {}
+  return { ...DEFAULT_FACTORY_SETTINGS };
+}
+
+export function saveStoredFactorySettings(settings: FactorySettings) {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_FACTORY_KEY, JSON.stringify(settings));
+    window.dispatchEvent(new CustomEvent('factory-settings-updated', { detail: settings }));
+  } catch {}
+}
+
+

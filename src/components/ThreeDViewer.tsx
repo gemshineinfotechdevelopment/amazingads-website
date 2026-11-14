@@ -143,7 +143,7 @@ export const ThreeDViewer = () => {
     if (mode === 'pet-foil') setSelectedGod('mahalakshmi');
     else if (mode === 'murugan-5d') setSelectedGod('murugan');
     else if (mode === 'ayyappan-frame') setSelectedGod('ayyappan');
-    else if (mode === 'sivan-stone') setSelectedGod('sivan');
+    else if (mode === 'sivan-stone') setSelectedGod('balaji');
     else if (mode === 'daily-panchangam') setSelectedGod('murugan');
     else if (mode === 'hand-fan') setSelectedGod('ganesha');
   };
@@ -234,7 +234,7 @@ export const ThreeDViewer = () => {
           { id: 'pet-foil', label: '✦ 24K Gold Foil (Mahalakshmi)', icon: '🌸' },
           { id: 'murugan-5d', label: '🌀 5D Lenticular (Murugan ↔ Ayyappan)', icon: '🦚' },
           { id: 'ayyappan-frame', label: '🛕 Swami Ayyappan (24K Gold Frame)', icon: '✨' },
-          { id: 'sivan-stone', label: '🔱 Lord Shiva (Stone Art Relief)', icon: '🕉️' },
+          { id: 'sivan-stone', label: '👑 Lord Balaji (Stone Art Sculptural)', icon: '👑' },
           { id: 'daily-panchangam', label: '📅 Daily Calendar (Tear-Off Leaves)', icon: '📜' },
           { id: 'hand-fan', label: '🪭 Temple Promo Hand Fan (Ganesha)', icon: '🪭' }
         ].map((tab) => (
@@ -952,17 +952,14 @@ export const ThreeDViewer = () => {
                     }}
                   >
                     <img
-                      src={GOD_PROFILES.sivan.img}
-                      alt="Lord Shiva Parameshwaran"
-                      onError={(e) => {
-                        e.currentTarget.src = GOD_PROFILES.sivan.fallback;
-                      }}
+                      src="/images/stone-art-calendar-real.jpg"
+                      alt="Lord Balaji Stone Art Sculptural"
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center 20%',
-                        filter: 'contrast(1.15) brightness(0.98)'
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        filter: 'contrast(1.05) brightness(1.02)'
                       }}
                     />
 
@@ -1003,11 +1000,11 @@ export const ThreeDViewer = () => {
                         textAlign: 'center'
                       }}
                     >
-                      <h4 style={{ fontSize: '0.88rem', color: '#a7f3d0', fontWeight: 800, letterSpacing: '0.04em' }}>
-                        LORD SHIVA (KAILASANATHAR) • STONE ART
+                      <h4 style={{ fontSize: '0.88rem', color: '#ffd700', fontWeight: 800, letterSpacing: '0.04em' }}>
+                        LORD BALAJI • STONE ART SCULPTURAL
                       </h4>
-                      <p style={{ fontSize: '0.6rem', color: '#6ee7b7' }}>
-                        Nandi Deva • Ardhanarishvara • Hand-Finished Patina
+                      <p style={{ fontSize: '0.6rem', color: '#fef08a' }}>
+                        Tirupati Sri Venkateswara • 24K Gold Arch • Daily Panchangam
                       </p>
                     </div>
                   </div>
@@ -1031,16 +1028,16 @@ export const ThreeDViewer = () => {
 
                 <div
                   style={{
-                    background: 'rgba(16, 185, 129, 0.08)',
-                    border: '1.5px dashed #10b981',
+                    background: 'rgba(207, 168, 78, 0.1)',
+                    border: '1.5px dashed var(--accent-gold)',
                     borderRadius: '8px',
                     padding: '8px 12px',
                     textAlign: 'center',
                     marginTop: '10px'
                   }}
                 >
-                  <p style={{ fontSize: '0.72rem', color: '#6ee7b7', fontWeight: 800 }}>
-                    ★ {customBrand || 'KAILASAM GRANITES & TRADERS'} ★
+                  <p style={{ fontSize: '0.72rem', color: '#ffd700', fontWeight: 800 }}>
+                    ★ {customBrand || 'SRI VENKATESWARA TRADERS & JEWELLERS'} ★
                   </p>
                   <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
                     Exclusive prestige edition for stone, marble & builder trusts

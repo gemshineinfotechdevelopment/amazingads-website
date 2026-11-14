@@ -45,11 +45,11 @@ const SLIDES: Slide[] = [
   },
   {
     id: 'stone-art',
-    category: 'Stone Art Heritage Relievo',
-    badge: 'Sculpted Relievo & Kundan Gems',
-    title: 'Handcrafted Heritage Temple Stone Relief',
-    subtitle: 'Simulating sacred temple stone carvings with tactile multi-level embossing, antique stone washes, and 24K gold foil.',
-    spec: 'High-Density Resin Board • Carved Teak Synthetic Frame • 14×20 / 18×24 in',
+    category: 'Stone Art Sculptural Edition',
+    badge: 'Lord Balaji 3D Stone Relief',
+    title: 'Lord Balaji Stone Art Sculptural Calendar',
+    subtitle: 'Sculpted Tirupati Sri Venkateswara temple relief with 24K gold foil arch accents, kundan work, custom company imprint, and daily panchangam tear-off pad.',
+    spec: 'Composite Stone Resin Mount • Ornate Teak & Gold Moulded Frame • 14×20 in',
     image: '/images/stone-art-calendar-real.jpg',
     productTarget: 'Stone Art Calendars'
   },

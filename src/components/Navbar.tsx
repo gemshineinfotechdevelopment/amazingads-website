@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, type PageRoute } from '../context/RouterContext';
+import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface NavbarProps {
   onOpenSampleKit: () => void;
@@ -9,14 +10,28 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   const { currentPage, navigate } = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [brandSettings, setBrandSettings] = useState<FactorySettings>(getStoredFactorySettings());
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
     };
 
+    const handleSettingsUpdate = (e: Event) => {
+      const custom = e as CustomEvent<FactorySettings>;
+      if (custom.detail) {
+        setBrandSettings(custom.detail);
+      } else {
+        setBrandSettings(getStoredFactorySettings());
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('factory-settings-updated', handleSettingsUpdate);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('factory-settings-updated', handleSettingsUpdate);
+    };
   }, []);
 
   const navItems: { id: PageRoute; label: string }[] = [
@@ -49,25 +64,23 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           onClick={() => navigate('home')}
           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}
         >
-          <div
-            className="navbar-brand-logo"
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #2a2210 0%, #151821 100%)',
-              border: '1px solid var(--accent-gold)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(207, 168, 78, 0.25)',
-              flexShrink: 0
-            }}
-          >
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '16px', color: 'var(--accent-gold-bright)', fontWeight: 800 }}>
-              AA
-            </span>
-          </div>
+          {brandSettings.logoUrl && (
+            <img
+              src={brandSettings.logoUrl}
+              alt="Brand Logo"
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                objectFit: 'contain',
+                background: 'rgba(255, 255, 255, 0.08)',
+                padding: '2px',
+                border: '1px solid var(--accent-gold)',
+                boxShadow: '0 0 15px rgba(207, 168, 78, 0.25)',
+                flexShrink: 0
+              }}
+            />
+          )}
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
               <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff', whiteSpace: 'nowrap' }}>
