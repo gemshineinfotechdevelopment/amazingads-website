@@ -59,11 +59,11 @@ const AppContent = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
-      {/* Sticky Top Navigation */}
+      {/* Fixed Top Navigation */}
       <Navbar onOpenSampleKit={() => setIsSampleKitOpen(true)} />
 
       {/* Dynamic Viewport View for Current Page */}
-      <main style={{ flex: 1, width: '100%' }}>
+      <main style={{ flex: 1, width: '100%', paddingTop: '68px' }}>
         {renderActivePage()}
       </main>
 

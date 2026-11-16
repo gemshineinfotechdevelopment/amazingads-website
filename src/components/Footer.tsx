@@ -162,7 +162,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
                 <span>Chennai & Madurai Corporate Distribution Hubs</span>
               </div>
               <div style={{ marginTop: '4px' }}>
-                <strong style={{ color: 'var(--accent-gold-bright)', display: 'block' }}>Direct Factory Hotline:</strong>
+                <strong className="gold-gradient-text" style={{ display: 'block', fontWeight: 800 }}>Direct Factory Hotline:</strong>
                 <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.phone} {settings.secondaryPhone ? `• ${settings.secondaryPhone}` : ''}</span>
               </div>
               <div>

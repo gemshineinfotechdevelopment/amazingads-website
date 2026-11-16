@@ -98,7 +98,7 @@ export const Craftsmanship = () => {
               <h3 style={{ fontSize: '1.4rem', color: '#fff' }}>Tactile Paper Substrates</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Click a swatch to inspect grammage, origin, and archival characteristics</p>
             </div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
+            <span className="gold-gradient-text" style={{ fontSize: '0.78rem', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
               100% ACID-FREE & FSC CERTIFIED
             </span>
           </div>
@@ -175,8 +175,8 @@ export const Craftsmanship = () => {
                 <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '16px' }}>
                   {PAPERS[activePaperIdx].desc}
                 </p>
-                <div style={{ fontSize: '0.82rem', color: 'var(--accent-gold-bright)' }}>
-                  <strong>Ideal Application:</strong> {PAPERS[activePaperIdx].idealFor}
+                <div style={{ fontSize: '0.82rem' }}>
+                  <strong className="gold-gradient-text" style={{ fontWeight: 800 }}>Ideal Application:</strong> <span style={{ color: 'var(--text-secondary)' }}>{PAPERS[activePaperIdx].idealFor}</span>
                 </div>
               </div>
 

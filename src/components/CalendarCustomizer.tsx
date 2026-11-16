@@ -470,7 +470,7 @@ export const CalendarCustomizer = () => {
                   <div style={{ fontSize: '1.08rem', fontWeight: 700, color: '#fff' }}>
                     {selectedFormatObj.fullName}
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--accent-gold-bright)', marginTop: '2px' }}>
+                  <div className="gold-gradient-text" style={{ fontSize: '0.8rem', fontWeight: 700, marginTop: '2px' }}>
                     {selectedFormatObj.tag} • Base Dimensions: {selectedFormatObj.size}
                   </div>
                 </div>
@@ -484,7 +484,7 @@ export const CalendarCustomizer = () => {
               <div className="spec-form-group">
                 <label className="spec-label">
                   <span>Frame Dimensions & Frame-Specific Rate</span>
-                  <span className="spec-tag" style={{ color: 'var(--accent-gold-bright)' }}>Frame Size</span>
+                  <span className="spec-tag gold-gradient-text" style={{ fontWeight: 700 }}>Frame Size</span>
                 </label>
                 <div className="customizer-sizes-grid">
                   {sizesList.map((szObj) => {
@@ -770,7 +770,7 @@ export const CalendarCustomizer = () => {
                 </div>
                 <div className="quote-spec-row">
                   <span className="spec-k">Frame Size:</span>
-                  <span className="spec-v" style={{ color: 'var(--accent-gold-bright)', fontWeight: 700 }}>{currentSizeObj.size}</span>
+                  <span className="spec-v gold-gradient-text" style={{ fontWeight: 800 }}>{currentSizeObj.size}</span>
                 </div>
                 <div className="quote-spec-row">
                   <span className="spec-k">Frame Rate:</span>
@@ -913,7 +913,7 @@ export const CalendarCustomizer = () => {
                   <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '6px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     Total Configured: <strong>{quantity} units</strong> of {format} ({currentSizeObj.size}) with {finish}.
                     <br />
-                    Total Estimated: <strong style={{ color: 'var(--accent-gold-bright)' }}>₹{quote?.subtotal.toLocaleString()}</strong>
+                    Total Estimated: <strong className="gold-gradient-text" style={{ fontWeight: 800 }}>₹{quote?.subtotal.toLocaleString()}</strong>
                   </div>
 
                   <button
@@ -950,7 +950,7 @@ export const CalendarCustomizer = () => {
                   Quotation Confirmed!
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '20px' }}>
-                  Your official quotation reference <strong style={{ color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>{quote?.quoteId}</strong> has been logged with our press scheduler.
+                  Your official quotation reference <strong className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800 }}>{quote?.quoteId}</strong> has been logged with our press scheduler.
                 </p>
 
                 <div
@@ -1121,7 +1121,9 @@ export const CalendarCustomizer = () => {
         }
 
         .format-card-price strong {
-          color: var(--accent-gold-bright);
+          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           font-family: var(--font-mono);
           font-size: 1.05rem;
           font-weight: 800;
@@ -1342,7 +1344,9 @@ export const CalendarCustomizer = () => {
           font-family: var(--font-mono);
           font-size: 2.2rem;
           font-weight: 800;
-          color: var(--accent-gold-bright);
+          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           line-height: 1;
         }
 
@@ -1418,7 +1422,9 @@ export const CalendarCustomizer = () => {
         }
 
         .customizer-size-price {
-          color: var(--accent-gold-bright);
+          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           font-size: 0.95rem;
           font-family: var(--font-mono);
           font-weight: 800;
@@ -1433,7 +1439,9 @@ export const CalendarCustomizer = () => {
 
         .customizer-size-badge {
           font-size: 0.68rem;
-          color: var(--accent-gold-bright);
+          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           font-weight: 700;
           margin-top: 2px;
         }

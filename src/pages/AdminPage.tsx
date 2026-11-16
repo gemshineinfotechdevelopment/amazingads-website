@@ -1248,7 +1248,7 @@ export const AdminPage = () => {
             <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-sans)' }}>
                     <InquiryIcon size={24} color="#0284c7" />
                     <span>Customer Inquiries ({messages.length})</span>
                   </h3>
@@ -1384,25 +1384,6 @@ export const AdminPage = () => {
                       </div>
 
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <a
-                          href={`tel:${msg.phone}`}
-                          style={{
-                            background: BLUE_GRADIENT,
-                            color: '#ffffff',
-                            padding: '9px 16px',
-                            borderRadius: '10px',
-                            fontSize: '0.82rem',
-                            fontWeight: 800,
-                            textDecoration: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            boxShadow: '0 2px 8px rgba(2, 132, 199, 0.3)'
-                          }}
-                        >
-                          <span>📞 Call Customer</span>
-                        </a>
-
                         {msg.email && (
                           <a
                             href={`mailto:${msg.email}`}
@@ -1929,8 +1910,7 @@ export const AdminPage = () => {
                           <th style={{ padding: '10px 12px' }}>Customer / Company</th>
                           <th style={{ padding: '10px 12px' }}>Product</th>
                           <th style={{ padding: '10px 12px' }}>Quantity</th>
-                          <th style={{ padding: '10px 12px' }}>Total Price</th>
-                          <th style={{ padding: '10px 12px', textAlign: 'right' }}>Action</th>
+                          <th style={{ padding: '10px 12px', textAlign: 'right' }}>Total Price</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1953,27 +1933,7 @@ export const AdminPage = () => {
                               {q.product}
                             </td>
                             <td style={{ padding: '10px 12px', fontWeight: 800 }}>{q.quantity} units</td>
-                            <td style={{ padding: '10px 12px', fontWeight: 900, color: '#16a34a' }}>₹{q.totalPrice.toLocaleString()}</td>
-                            <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                              <a
-                                href={`tel:${q.phone}`}
-                                style={{
-                                  background: BLUE_GRADIENT,
-                                  color: '#fff',
-                                  padding: '6px 14px',
-                                  borderRadius: '8px',
-                                  fontSize: '0.78rem',
-                                  fontWeight: 800,
-                                  textDecoration: 'none',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '6px',
-                                  boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)'
-                                }}
-                              >
-                                <span>📞 Call Customer</span>
-                              </a>
-                            </td>
+                            <td style={{ padding: '10px 12px', fontWeight: 900, color: '#16a34a', textAlign: 'right' }}>₹{q.totalPrice.toLocaleString()}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -2050,25 +2010,6 @@ export const AdminPage = () => {
                               </td>
                               <td style={{ padding: '10px 12px', textAlign: 'right' }}>
                                 <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                                  {inq.phone && inq.phone !== 'N/A' && (
-                                    <a
-                                      href={`tel:${inq.phone}`}
-                                      style={{
-                                        background: '#0284c7',
-                                        color: '#fff',
-                                        padding: '6px 12px',
-                                        borderRadius: '8px',
-                                        fontSize: '0.76rem',
-                                        fontWeight: 700,
-                                        textDecoration: 'none',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '4px'
-                                      }}
-                                    >
-                                      📞 Call
-                                    </a>
-                                  )}
                                   {inq.email && (
                                     <a
                                       href={`mailto:${inq.email}?subject=Amazing Ads Quotation - ${inq.inquiryId}`}
@@ -2126,8 +2067,7 @@ export const AdminPage = () => {
                             <th style={{ padding: '10px 12px' }}>Recipient & Organization</th>
                             <th style={{ padding: '10px 12px' }}>Shipping Address</th>
                             <th style={{ padding: '10px 12px' }}>Preferred Styles</th>
-                            <th style={{ padding: '10px 12px' }}>Status</th>
-                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Action</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Status</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -2162,34 +2102,13 @@ export const AdminPage = () => {
                                   ))}
                                 </div>
                               </td>
-                              <td style={{ padding: '10px 12px' }}>
+                              <td style={{ padding: '10px 12px', textAlign: 'right' }}>
                                 <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '6px', fontSize: '0.74rem', fontWeight: 700 }}>
                                   {kit.status}
                                 </span>
                                 <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
                                   Est: {kit.estimatedDeliveryDays}
                                 </div>
-                              </td>
-                              <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                                {kit.phone && kit.phone !== 'N/A' && (
-                                  <a
-                                    href={`tel:${kit.phone}`}
-                                    style={{
-                                      background: '#0284c7',
-                                      color: '#fff',
-                                      padding: '6px 12px',
-                                      borderRadius: '8px',
-                                      fontSize: '0.76rem',
-                                      fontWeight: 700,
-                                      textDecoration: 'none',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: '4px'
-                                    }}
-                                  >
-                                    📞 Call
-                                  </a>
-                                )}
                               </td>
                             </tr>
                           ))}

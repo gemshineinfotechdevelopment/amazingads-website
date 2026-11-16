@@ -47,15 +47,18 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   return (
     <header
       style={{
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
-        zIndex: 1000,
-        backgroundColor: scrolled ? 'rgba(3, 3, 3, 0.96)' : 'rgba(33, 37, 40, 0.94)',
-        backdropFilter: 'blur(18px)',
+        left: 0,
+        right: 0,
+        width: '100%',
+        zIndex: 2000,
+        backgroundColor: scrolled ? 'rgba(3, 3, 3, 0.98)' : 'rgba(3, 3, 3, 0.94)',
+        backdropFilter: 'blur(20px)',
         borderBottom: '1px solid #454545',
+        boxShadow: scrolled ? '0 8px 30px rgba(0, 0, 0, 0.85)' : '0 4px 20px rgba(0, 0, 0, 0.55)',
         transition: 'all 0.3s ease',
-        padding: scrolled ? '10px 0' : '15px 0',
-        width: '100%'
+        padding: scrolled ? '10px 0' : '14px 0'
       }}
     >
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>

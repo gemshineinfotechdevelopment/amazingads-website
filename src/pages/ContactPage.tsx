@@ -140,7 +140,7 @@ className="contact-card contact-box"
                   <span style={{ fontSize: '1.4rem' }}>📞</span>
                   <div>
                     <strong style={{ color: '#fff', display: 'block' }}>Direct Factory Hotline:</strong>
-                    <span style={{ color: 'var(--accent-gold-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                    <span className="gold-gradient-text" style={{ fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
                       {settings.phone} {settings.secondaryPhone ? `/ ${settings.secondaryPhone}` : ''}
                     </span>
                   </div>
@@ -178,7 +178,7 @@ className="contact-card contact-box"
                   borderRadius: 'var(--radius-lg)'
                 }}
               >
-                <h4 style={{ color: 'var(--accent-gold-bright)', fontSize: '0.95rem', marginBottom: '6px' }}>
+                <h4 className="gold-gradient-text" style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: '6px' }}>
                   Need physical specimens?
                 </h4>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '14px' }}>
