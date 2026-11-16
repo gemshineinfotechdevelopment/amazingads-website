@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, type PageRoute } from '../context/RouterContext';
+import { useCart } from '../context/CartContext';
 import { getStoredFactorySettings, type FactorySettings } from '../services/api';
 
 interface NavbarProps {
@@ -8,6 +9,7 @@ interface NavbarProps {
 
 export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
   const { currentPage, navigate } = useRouter();
+  const { openCart, totalCount } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [brandSettings, setBrandSettings] = useState<FactorySettings>(getStoredFactorySettings());
@@ -78,18 +80,18 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
                 objectFit: 'contain',
                 background: 'rgba(255, 255, 255, 0.08)',
                 padding: '2px',
-                border: '1px solid #D78600',
-                boxShadow: '0 0 15px rgba(255, 215, 46, 0.35)',
+                border: '1px solid #FFD700',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)',
                 flexShrink: 0
               }}
             />
           )}
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
-              <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#fff', whiteSpace: 'nowrap' }}>
+              <span className="navbar-brand-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.03em', color: '#ffffff', whiteSpace: 'nowrap' }}>
                 {brandSettings.factoryName || 'AMAZING ADS'}
               </span>
-              <span style={{ fontSize: '0.68rem', color: '#D78600', letterSpacing: '0.08em', fontWeight: 700, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '0.68rem', color: '#FFD700', letterSpacing: '0.08em', fontWeight: 800, whiteSpace: 'nowrap' }}>
                 SIVAKASI
               </span>
             </div>
@@ -112,8 +114,51 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Mobile Menu Toggle Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Actions Bar: Global Cart Button & Mobile Menu Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Global Cart Button (Visible across all pages) */}
+          <button
+            onClick={openCart}
+            className="navbar-cart-btn"
+            title="Open Order Cart"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: totalCount > 0 ? 'rgba(255, 215, 0, 0.16)' : 'rgba(255, 255, 255, 0.06)',
+              border: `1px solid ${totalCount > 0 ? '#FFD700' : '#454545'}`,
+              borderRadius: '24px',
+              padding: '6px 14px',
+              color: totalCount > 0 ? '#FFD700' : '#ffffff',
+              fontSize: '0.86rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: totalCount > 0 ? '0 0 15px rgba(255, 215, 0, 0.35)' : 'none'
+            }}
+          >
+            <span style={{ fontSize: '1.05rem' }}>🛒</span>
+            <span className="navbar-cart-label">Cart</span>
+            <span
+              style={{
+                background: totalCount > 0 ? '#FFD700' : 'rgba(255, 255, 255, 0.2)',
+                color: totalCount > 0 ? '#000000' : '#ffffff',
+                borderRadius: '50%',
+                minWidth: '20px',
+                height: '20px',
+                padding: '0 5px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.74rem',
+                fontWeight: 800
+              }}
+            >
+              {totalCount}
+            </span>
+          </button>
+
+          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="mobile-toggle"
@@ -178,6 +223,33 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
             </button>
           ))}
 
+          {/* Direct Cart Action */}
+          <button
+            onClick={() => { openCart(); setMobileMenuOpen(false); }}
+            style={{
+              padding: '12px 16px',
+              borderRadius: '8px',
+              background: 'rgba(255, 215, 0, 0.16)',
+              border: '1px solid #FFD700',
+              color: '#FFD700',
+              fontWeight: 800,
+              fontSize: '0.92rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: '4px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🛒</span>
+              <span>Open Wholesale Cart</span>
+            </div>
+            <span style={{ background: '#FFD700', color: '#000', borderRadius: '12px', padding: '2px 8px', fontSize: '0.78rem', fontWeight: 800 }}>
+              {totalCount} {totalCount === 1 ? 'item' : 'items'}
+            </span>
+          </button>
+
           <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
             <a
               href={`tel:${(brandSettings.phone || '+919790472767').replace(/[^0-9+]/g, '')}`}
@@ -185,9 +257,9 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
                 flex: 1,
                 padding: '12px',
                 borderRadius: 'var(--radius-sm)',
-                background: 'rgba(215, 134, 0, 0.16)',
-                border: '1px solid #D78600',
-                color: '#FFD72E',
+                background: 'rgba(255, 215, 0, 0.12)',
+                border: '1px solid #FFD700',
+                color: '#FFD700',
                 textDecoration: 'none',
                 fontSize: '0.9rem',
                 fontWeight: 700,
@@ -223,6 +295,8 @@ export const Navbar = ({ onOpenSampleKit }: NavbarProps) => {
         }
         @media (max-width: 480px) {
           .navbar-tagline { display: none; }
+          .navbar-cart-label { display: none; }
+          .navbar-cart-btn { padding: 6px 10px !important; }
         }
         @media (max-width: 480px) {
           .navbar-brand-title {

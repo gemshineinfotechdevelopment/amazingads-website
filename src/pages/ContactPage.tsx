@@ -35,8 +35,13 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name || (!email && !phone)) {
-      alert('Please provide your name and phone number or email.');
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!name.trim() || !cleanPhone) {
+      alert('Please provide your name and 10-digit mobile number.');
+      return;
+    }
+    if (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      alert('Mobile number must be exactly 10 digits.');
       return;
     }
 
@@ -44,7 +49,7 @@ export const ContactPage = ({ onOpenSampleKit }: ContactPageProps) => {
       setSubmitting(true);
       await sendCustomerMessage(
         name,
-        phone,
+        cleanPhone,
         message,
         {
           email,
@@ -256,14 +261,16 @@ className="contact-card contact-box"
 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
-                      Phone Number *
+                      Phone Number (10 Digits) *
                     </label>
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98765 43210"
+                      maxLength={10}
+                      pattern="[6-9][0-9]{9}"
+                      placeholder="10-digit mobile number"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       className="form-input"
                       style={{ width: '100%', padding: '12px 14px' }}
                     />

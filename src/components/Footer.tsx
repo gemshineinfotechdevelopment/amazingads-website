@@ -2,10 +2,7 @@ import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import {
   getStoredFactorySettings,
-  getStoredCatalog,
-  SIVAKASI_CATALOG,
-  type FactorySettings,
-  type CalendarProduct
+  type FactorySettings
 } from '../services/api';
 
 interface FooterProps {
@@ -15,10 +12,6 @@ interface FooterProps {
 export const Footer = ({ onOpenSampleKit }: FooterProps) => {
   const { navigate } = useRouter();
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
-  const [products, setProducts] = useState<CalendarProduct[]>(() => {
-    const stored = getStoredCatalog();
-    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
-  });
 
   useEffect(() => {
     const handleUpdate = (e: Event) => {
@@ -30,17 +23,10 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
       }
     };
 
-    const handleCatalogUpdate = () => {
-      const stored = getStoredCatalog();
-      if (stored && stored.length > 0) setProducts(stored);
-    };
-
     window.addEventListener('factory-settings-updated', handleUpdate);
-    window.addEventListener('catalog-updated', handleCatalogUpdate);
 
     return () => {
       window.removeEventListener('factory-settings-updated', handleUpdate);
-      window.removeEventListener('catalog-updated', handleCatalogUpdate);
     };
   }, []);
 
@@ -62,7 +48,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.4fr 1fr 1fr 1.2fr',
+            gridTemplateColumns: '1.4fr 1fr 1.2fr',
             gap: '40px',
             marginBottom: '60px'
           }}
@@ -113,26 +99,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
             </div>
           </div>
 
-          {/* Column 2: Dynamic Catalog Products */}
-          <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '18px' }}>
-              Products
-            </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-              {products.slice(0, 6).map((p) => (
-                <li key={p.id}>
-                  <button
-                    onClick={() => navigate('calculator', { product: p.name })}
-                    style={footerLinkStyle}
-                  >
-                    {p.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Atelier Studio Departments */}
+          {/* Column 2: Atelier Studio Departments */}
           <div>
             <h4 style={{ fontSize: '0.9rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '18px' }}>
               Press Studio
@@ -147,7 +114,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
             </ul>
           </div>
 
-          {/* Column 4: Sivakasi Factory & Contact */}
+          {/* Column 3: Sivakasi Factory & Contact */}
           <div>
             <h4 style={{ fontSize: '0.9rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '18px' }}>
               Factory & Sales Works

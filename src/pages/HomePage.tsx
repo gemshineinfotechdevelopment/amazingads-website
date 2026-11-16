@@ -15,7 +15,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         onOpenSampleKit={onOpenSampleKit}
       />
 
-      {/* 2. Signature 2027 Calendar Collection (Front & Center) */}
+      {/* 2. Signature 2027 Calendar Collection - Our Products (Front & Center) */}
       <section style={{ padding: '40px 0 50px' }}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 36px' }}>
@@ -23,10 +23,10 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
               ✦ 2027 SIVAKASI PRESS EDITIONS
             </span>
             <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
-              Signature <span className="gold-gradient-text">Calendar Editions</span>
+              Our <span className="gold-gradient-text">Products</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              Direct factory wholesale pricing. Real 24K gold foil stamping, daily panchangam, and tabletop desk easels.
+              Direct factory wholesale pricing. Real 24K gold foil stamping, 5D holographic motion, stone art relief, and promotional hand fans.
             </p>
           </div>
 

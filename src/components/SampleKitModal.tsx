@@ -55,13 +55,19 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
       return;
     }
 
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone && (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+      alert('Courier mobile number must be exactly 10 digits.');
+      return;
+    }
+
     try {
       setSubmitting(true);
       const res = await requestSampleKit({
         name,
         email,
         company,
-        phone,
+        phone: cleanPhone,
         shippingAddress,
         preferredStyles: selectedStyles.length > 0 ? selectedStyles : products.slice(0, 2).map(p => p.name)
       });
@@ -195,12 +201,14 @@ export const SampleKitModal = ({ isOpen, onClose }: SampleKitModalProps) => {
                   />
                 </div>
                 <div>
-                  <label>Courier Phone Number</label>
+                  <label>Courier Mobile Number (10 Digits)</label>
                   <input
                     type="tel"
-                    placeholder="+91 98400 12345"
+                    maxLength={10}
+                    pattern="[6-9][0-9]{9}"
+                    placeholder="10-digit mobile number"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   />
                 </div>
               </div>

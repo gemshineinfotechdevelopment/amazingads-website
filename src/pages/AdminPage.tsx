@@ -17,6 +17,7 @@ import {
   fetchQuotes,
   fetchInquiries,
   fetchSampleKits,
+  deduplicateProducts,
   uploadImageToCloudinary,
   DEFAULT_DISCOUNT_TIERS,
   DEFAULT_FACTORY_SETTINGS,
@@ -91,7 +92,7 @@ const INITIAL_FORM_STATE: CalendarProduct = {
   id: '',
   name: '',
   subtitle: '',
-  category: 'Gold/Silver PET Foil',
+  category: '',
   tag: 'Flagship Luxury Spec',
   startingPrice: 145,
   currency: '₹',
@@ -173,9 +174,9 @@ export const AdminPage = () => {
   const [products, setProducts] = useState<CalendarProduct[]>([]);
   const [matrixData, setMatrixData] = useState<Record<string, {
     name: string;
-    price: number;
+    price: number | string;
     sizes: string[];
-    sizePrices: Record<string, number>;
+    sizePrices: Record<string, number | string>;
   }>>({});
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -195,7 +196,7 @@ export const AdminPage = () => {
   // Modal & Form State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<CalendarProduct>(INITIAL_FORM_STATE);
+  const [formData, setFormData] = useState<CalendarProduct & { sizePrices?: Record<string, any> }>(INITIAL_FORM_STATE);
   const [newSizeInput, setNewSizeInput] = useState('');
   const [newSizePriceInput, setNewSizePriceInput] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
@@ -215,8 +216,16 @@ export const AdminPage = () => {
         fetchInquiries(),
         fetchSampleKits()
       ]);
-      setProducts(prods);
-      setMessages(msgs);
+      const uniqueProds = deduplicateProducts(prods);
+      setProducts(uniqueProds);
+
+      const seenMsgIds = new Set<string>();
+      const uniqueMsgs = (msgs || []).filter(m => {
+        if (!m || !m.id || seenMsgIds.has(m.id)) return false;
+        seenMsgIds.add(m.id);
+        return true;
+      });
+      setMessages(uniqueMsgs);
       if (quotes && quotes.length > 0) setQuotesList(quotes);
       if (settings) setFactorySettings(settings);
       if (inqs && inqs.length > 0) setInquiriesList(inqs);
@@ -334,6 +343,7 @@ export const AdminPage = () => {
     setFormData({
       ...INITIAL_FORM_STATE,
       id: `product-${Date.now()}`,
+      category: '',
       sizes: defaultSizes,
       sizePrices: defaultSizePrices,
       startingPrice: 125
@@ -351,23 +361,22 @@ export const AdminPage = () => {
     setUploadedFileName(null);
   };
 
-  // Device Image File Upload Handler with Auto Canvas Compression & Cloudinary Sync
+  // Device Image File Upload Handler with Cloudinary Integration & Local Fallback
   const handleImageFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedFileName(file.name);
       try {
-        const compressedBase64 = await compressImageFile(file, 900, 0.82);
+        showToast(`Preparing and uploading "${file.name}" to Cloudinary...`, 'info');
+        const compressedBase64 = await compressImageFile(file, 900, 0.85);
         if (compressedBase64) {
-          // Attempt Cloudinary upload via backend
-          const uploadRes = await uploadImageToCloudinary(compressedBase64, 'amazingads/products');
-          if (uploadRes.success && uploadRes.url) {
-            setFormData(prev => ({ ...prev, mockupImg: uploadRes.url! }));
-            showToast(`Image "${file.name}" uploaded to Cloudinary successfully!`);
+          const uploadResult = await uploadImageToCloudinary(compressedBase64, 'amazingads/products');
+          if (uploadResult.success && uploadResult.url) {
+            setFormData(prev => ({ ...prev, mockupImg: uploadResult.url }));
+            showToast(`✓ Image "${file.name}" successfully uploaded and stored in Cloudinary!`);
           } else {
-            // Fallback to local compressed base64 if Cloudinary is not configured yet
             setFormData(prev => ({ ...prev, mockupImg: compressedBase64 }));
-            showToast(`Image "${file.name}" loaded successfully!`);
+            showToast(`Image loaded locally. Cloudinary: ${uploadResult.error || 'Check access key permissions'}`, 'info');
           }
         }
       } catch {
@@ -383,9 +392,11 @@ export const AdminPage = () => {
       showToast('This size is already in the list', 'info');
       return;
     }
-    const price = priceToAdd || (newSizePriceInput ? Number(newSizePriceInput) : formData.startingPrice);
+    const cleanRateStr = newSizePriceInput.replace(/\D/g, '');
+    const cleanRate = cleanRateStr ? Number(cleanRateStr) : 0;
+    const price = priceToAdd || (cleanRate > 0 ? cleanRate : (formData.startingPrice || 125));
     const updatedSizes = [...(formData.sizes || []), size];
-    const updatedSizePrices = { ...(formData.sizePrices || {}), [size]: Math.max(1, price) };
+    const updatedSizePrices = { ...(formData.sizePrices || {}), [size]: price };
     setFormData({ ...formData, sizes: updatedSizes, sizePrices: updatedSizePrices });
     if (!sizeToAdd) {
       setNewSizeInput('');
@@ -393,8 +404,10 @@ export const AdminPage = () => {
     }
   };
 
-  const handleUpdateSizePrice = (sizeName: string, price: number) => {
-    const updatedSizePrices = { ...(formData.sizePrices || {}), [sizeName]: Math.max(1, price) };
+  const handleUpdateSizePrice = (sizeName: string, val: string | number) => {
+    const cleanVal = typeof val === 'string' ? val.replace(/\D/g, '') : String(val);
+    const updatedSizePrices = { ...(formData.sizePrices || {}) };
+    updatedSizePrices[sizeName] = cleanVal;
     setFormData({ ...formData, sizePrices: updatedSizePrices });
   };
 
@@ -414,19 +427,30 @@ export const AdminPage = () => {
       showToast('Product name is required', 'error');
       return;
     }
+    if (!formData.category || !formData.category.trim()) {
+      showToast('Please specify a product category', 'error');
+      return;
+    }
     if (!formData.sizes || formData.sizes.length === 0) {
       showToast('Please add at least one frame size and price', 'error');
       return;
     }
 
+    const sanitizedSizePrices: Record<string, number> = {};
+    (formData.sizes || []).forEach((s) => {
+      const parsed = Number(formData.sizePrices?.[s]);
+      sanitizedSizePrices[s] = (parsed && parsed > 0) ? parsed : (formData.startingPrice || 125);
+    });
+
     const firstSize = formData.sizes[0];
-    const computedPrice = (firstSize && formData.sizePrices?.[firstSize]) ? formData.sizePrices[firstSize] : (formData.startingPrice || 125);
+    const computedPrice = (firstSize && sanitizedSizePrices[firstSize]) ? sanitizedSizePrices[firstSize] : (formData.startingPrice || 125);
     
     const payloadToSave: CalendarProduct = {
       ...formData,
       startingPrice: computedPrice,
-      category: formData.category ? formData.category.trim() : 'Devotional Calendars',
-      tag: formData.category ? formData.category.trim() : 'Wholesale',
+      sizePrices: sanitizedSizePrices,
+      category: formData.category.trim(),
+      tag: formData.category.trim() || 'Wholesale',
       subtitle: formData.subtitle || `${formData.name} - Sivakasi Direct Factory Works`,
       description: formData.description || `${formData.name} direct wholesale manufacture with custom corporate crest and high-definition embellishments.`,
       features: formData.features && formData.features.length > 0 ? formData.features : ['Direct Sivakasi Factory Pressing', 'High Quality Frame Finish', 'Priority Courier Dispatch'],
@@ -475,22 +499,24 @@ export const AdminPage = () => {
 
   // Matrix Quick Updates with Frame Size-Wise Pricing
   const handleMatrixFieldChange = (productId: string, field: 'name' | 'price', value: string | number) => {
+    const cleanVal = field === 'price' && typeof value === 'string' ? value.replace(/\D/g, '') : value;
     setMatrixData(prev => ({
       ...prev,
       [productId]: {
         ...prev[productId],
-        [field]: field === 'price' ? Math.max(1, Number(value)) : value
+        [field]: cleanVal
       }
     }));
   };
 
-  const handleMatrixSizePriceChange = (productId: string, sizeName: string, price: number) => {
+  const handleMatrixSizePriceChange = (productId: string, sizeName: string, price: string | number) => {
+    const cleanVal = typeof price === 'string' ? price.replace(/\D/g, '') : String(price);
     setMatrixData(prev => {
       const current = prev[productId];
       if (!current) return prev;
       const updatedSizePrices = {
         ...current.sizePrices,
-        [sizeName]: Math.max(1, Number(price) || 1)
+        [sizeName]: cleanVal
       };
       return {
         ...prev,
@@ -529,7 +555,8 @@ export const AdminPage = () => {
     setMatrixData(prev => {
       const current = prev[productId];
       if (!current || current.sizes.includes(trimmed)) return prev;
-      const sizePrice = price && price > 0 ? price : current.price;
+      const rowPrice = Number(current.price) || 125;
+      const sizePrice = price && price > 0 ? price : rowPrice;
       return {
         ...prev,
         [productId]: {
@@ -547,14 +574,21 @@ export const AdminPage = () => {
   const handleSaveMatrixRow = async (productId: string) => {
     const row = matrixData[productId];
     if (!row) return;
+    const cleanPrice = Number(row.price) > 0 ? Number(row.price) : 125;
+    const sanitizedSizePrices: Record<string, number> = {};
+    (row.sizes || []).forEach(sz => {
+      const p = Number(row.sizePrices?.[sz]);
+      sanitizedSizePrices[sz] = (p && p > 0) ? p : cleanPrice;
+    });
+
     try {
       await updateCalendarProduct(productId, {
         name: row.name,
-        startingPrice: row.price,
+        startingPrice: cleanPrice,
         sizes: row.sizes,
-        sizePrices: row.sizePrices
+        sizePrices: sanitizedSizePrices
       });
-      showToast(`Updated "${row.name}" with Price ₹${row.price} and ${row.sizes.length} frame size rates.`);
+      showToast(`Updated "${row.name}" with Price ₹${cleanPrice} and ${row.sizes.length} frame size rates.`);
       await loadData();
     } catch {
       showToast('Failed to save row changes', 'error');
@@ -564,11 +598,18 @@ export const AdminPage = () => {
   const handleSaveAllMatrix = async () => {
     try {
       for (const [id, row] of Object.entries(matrixData)) {
+        const cleanPrice = Number(row.price) > 0 ? Number(row.price) : 125;
+        const sanitizedSizePrices: Record<string, number> = {};
+        (row.sizes || []).forEach(sz => {
+          const p = Number(row.sizePrices?.[sz]);
+          sanitizedSizePrices[sz] = (p && p > 0) ? p : cleanPrice;
+        });
+
         await updateCalendarProduct(id, {
           name: row.name,
-          startingPrice: row.price,
+          startingPrice: cleanPrice,
           sizes: row.sizes,
-          sizePrices: row.sizePrices
+          sizePrices: sanitizedSizePrices
         });
       }
       showToast('All products, frame size rates, and matrix changes saved successfully!');
@@ -600,15 +641,16 @@ export const AdminPage = () => {
     const file = e.target.files?.[0];
     if (file) {
       try {
+        showToast(`Uploading logo "${file.name}" to Cloudinary...`, 'info');
         const compressedLogo = await compressImageFile(file, 500, 0.9);
         if (compressedLogo) {
-          const uploadRes = await uploadImageToCloudinary(compressedLogo, 'amazingads/branding');
-          if (uploadRes.success && uploadRes.url) {
-            setFactorySettings(prev => ({ ...prev, logoUrl: uploadRes.url! }));
-            showToast(`Logo "${file.name}" uploaded to Cloudinary! Click "Save Settings" to apply.`);
+          const uploadResult = await uploadImageToCloudinary(compressedLogo, 'amazingads/branding');
+          if (uploadResult.success && uploadResult.url) {
+            setFactorySettings(prev => ({ ...prev, logoUrl: uploadResult.url }));
+            showToast(`✓ Logo "${file.name}" stored in Cloudinary! Click "Save Settings" to apply.`);
           } else {
             setFactorySettings(prev => ({ ...prev, logoUrl: compressedLogo }));
-            showToast(`Logo "${file.name}" loaded successfully! Click "Save Settings" to apply.`);
+            showToast(`Logo loaded locally. Cloudinary: ${uploadResult.error || 'Check access key permissions'}`, 'info');
           }
         }
       } catch {
@@ -1714,11 +1756,16 @@ export const AdminPage = () => {
                             <div style={{ position: 'relative' }}>
                               <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 800 }}>₹</span>
                               <input
-                                type="number"
-                                min={1}
+                                type="text"
+                                inputMode="numeric"
                                 className="no-spinners"
-                                value={row.price}
+                                value={row.price !== undefined ? row.price : ''}
                                 onChange={(e) => handleMatrixFieldChange(p.id, 'price', e.target.value)}
+                                onBlur={() => {
+                                  if (!row.price || Number(row.price) <= 0) {
+                                    handleMatrixFieldChange(p.id, 'price', 125);
+                                  }
+                                }}
                                 style={{
                                   width: '100%',
                                   background: '#ffffff',
@@ -1729,8 +1776,8 @@ export const AdminPage = () => {
                                   fontWeight: 800,
                                   color: '#0f172a',
                                   WebkitTextFillColor: '#0f172a',
-                                  appearance: 'none',
-                                  MozAppearance: 'textfield'
+                                  outline: 'none',
+                                  boxSizing: 'border-box'
                                 }}
                               />
                             </div>
@@ -1738,7 +1785,7 @@ export const AdminPage = () => {
                           <td style={{ padding: '10px 12px' }}>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
                               {row.sizes.map((sz, szIdx) => {
-                                const sizePrice = row.sizePrices?.[sz] ?? row.price;
+                                const sizePrice = row.sizePrices?.[sz] !== undefined ? row.sizePrices[sz] : '';
                                 return (
                                   <div
                                     key={szIdx}
@@ -1758,11 +1805,18 @@ export const AdminPage = () => {
                                     <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', borderRadius: '5px', border: '1px solid #7dd3fc', padding: '1px 4px' }}>
                                       <span style={{ fontSize: '0.72rem', color: '#0284c7', fontWeight: 800 }}>₹</span>
                                       <input
-                                        type="number"
-                                        min={1}
+                                        type="text"
+                                        inputMode="numeric"
                                         className="no-spinners"
                                         value={sizePrice}
-                                        onChange={(e) => handleMatrixSizePriceChange(p.id, sz, Number(e.target.value))}
+                                        onChange={(e) => handleMatrixSizePriceChange(p.id, sz, e.target.value)}
+                                        onBlur={() => {
+                                          const cur = row.sizePrices?.[sz];
+                                          if (cur === '' || cur === undefined || Number(cur) <= 0) {
+                                            handleMatrixSizePriceChange(p.id, sz, row.price || 125);
+                                          }
+                                        }}
+                                        placeholder="Rate"
                                         style={{
                                           width: '52px',
                                           border: 'none',
@@ -1770,8 +1824,10 @@ export const AdminPage = () => {
                                           fontSize: '0.8rem',
                                           fontWeight: 800,
                                           color: '#0f172a',
+                                          WebkitTextFillColor: '#0f172a',
                                           textAlign: 'center',
-                                          padding: '2px 0'
+                                          padding: '2px 0',
+                                          outline: 'none'
                                         }}
                                       />
                                     </div>
@@ -1791,7 +1847,7 @@ export const AdminPage = () => {
                                 const customSize = window.prompt(`Enter frame size for "${row.name}" (e.g. 15 × 20 in):`, '15 × 20 in');
                                 if (customSize) {
                                   const customPriceStr = window.prompt(`Enter wholesale price (₹) for "${customSize}":`, String(row.price));
-                                  const customPrice = customPriceStr ? Number(customPriceStr) : row.price;
+                                  const customPrice = customPriceStr ? Number(customPriceStr) : Number(row.price);
                                   handleMatrixAddSize(p.id, customSize, customPrice);
                                 }
                               }}
@@ -2847,16 +2903,17 @@ export const AdminPage = () => {
                 />
               </div>
 
-              {/* 2. CATEGORY */}
+              {/* 2. CATEGORY (NO DEFAULT VALUE) */}
               <div style={{ marginBottom: '18px' }}>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '6px' }}>
-                  Category
+                  Category *
                 </label>
                 <input
                   type="text"
+                  required
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="e.g. Devotional Calendars / Premium Foils / 5D Holographic"
+                  placeholder="Enter product category (e.g. Gold/Silver PET Foil, Custom 5D Calendars, etc.)"
                   style={{
                     width: '100%',
                     background: '#ffffff',
@@ -2885,7 +2942,8 @@ export const AdminPage = () => {
                 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px', minHeight: '44px', background: '#ffffff', padding: '10px', borderRadius: '10px', border: '1px solid #bae6fd' }}>
                   {formData.sizes && formData.sizes.map((s, idx) => {
-                    const currentPrice = formData.sizePrices?.[s] ?? formData.startingPrice ?? 125;
+                    const rawVal = formData.sizePrices?.[s];
+                    const currentPrice = rawVal !== undefined ? rawVal : (formData.startingPrice ?? 125);
                     return (
                       <div
                         key={idx}
@@ -2905,11 +2963,18 @@ export const AdminPage = () => {
                         <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', borderRadius: '5px', border: '1px solid #7dd3fc', padding: '1px 5px' }}>
                           <span style={{ fontSize: '0.74rem', color: '#0284c7', fontWeight: 800 }}>₹</span>
                           <input
-                            type="number"
-                            min={1}
+                            type="text"
+                            inputMode="numeric"
                             className="no-spinners"
                             value={currentPrice}
-                            onChange={(e) => handleUpdateSizePrice(s, Number(e.target.value))}
+                            onChange={(e) => handleUpdateSizePrice(s, e.target.value)}
+                            onBlur={() => {
+                              const cur = formData.sizePrices?.[s];
+                              if (cur === '' || cur === undefined || Number(cur) <= 0) {
+                                handleUpdateSizePrice(s, formData.startingPrice || 125);
+                              }
+                            }}
+                            placeholder="Rate"
                             style={{
                               width: '54px',
                               border: 'none',
@@ -2917,8 +2982,10 @@ export const AdminPage = () => {
                               fontSize: '0.82rem',
                               fontWeight: 800,
                               color: '#0f172a',
+                              WebkitTextFillColor: '#0f172a',
                               textAlign: 'center',
-                              padding: '2px 0'
+                              padding: '2px 0',
+                              outline: 'none'
                             }}
                           />
                         </div>
@@ -2963,11 +3030,11 @@ export const AdminPage = () => {
                   <div style={{ position: 'relative', width: '120px' }}>
                     <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 800 }}>₹</span>
                     <input
-                      type="number"
-                      min={1}
+                      type="text"
+                      inputMode="numeric"
                       className="no-spinners"
                       value={newSizePriceInput}
-                      onChange={(e) => setNewSizePriceInput(e.target.value)}
+                      onChange={(e) => setNewSizePriceInput(e.target.value.replace(/\D/g, ''))}
                       placeholder="Rate"
                       style={{
                         width: '100%',
@@ -2979,6 +3046,7 @@ export const AdminPage = () => {
                         fontWeight: 800,
                         color: '#0f172a',
                         WebkitTextFillColor: '#0f172a',
+                        outline: 'none',
                         boxSizing: 'border-box'
                       }}
                     />

@@ -1,5 +1,19 @@
 [
   {
+    "id": "MSG-3216",
+    "name": "prabhu",
+    "phone": "9584658578",
+    "email": "",
+    "product": "Bulk Cart (2 item types, 6 units)",
+    "size": "",
+    "quantity": 6,
+    "notes": "Cart Total: ₹753 | Delivery: Direct",
+    "message": "WHOLESALE CART ORDER INQUIRY:\n• Promotional Hand Fan (Lord Ganesha Edition) [Size: 8 × 8 inches (Standard Circle)] × 1 units @ ₹28/unit = ₹28\n• Gold / Silver PET Foil Calendar [Size: 15 × 20 inches (Standard Wall)] × 5 units @ ₹145/unit = ₹725\n\nTotal Items: 6 units\nTotal Estimated Value: ₹753\n\nNotes / Location: Direct Delivery",
+    "status": "New",
+    "createdAt": "2026-11-16T08:29:53.216Z",
+    "updatedAt": "2026-11-16T08:29:53.216Z"
+  },
+  {
     "id": "MSG-1001",
     "name": "Karthik Raja",
     "phone": "+91 98401 23456",
@@ -9,15 +23,6 @@
     "updatedAt": "2026-11-14T05:47:04.295Z"
   },
   {
-    "id": "MSG-1001",
-    "name": "Karthik Raja",
-    "phone": "+91 98401 23456",
-    "message": "Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our company name printed at the top.",
-    "status": "New",
-    "createdAt": "2026-11-14T03:43:03.097Z",
-    "updatedAt": "2026-11-14T05:47:04.312Z"
-  },
-  {
     "id": "MSG-1002",
     "name": "Lakshmi Narayanan",
     "phone": "+91 97904 88765",
@@ -25,14 +30,5 @@
     "status": "Replied",
     "createdAt": "2026-11-14T00:43:03.097Z",
     "updatedAt": "2026-11-14T05:47:04.295Z"
-  },
-  {
-    "id": "MSG-1002",
-    "name": "Lakshmi Narayanan",
-    "phone": "+91 97904 88765",
-    "message": "Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?",
-    "status": "Replied",
-    "createdAt": "2026-11-14T00:43:03.097Z",
-    "updatedAt": "2026-11-14T05:47:04.312Z"
   }
 ]

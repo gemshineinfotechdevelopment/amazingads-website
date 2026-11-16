@@ -1,5 +1,6 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { getCalendarProducts, sendCustomerMessage, SIVAKASI_CATALOG, type CalendarProduct } from '../services/api';
+import { useState, useEffect, useRef } from 'react';
+import { getCalendarProducts, SIVAKASI_CATALOG, deduplicateProducts, type CalendarProduct } from '../services/api';
+import { useCart } from '../context/CartContext';
 
 interface ProductCatalogProps {
   onSelectProduct?: (productName: string) => void;
@@ -53,7 +54,231 @@ export interface CartItem {
   image: string;
 }
 
+export const getProductSizePrice = (item: CalendarProduct, sizeString: string): number => {
+  if (item.sizePrices && item.sizePrices[sizeString] !== undefined) {
+    return Number(item.sizePrices[sizeString]);
+  }
+  // Try matching prefix before parenthesis e.g. "12 × 18 inches" matching "12 × 18"
+  if (item.sizePrices && typeof item.sizePrices === 'object') {
+    const cleanSize = sizeString.split('(')[0].replace(/inches|in/gi, '').trim().toLowerCase();
+    for (const [key, price] of Object.entries(item.sizePrices)) {
+      const cleanKey = key.split('(')[0].replace(/inches|in/gi, '').trim().toLowerCase();
+      if (cleanKey && cleanSize && (cleanKey === cleanSize || cleanSize.includes(cleanKey) || cleanKey.includes(cleanSize))) {
+        return Number(price);
+      }
+    }
+  }
+  // Fallback to distinct progressive tiers per size if item has startingPrice
+  const allSizes = (item.sizes && item.sizes.length > 0) ? item.sizes : (PRODUCT_SIZES[item.id] || []);
+  const idx = allSizes.indexOf(sizeString);
+  if (idx > 0 && item.startingPrice) {
+    const tierMultipliers = [1, 1.34, 1.72, 2.15];
+    return Math.round(item.startingPrice * (tierMultipliers[idx] || (1 + idx * 0.35)));
+  }
+  return Number(item.startingPrice) || 125;
+};
+
+// Custom Dropdown bounded strictly to parent box width (never extends outside card)
+const SizeSelectDropdown = ({
+  productId,
+  sizes,
+  currentSize,
+  item,
+  onSelectSize
+}: {
+  productId: string;
+  sizes: string[];
+  currentSize: string;
+  item: CalendarProduct;
+  onSelectSize: (productId: string, size: string) => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const currentPrice = getProductSizePrice(item, currentSize);
+
+  return (
+    <div
+      ref={dropdownRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          background: '#161714',
+          border: `1px solid ${isOpen ? '#FFD700' : 'rgba(255, 255, 255, 0.18)'}`,
+          borderRadius: '8px',
+          padding: '10px 12px',
+          color: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          cursor: 'pointer',
+          outline: 'none',
+          boxShadow: isOpen ? '0 0 12px rgba(255, 215, 0, 0.35)' : 'none',
+          transition: 'all 0.2s ease'
+        }}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <span
+          style={{
+            fontSize: '0.84rem',
+            fontWeight: 600,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textAlign: 'left',
+            flex: 1
+          }}
+        >
+          {currentSize}
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.9rem',
+              fontWeight: 800,
+              color: '#FFD700'
+            }}
+          >
+            ₹{currentPrice}
+          </span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFD700"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease'
+            }}
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </button>
+
+      {/* Strictly Bounded Dropdown Menu */}
+      {isOpen && (
+        <div
+          role="listbox"
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: 0,
+            right: 0,
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            background: '#161714',
+            border: '1px solid #FFD700',
+            borderRadius: '8px',
+            boxShadow: '0 14px 35px rgba(0, 0, 0, 0.95), 0 0 20px rgba(255, 215, 0, 0.25)',
+            zIndex: 150,
+            maxHeight: '220px',
+            overflowY: 'auto',
+            padding: '4px'
+          }}
+        >
+          {sizes.map((s) => {
+            const isSelected = s === currentSize;
+            const price = getProductSizePrice(item, s);
+            return (
+              <div
+                key={s}
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => {
+                  onSelectSize(productId, s);
+                  setIsOpen(false);
+                }}
+                style={{
+                  padding: '9px 12px',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  background: isSelected ? 'rgba(255, 215, 0, 0.2)' : 'transparent',
+                  color: isSelected ? '#FFD700' : '#ffffff',
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  transition: 'background 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1 }}>
+                  {isSelected && <span style={{ color: '#FFD700', fontSize: '0.85rem' }}>✓</span>}
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {s}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 800,
+                    fontSize: '0.86rem',
+                    color: isSelected ? '#FFD700' : '#d1d5db',
+                    flexShrink: 0
+                  }}
+                >
+                  ₹{price}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
+  const { addToCart, openCart, totalCount: totalCartCount, totalPrice: totalCartAmount } = useCart();
   const [activeCategory, setActiveCategory] = useState('All');
   const [products, setProducts] = useState<CalendarProduct[]>(SIVAKASI_CATALOG);
   
@@ -68,31 +293,20 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
   // Item quantities per product
   const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
-
-  // Cart state
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Cart checkout lead state
-  const [checkoutName, setCheckoutName] = useState('');
-  const [checkoutPhone, setCheckoutPhone] = useState('');
-  const [checkoutNotes, setCheckoutNotes] = useState('');
-  const [checkoutSubmitted, setCheckoutSubmitted] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     const loadProducts = () => {
       getCalendarProducts(activeCategory)
         .then((data) => {
-          setProducts(data);
+          setProducts(deduplicateProducts(data));
         })
         .catch(() => {
           if (activeCategory === 'All') {
-            setProducts(SIVAKASI_CATALOG);
+            setProducts(deduplicateProducts(SIVAKASI_CATALOG));
           } else {
-            setProducts(SIVAKASI_CATALOG.filter(p => p.category === activeCategory));
+            setProducts(deduplicateProducts(SIVAKASI_CATALOG.filter(p => p.category === activeCategory)));
           }
         });
     };
@@ -103,9 +317,9 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
       const customEvent = e as CustomEvent<CalendarProduct[]>;
       if (customEvent.detail && Array.isArray(customEvent.detail)) {
         if (activeCategory === 'All') {
-          setProducts(customEvent.detail);
+          setProducts(deduplicateProducts(customEvent.detail));
         } else {
-          setProducts(customEvent.detail.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase()));
+          setProducts(deduplicateProducts(customEvent.detail.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase())));
         }
       } else {
         loadProducts();
@@ -142,28 +356,16 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
   const handleAddToCart = (item: CalendarProduct) => {
     const itemSizes = (item.sizes && item.sizes.length > 0) ? item.sizes : (PRODUCT_SIZES[item.id] || [item.dimensions || 'Standard Size']);
     const size = selectedSizes[item.id] || itemSizes[0];
-    const sizeUnitPrice = (item.sizePrices && item.sizePrices[size]) || item.startingPrice;
+    const sizeUnitPrice = getProductSizePrice(item, size);
     const qty = Math.max(1, itemQuantities[item.id] || 1);
-    const cartItemId = `${item.id}-${size}`;
 
-    setCart(prevCart => {
-      const existing = prevCart.find(ci => ci.id === cartItemId);
-      if (existing) {
-        return prevCart.map(ci => ci.id === cartItemId ? { ...ci, quantity: ci.quantity + qty } : ci);
-      } else {
-        return [
-          ...prevCart,
-          {
-            id: cartItemId,
-            productId: item.id,
-            name: item.name,
-            size: size,
-            price: sizeUnitPrice,
-            quantity: qty,
-            image: item.mockupImg
-          }
-        ];
-      }
+    addToCart({
+      productId: item.id,
+      name: item.name,
+      size: size,
+      price: sizeUnitPrice,
+      quantity: qty,
+      image: item.mockupImg
     });
 
     // Provide visual feedback
@@ -177,58 +379,6 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
     setTimeout(() => {
       setToastMessage(null);
     }, 3200);
-  };
-
-  const updateQuantity = (cartItemId: string, delta: number) => {
-    setCart(prev => 
-      prev
-        .map(item => {
-          if (item.id === cartItemId) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null)
-    );
-  };
-
-  const removeFromCart = (cartItemId: string) => {
-    setCart(prev => prev.filter(item => item.id !== cartItemId));
-  };
-
-  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalCartAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-  const handleCheckoutSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!checkoutName.trim() || !checkoutPhone.trim()) {
-      alert('Please provide your name and contact phone number.');
-      return;
-    }
-    try {
-      setCheckoutLoading(true);
-      const itemsList = cart.map((c, i) => `${i + 1}. ${c.name} (${c.size}) × ${c.quantity} units @ ₹${c.price} = ₹${c.price * c.quantity}`).join('\n');
-      const orderMessage = `Catalog Cart Order (${totalCartCount} units, Est. Total: ₹${totalCartAmount.toLocaleString()}):\n${itemsList}\nCustomer Notes: ${checkoutNotes || 'None'}`;
-      
-      await sendCustomerMessage(
-        checkoutName,
-        checkoutPhone,
-        orderMessage,
-        {
-          product: cart.map(c => c.name).join(', '),
-          size: cart.map(c => c.size).join(', '),
-          quantity: totalCartCount,
-          notes: `Total: ₹${totalCartAmount}. Notes: ${checkoutNotes}`
-        }
-      );
-      setCheckoutSubmitted(true);
-      setCart([]);
-      setCheckoutLoading(false);
-    } catch {
-      alert('Unable to submit order. Please call our direct helpline.');
-      setCheckoutLoading(false);
-    }
   };
 
   const categoryList = Array.from(new Set(['All', ...CATEGORIES.filter(c => c !== 'All'), ...products.map(p => p.category).filter(Boolean)]));
@@ -267,12 +417,12 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
           {/* Cart Status Pill Button */}
           <button
-            onClick={() => setIsCartOpen(true)}
+            onClick={openCart}
             className="cart-trigger-pill"
             style={{
-              background: totalCartCount > 0 ? 'rgba(215, 134, 0, 0.2)' : 'var(--bg-card)',
-              border: `1px solid ${totalCartCount > 0 ? '#D78600' : 'var(--border-subtle)'}`,
-              color: totalCartCount > 0 ? '#FFD72E' : 'var(--text-secondary)',
+              background: totalCartCount > 0 ? 'rgba(255, 215, 0, 0.14)' : 'var(--bg-card)',
+              border: `1px solid ${totalCartCount > 0 ? '#FFD700' : 'var(--border-subtle)'}`,
+              color: totalCartCount > 0 ? '#FFD700' : 'var(--text-secondary)',
               padding: '10px 20px',
               borderRadius: '30px',
               fontWeight: 700,
@@ -281,7 +431,7 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
               alignItems: 'center',
               gap: '10px',
               cursor: 'pointer',
-              boxShadow: totalCartCount > 0 ? '0 0 16px rgba(215, 134, 0, 0.35)' : 'none',
+              boxShadow: totalCartCount > 0 ? '0 0 16px rgba(255, 215, 0, 0.35)' : 'none',
               transition: 'all 0.2s ease'
             }}
           >
@@ -361,25 +511,18 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
                     </h3>
                   </div>
 
-                  {/* Size Select Dropdown with Frame Price */}
+                  {/* Size Select Dropdown with Frame Price (Strictly bounded to box) */}
                   <div style={{ marginBottom: '16px' }}>
                     <label style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '6px' }}>
                       Select Frame Size & Rate:
                     </label>
-                    <select
-                      value={currentSize}
-                      onChange={(e) => handleSizeChange(item.id, e.target.value)}
-                      className="product-size-select"
-                    >
-                      {sizes.map((s) => {
-                        const sPrice = (item.sizePrices && item.sizePrices[s]) || item.startingPrice;
-                        return (
-                          <option key={s} value={s}>
-                            {s} — ₹{sPrice}
-                          </option>
-                        );
-                      })}
-                    </select>
+                    <SizeSelectDropdown
+                      productId={item.id}
+                      sizes={sizes}
+                      currentSize={currentSize}
+                      item={item}
+                      onSelectSize={handleSizeChange}
+                    />
                   </div>
 
                   {/* Quantity & Add To Cart Row */}
@@ -467,183 +610,6 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
 
       </div>
 
-      {/* Cart Slide-Over Modal Drawer */}
-      {isCartOpen && (
-        <div className="cart-modal-backdrop" onClick={() => setIsCartOpen(false)}>
-          <div className="cart-drawer-panel" onClick={(e) => e.stopPropagation()}>
-            
-            {/* Drawer Header */}
-            <div className="cart-drawer-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '1.4rem' }}>🛒</span>
-                <div>
-                  <h3 style={{ fontSize: '1.2rem', color: '#fff', margin: 0 }}>Your Order Cart</h3>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    {totalCartCount} item(s) selected
-                  </span>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsCartOpen(false)}
-                className="cart-close-btn"
-                aria-label="Close cart"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Drawer Content */}
-            <div className="cart-drawer-body">
-              {cart.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-                  <span style={{ fontSize: '3rem', display: 'block', marginBottom: '14px', opacity: 0.6 }}>🛒</span>
-                  <p style={{ fontSize: '1rem', color: '#fff', marginBottom: '6px' }}>Your cart is empty</p>
-                  <p style={{ fontSize: '0.82rem' }}>Select a size and click "Add to Cart" on any product.</p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {cart.map((item) => (
-                    <div key={item.id} className="cart-item-row">
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-subtle)' }} 
-                      />
-                      <div style={{ flex: 1 }}>
-                        <h4 style={{ fontSize: '0.92rem', color: '#fff', marginBottom: '2px' }}>{item.name}</h4>
-                        <p style={{ fontSize: '0.76rem', color: 'var(--accent-gold-bright)', marginBottom: '6px' }}>
-                          Size: {item.size}
-                        </p>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: '#fff', fontWeight: 700 }}>
-                            ₹{item.price} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>× {item.quantity}</span>
-                          </span>
-
-                          {/* Quantity Controls */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <button 
-                              onClick={() => updateQuantity(item.id, -1)}
-                              className="qty-btn"
-                              title="Decrease quantity"
-                            >
-                              -
-                            </button>
-                            <span style={{ fontSize: '0.85rem', fontWeight: 700, minWidth: '18px', textAlign: 'center' }}>
-                              {item.quantity}
-                            </span>
-                            <button 
-                              onClick={() => updateQuantity(item.id, 1)}
-                              className="qty-btn"
-                              title="Increase quantity"
-                            >
-                              +
-                            </button>
-                            <button 
-                              onClick={() => removeFromCart(item.id)}
-                              className="qty-del-btn"
-                              title="Remove item"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {/* Order Confirmation Screen */}
-              {checkoutSubmitted && (
-                <div style={{ padding: '24px 16px', textAlign: 'center', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '12px', margin: '14px 0' }}>
-                  <span style={{ fontSize: '2.4rem', display: 'block', marginBottom: '8px' }}>✅</span>
-                  <div style={{ fontWeight: 800, color: '#34d399', fontSize: '1.1rem', marginBottom: '6px' }}>Order Submitted to Factory Desk!</div>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', lineHeight: 1.5, marginBottom: '14px' }}>
-                    Thank you! Your cart order has been received at our Sivakasi manufacturing desk. We will call you directly to verify delivery schedule and dieline proofing.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => { setCheckoutSubmitted(false); setIsCartOpen(false); }}
-                    className="btn-gold"
-                    style={{ padding: '8px 18px', fontSize: '0.82rem', cursor: 'pointer' }}
-                  >
-                    Continue Shopping
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Drawer Footer with Actions */}
-            {cart.length > 0 && (
-              <div className="cart-drawer-footer">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <div>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Subtotal (Excl. GST & Cargo):</span>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
-                      ₹{totalCartAmount.toLocaleString()}
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: '20px' }}>
-                    Direct Factory Pricing
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {/* Direct Checkout Form */}
-                  <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-subtle)', padding: '12px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>
-                      ⚡ Direct Factory Order Placement
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Your Full Name *"
-                      value={checkoutName}
-                      onChange={(e) => setCheckoutName(e.target.value)}
-                      style={{ padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', color: '#fff' }}
-                    />
-                    <input
-                      type="tel"
-                      required
-                      placeholder="Contact Phone Number *"
-                      value={checkoutPhone}
-                      onChange={(e) => setCheckoutPhone(e.target.value)}
-                      style={{ padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', color: '#fff' }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Delivery City / Corporate notes (optional)"
-                      value={checkoutNotes}
-                      onChange={(e) => setCheckoutNotes(e.target.value)}
-                      style={{ padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', color: '#fff' }}
-                    />
-                    <button
-                      type="submit"
-                      disabled={checkoutLoading}
-                      className="btn-gold"
-                      style={{ width: '100%', padding: '12px', fontSize: '0.9rem', marginTop: '4px', cursor: 'pointer' }}
-                    >
-                      {checkoutLoading ? 'Submitting Order...' : 'Submit Direct Factory Order →'}
-                    </button>
-                  </form>
-
-                  <button
-                    onClick={() => {
-                      setIsCartOpen(false);
-                      if (onSelectProduct) onSelectProduct(cart[0].name);
-                    }}
-                    className="btn-outline-gold"
-                    style={{ width: '100%', padding: '10px', fontSize: '0.82rem' }}
-                  >
-                    Open Bulk Customizer Calculator →
-                  </button>
-                </div>
-              </div>
-            )}
-
-          </div>
-        </div>
-      )}
-
       {/* Scoped Styles for Clean E-Commerce Display */}
       <style>{`
         /* Clean Product Card */
@@ -689,8 +655,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
           top: 14px;
           left: 14px;
           background: rgba(3, 3, 3, 0.88);
-          border: 1px solid #D78600;
-          color: #FFD72E;
+          border: 1px solid #FFD700;
+          color: #FFD700;
           font-size: 0.7rem;
           font-weight: 700;
           padding: 4px 10px;
@@ -720,8 +686,8 @@ export const ProductCatalog = ({ onSelectProduct }: ProductCatalogProps) => {
         }
 
         .product-size-select:focus {
-          border-color: #D78600;
-          box-shadow: 0 0 0 2px rgba(215, 134, 0, 0.3);
+          border-color: #FFD700;
+          box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.35);
         }
 
         .btn-cart-success {
