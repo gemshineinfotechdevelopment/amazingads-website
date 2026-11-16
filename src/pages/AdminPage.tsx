@@ -911,6 +911,7 @@ export const AdminPage = () => {
       {/* Toast Alert */}
       {toastMessage && (
         <div
+          className="admin-toast"
           style={{
             position: 'fixed',
             top: '24px',
@@ -933,6 +934,14 @@ export const AdminPage = () => {
         </div>
       )}
 
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          className="admin-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* A. WHITE THEME ADMIN SIDEBAR (PERMANENT FIXED NON-SCROLLING) */}
       <aside
         style={{
@@ -952,41 +961,51 @@ export const AdminPage = () => {
         className={sidebarOpen ? 'admin-sidebar open admin-fixed-sidebar' : 'admin-sidebar admin-fixed-sidebar'}
       >
         {/* Brand Header with Dark Blue to Sky Blue Gradient */}
-        <div style={{ padding: '20px 18px', borderBottom: '1px solid #f1f5f9' }}>
+        <div style={{ padding: '16px 14px', borderBottom: '1px solid #f1f5f9' }}>
           <div
             style={{
               background: BLUE_GRADIENT,
-              padding: '16px 18px',
+              padding: '14px 16px',
               borderRadius: '16px',
               color: '#ffffff',
               boxShadow: '0 8px 22px rgba(2, 132, 199, 0.3)'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {factorySettings.logoUrl ? (
-                <img
-                  src={factorySettings.logoUrl}
-                  alt="Logo"
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '12px',
-                    objectFit: 'contain',
-                    background: '#ffffff',
-                    padding: '3px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-                    flexShrink: 0
-                  }}
-                />
-              ) : null}
-              <div style={{ minWidth: 0, overflow: 'hidden' }}>
-                <div style={{ fontWeight: 800, fontSize: '1rem', color: '#ffffff', letterSpacing: '0.02em', lineHeight: 1.2, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {factorySettings.factoryName || 'AMAZING ADS'}
-                </div>
-                <div style={{ fontSize: '0.68rem', color: '#e0f2fe', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700, marginTop: '2px' }}>
-                  Sivakasi Works Admin
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, overflow: 'hidden' }}>
+                {factorySettings.logoUrl ? (
+                  <img
+                    src={factorySettings.logoUrl}
+                    alt="Logo"
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '10px',
+                      objectFit: 'contain',
+                      background: '#ffffff',
+                      padding: '2px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                      flexShrink: 0
+                    }}
+                  />
+                ) : null}
+                <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ fontWeight: 800, fontSize: '0.96rem', color: '#ffffff', letterSpacing: '0.02em', lineHeight: 1.2, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {factorySettings.factoryName || 'AMAZING ADS'}
+                  </div>
+                  <div style={{ fontSize: '0.66rem', color: '#e0f2fe', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700, marginTop: '2px' }}>
+                    Sivakasi Works Admin
+                  </div>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(false)}
+                className="admin-sidebar-close-btn"
+                aria-label="Close sidebar"
+              >
+                ✕
+              </button>
             </div>
           </div>
         </div>
@@ -999,7 +1018,7 @@ export const AdminPage = () => {
 
           {/* 1. CUSTOMER INQUIRIES */}
           <button
-            onClick={() => setActiveTab('messages')}
+            onClick={() => { setActiveTab('messages'); setSidebarOpen(false); }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1033,7 +1052,7 @@ export const AdminPage = () => {
 
           {/* 2. PRODUCTS & CATALOG */}
           <button
-            onClick={() => setActiveTab('catalog')}
+            onClick={() => { setActiveTab('catalog'); setSidebarOpen(false); }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1063,7 +1082,7 @@ export const AdminPage = () => {
 
           {/* 3. BULK PRICE & SIZE MATRIX */}
           <button
-            onClick={() => setActiveTab('matrix')}
+            onClick={() => { setActiveTab('matrix'); setSidebarOpen(false); }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1091,10 +1110,9 @@ export const AdminPage = () => {
             </span>
           </button>
 
-
-          {/* 5. QUOTES & LEADS */}
+          {/* 4. QUOTES & LEADS */}
           <button
-            onClick={() => setActiveTab('quotes')}
+            onClick={() => { setActiveTab('quotes'); setSidebarOpen(false); }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1122,9 +1140,9 @@ export const AdminPage = () => {
             </span>
           </button>
 
-          {/* 6. COMPANY SETTINGS & CONTACT */}
+          {/* 5. COMPANY SETTINGS & CONTACT */}
           <button
-            onClick={() => setActiveTab('settings')}
+            onClick={() => { setActiveTab('settings'); setSidebarOpen(false); }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1171,7 +1189,7 @@ export const AdminPage = () => {
             </div>
 
             <button
-              onClick={handleLogout}
+              onClick={() => { handleLogout(); setSidebarOpen(false); }}
               style={{
                 background: '#fee2e2',
                 border: '1px solid #fecaca',
@@ -1189,7 +1207,7 @@ export const AdminPage = () => {
           </div>
 
           <button
-            onClick={() => navigate('home')}
+            onClick={() => { navigate('home'); setSidebarOpen(false); }}
             style={{
               width: '100%',
               background: '#ffffff',
@@ -1217,6 +1235,7 @@ export const AdminPage = () => {
         
         {/* Top Header */}
         <header
+          className="admin-top-header"
           style={{
             height: '70px',
             background: '#ffffff',
@@ -1230,7 +1249,7 @@ export const AdminPage = () => {
             boxShadow: '0 2px 12px rgba(2, 132, 199, 0.04)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="admin-mobile-toggle"
@@ -1241,69 +1260,119 @@ export const AdminPage = () => {
                 padding: '6px 10px',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontSize: '1rem',
+                fontSize: '1.05rem',
                 color: '#0284c7'
               }}
               aria-label="Toggle admin sidebar"
             >
               ☰
             </button>
-            <div>
-              <div style={{ fontSize: '0.72rem', color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800 }}>
-                Admin Portal / {activeTab === 'messages' ? 'Customer Inquiries' : activeTab === 'catalog' ? 'Products & Catalog' : activeTab === 'matrix' ? 'Price & Size Matrix' : activeTab === 'quotes' ? 'Quotes & Online Estimates' : 'Settings & Contact Details'}
+            <div style={{ minWidth: 0 }}>
+              <div className="admin-top-breadcrumb" style={{ fontSize: '0.72rem', color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800 }}>
+                Admin / {activeTab === 'messages' ? 'Inquiries' : activeTab === 'catalog' ? 'Catalog' : activeTab === 'matrix' ? 'Matrix' : activeTab === 'quotes' ? 'Quotes' : 'Settings'}
               </div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif" }}>
-                {activeTab === 'messages' && 'Customer Inquiries & Form Submissions'}
-                {activeTab === 'catalog' && 'Product Specifications & Catalog Management'}
-                {activeTab === 'matrix' && 'Quick Price & Size Bulk Matrix'}
+              <h2 className="admin-top-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {activeTab === 'messages' && 'Customer Inquiries'}
+                {activeTab === 'catalog' && 'Product Catalog'}
+                {activeTab === 'matrix' && 'Quick Price & Size Matrix'}
                 {activeTab === 'quotes' && 'Quotes & Online Estimates'}
-                {activeTab === 'settings' && 'Company Settings, Logo & Contact Details'}
+                {activeTab === 'settings' && 'Company Settings'}
               </h2>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              onClick={handleResetCatalog}
-              style={{
-                background: '#fee2e2',
-                border: '1px solid #fecaca',
-                color: '#dc2626',
-                padding: '8px 14px',
-                borderRadius: '20px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              ↺ Reset Defaults
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {activeTab === 'catalog' && (
+              <button
+                onClick={handleResetCatalog}
+                style={{
+                  background: '#fee2e2',
+                  border: '1px solid #fecaca',
+                  color: '#dc2626',
+                  padding: '7px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+                title="Reset to factory catalog defaults"
+              >
+                <span className="hide-mobile">↺ Reset Defaults</span>
+                <span className="show-mobile">↺</span>
+              </button>
+            )}
 
-            <button
-              onClick={handleOpenCreate}
-              style={{
-                background: BLUE_GRADIENT,
-                border: 'none',
-                color: '#ffffff',
-                padding: '9px 20px',
-                borderRadius: '20px',
-                fontSize: '0.84rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)'
-              }}
-            >
-              + Add Product
-            </button>
+            {activeTab === 'catalog' && (
+              <button
+                onClick={handleOpenCreate}
+                style={{
+                  background: BLUE_GRADIENT,
+                  border: 'none',
+                  color: '#ffffff',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <span className="hide-mobile">+ Add Product</span>
+                <span className="show-mobile">+ Add</span>
+              </button>
+            )}
+
+            {activeTab === 'matrix' && (
+              <button
+                onClick={handleSaveAllMatrix}
+                style={{
+                  background: BLUE_GRADIENT,
+                  border: 'none',
+                  color: '#ffffff',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <span className="hide-mobile">💾 Save Matrix</span>
+                <span className="show-mobile">💾 Save</span>
+              </button>
+            )}
+
+            {activeTab === 'settings' && (
+              <button
+                onClick={handleSaveAllSettings}
+                style={{
+                  background: BLUE_GRADIENT,
+                  border: 'none',
+                  color: '#ffffff',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <span className="hide-mobile">💾 Save Settings</span>
+                <span className="show-mobile">💾 Save</span>
+              </button>
+            )}
           </div>
         </header>
 
         {/* Dashboard Main Content */}
-        <main style={{ padding: '26px 28px', flex: 1, height: 'calc(100vh - 70px)', overflowY: 'auto', background: '#f8fafc' }}>
+        <main className="admin-main-content" style={{ padding: '26px 28px', flex: 1, height: 'calc(100vh - 70px)', overflowY: 'auto', background: '#f8fafc' }}>
 
           {/* TAB 1: CUSTOMER INQUIRIES & FORM SUBMISSIONS */}
           {activeTab === 'messages' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+            <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-sans)' }}>
@@ -1507,6 +1576,7 @@ export const AdminPage = () => {
           {activeTab === 'catalog' && (
             <div>
               <div
+                className="admin-card"
                 style={{
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
@@ -1543,11 +1613,12 @@ export const AdminPage = () => {
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <div className="admin-category-chips" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {categories.map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
+                      className="admin-category-chip"
                       style={{
                         padding: '6px 14px',
                         borderRadius: '20px',
@@ -1570,7 +1641,7 @@ export const AdminPage = () => {
                   Loading catalog products...
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '22px' }}>
+                <div className="admin-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
                   {filteredProducts.map((p) => {
                     const displaySizes = p.sizes && p.sizes.length > 0 ? p.sizes : [p.dimensions || 'Standard'];
 
@@ -1716,7 +1787,7 @@ export const AdminPage = () => {
 
           {/* TAB 3: BULK PRICE & FRAME SIZE MATRIX */}
           {activeTab === 'matrix' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
+            <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
@@ -1744,7 +1815,11 @@ export const AdminPage = () => {
                 </button>
               </div>
 
-              <div style={{ overflowX: 'auto' }}>
+              <div className="show-mobile" style={{ fontSize: '0.74rem', color: '#0284c7', fontWeight: 600, margin: '0 0 10px', padding: '6px 10px', background: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                👉 Scroll horizontally to view & edit all sizes and rates
+              </div>
+
+              <div className="admin-table-container" style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
@@ -1943,10 +2018,11 @@ export const AdminPage = () => {
           {activeTab === 'quotes' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {/* Sub-navigation Pills */}
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', background: '#ffffff', padding: '12px 16px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+              <div className="admin-category-chips" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', background: '#ffffff', padding: '10px 14px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
                 <button
                   type="button"
                   onClick={() => setLeadsSubTab('quotes')}
+                  className="admin-category-chip"
                   style={{
                     padding: '8px 16px',
                     borderRadius: '10px',
@@ -1965,6 +2041,7 @@ export const AdminPage = () => {
                 <button
                   type="button"
                   onClick={() => setLeadsSubTab('inquiries')}
+                  className="admin-category-chip"
                   style={{
                     padding: '8px 16px',
                     borderRadius: '10px',
@@ -1983,6 +2060,7 @@ export const AdminPage = () => {
                 <button
                   type="button"
                   onClick={() => setLeadsSubTab('sampleKits')}
+                  className="admin-category-chip"
                   style={{
                     padding: '8px 16px',
                     borderRadius: '10px',
@@ -2002,7 +2080,7 @@ export const AdminPage = () => {
 
               {/* Sub-view 1: Online Quotes */}
               {leadsSubTab === 'quotes' && (
-                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
                       Online Quotes & Estimation Requests
@@ -2014,7 +2092,7 @@ export const AdminPage = () => {
                       🔄 Refresh
                     </button>
                   </div>
-                  <div style={{ overflowX: 'auto' }}>
+                  <div className="admin-table-container" style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                       <thead>
                         <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
@@ -2056,7 +2134,7 @@ export const AdminPage = () => {
 
               {/* Sub-view 2: Corporate & Contact Inquiries */}
               {leadsSubTab === 'inquiries' && (
-                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
                       Corporate Bulk & Contact Inquiries ({inquiriesList.length})
@@ -2076,7 +2154,7 @@ export const AdminPage = () => {
                       <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Corporate leads from /corporate and /contact will appear here automatically.</p>
                     </div>
                   ) : (
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="admin-table-container" style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                         <thead>
                           <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
@@ -2151,7 +2229,7 @@ export const AdminPage = () => {
 
               {/* Sub-view 3: Master Swatch Kits */}
               {leadsSubTab === 'sampleKits' && (
-                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
                       Master Swatch Kit Dispatches ({sampleKitsList.length})
@@ -2171,7 +2249,7 @@ export const AdminPage = () => {
                       <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Requests from the 'Request Free Swatch Kit' modal will appear here with delivery details.</p>
                     </div>
                   ) : (
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="admin-table-container" style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                         <thead>
                           <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
@@ -2238,6 +2316,7 @@ export const AdminPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
               {/* Header Action Card */}
               <div
+                className="admin-card"
                 style={{
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
@@ -2300,6 +2379,7 @@ export const AdminPage = () => {
               <form onSubmit={handleSaveAllSettings}>
                 {/* 1. BRAND LOGO MANAGER */}
                 <div
+                  className="admin-card"
                   style={{
                     background: '#ffffff',
                     border: '1px solid #e2e8f0',
@@ -2445,6 +2525,7 @@ export const AdminPage = () => {
 
                 {/* 2. COMPANY PROFILE & BUSINESS DETAILS */}
                 <div
+                  className="admin-card"
                   style={{
                     background: '#ffffff',
                     border: '1px solid #e2e8f0',
@@ -2572,6 +2653,7 @@ export const AdminPage = () => {
 
                 {/* 3. CONTACT DETAILS & CUSTOMER HOTLINES */}
                 <div
+                  className="admin-card"
                   style={{
                     background: '#ffffff',
                     border: '1px solid #e2e8f0',
@@ -2728,6 +2810,7 @@ export const AdminPage = () => {
 
                 {/* 4. TURNAROUND & LOGISTICS */}
                 <div
+                  className="admin-card"
                   style={{
                     background: '#ffffff',
                     border: '1px solid #e2e8f0',
@@ -2852,9 +2935,63 @@ export const AdminPage = () => {
         </main>
       </div>
 
+      {/* Native Mobile Bottom Navigation Bar */}
+      <nav className="admin-bottom-nav">
+        <button
+          type="button"
+          onClick={() => { setActiveTab('messages'); }}
+          className={`admin-bottom-nav-item ${activeTab === 'messages' ? 'active' : ''}`}
+        >
+          <span className="admin-bnav-icon">
+            💬
+            {unreadMessagesCount > 0 && (
+              <span className="admin-bnav-badge">{unreadMessagesCount}</span>
+            )}
+          </span>
+          <span className="admin-bnav-label">Inquiries</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { setActiveTab('catalog'); }}
+          className={`admin-bottom-nav-item ${activeTab === 'catalog' ? 'active' : ''}`}
+        >
+          <span className="admin-bnav-icon">📦</span>
+          <span className="admin-bnav-label">Catalog</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { setActiveTab('matrix'); }}
+          className={`admin-bottom-nav-item ${activeTab === 'matrix' ? 'active' : ''}`}
+        >
+          <span className="admin-bnav-icon">⚡</span>
+          <span className="admin-bnav-label">Matrix</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { setActiveTab('quotes'); }}
+          className={`admin-bottom-nav-item ${activeTab === 'quotes' ? 'active' : ''}`}
+        >
+          <span className="admin-bnav-icon">📋</span>
+          <span className="admin-bnav-label">Quotes</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { setActiveTab('settings'); }}
+          className={`admin-bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+        >
+          <span className="admin-bnav-icon">⚙️</span>
+          <span className="admin-bnav-label">Settings</span>
+        </button>
+      </nav>
+
       {/* C. EDIT / CREATE PRODUCT MODAL (WITH IMAGE UPLOAD & NO SPINNERS) */}
       {isModalOpen && (
         <div
+          className="admin-modal-overlay"
           style={{
             position: 'fixed',
             inset: 0,
@@ -3057,7 +3194,7 @@ export const AdminPage = () => {
                     }}
                     placeholder="Size name (e.g. 15 × 20 in)"
                     style={{
-                      flex: '1 1 200px',
+                      flex: '1 1 140px',
                       background: '#ffffff',
                       border: '1px solid #7dd3fc',
                       borderRadius: '8px',
