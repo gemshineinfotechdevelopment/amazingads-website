@@ -387,17 +387,30 @@ export const AdminPage = () => {
 
   const handleAddSize = (sizeToAdd?: string, priceToAdd?: number) => {
     const size = (sizeToAdd || newSizeInput).trim();
-    if (!size) return;
-    if (formData.sizes && formData.sizes.includes(size)) {
-      showToast('This size is already in the list', 'info');
+    if (!size) {
+      showToast('Please type a frame size name (e.g. 10 × 15 in) to add', 'info');
       return;
     }
-    const cleanRateStr = newSizePriceInput.replace(/\D/g, '');
+    const normalizedSize = size.toLowerCase();
+    const existing = (formData.sizes || []).find(s => s.toLowerCase() === normalizedSize);
+    if (existing) {
+      showToast(`Size "${size}" is already added in the list`, 'info');
+      return;
+    }
+    const cleanRateStr = newSizePriceInput ? newSizePriceInput.replace(/\D/g, '') : '';
     const cleanRate = cleanRateStr ? Number(cleanRateStr) : 0;
     const price = priceToAdd || (cleanRate > 0 ? cleanRate : (formData.startingPrice || 125));
     const updatedSizes = [...(formData.sizes || []), size];
     const updatedSizePrices = { ...(formData.sizePrices || {}), [size]: price };
-    setFormData({ ...formData, sizes: updatedSizes, sizePrices: updatedSizePrices });
+    
+    setFormData(prev => ({
+      ...prev,
+      sizes: updatedSizes,
+      sizePrices: updatedSizePrices
+    }));
+
+    showToast(`✓ Added frame size "${size}" at ₹${price}!`, 'success');
+
     if (!sizeToAdd) {
       setNewSizeInput('');
       setNewSizePriceInput('');
@@ -3180,7 +3193,7 @@ export const AdminPage = () => {
                   })}
                 </div>
 
-                {/* Add New Frame Size with Specific Price (NO PRESETS) */}
+                {/* Add New Frame Size with Specific Price */}
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <input
                     type="text"
@@ -3213,6 +3226,12 @@ export const AdminPage = () => {
                       className="no-spinners"
                       value={newSizePriceInput}
                       onChange={(e) => setNewSizePriceInput(e.target.value.replace(/\D/g, ''))}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddSize();
+                        }
+                      }}
                       placeholder="Rate"
                       style={{
                         width: '100%',
@@ -3231,7 +3250,11 @@ export const AdminPage = () => {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleAddSize()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAddSize();
+                    }}
                     style={{
                       background: BLUE_GRADIENT,
                       border: 'none',
@@ -3245,6 +3268,33 @@ export const AdminPage = () => {
                   >
                     + Add Size & Price
                   </button>
+                </div>
+
+                {/* Quick Frame Size Preset Shortcuts */}
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#0369a1', fontWeight: 700 }}>Quick suggestions:</span>
+                  {['10 × 15 in', '12 × 18 in', '14 × 20 in', '15 × 20 in', '17 × 27 in', '18 × 24 in', 'Custom Shape'].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNewSizeInput(preset);
+                      }}
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #bae6fd',
+                        color: '#0284c7',
+                        fontSize: '0.72rem',
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 700
+                      }}
+                    >
+                      + {preset}
+                    </button>
+                  ))}
                 </div>
               </div>
 
