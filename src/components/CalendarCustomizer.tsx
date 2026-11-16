@@ -231,9 +231,7 @@ export const CalendarCustomizer = () => {
   const [company, setCompany] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [clientNotes, setClientNotes] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const selectedFormatObj = FORMAT_OPTIONS.find(f => f.id === format) || FORMAT_OPTIONS[0];
@@ -297,65 +295,6 @@ export const CalendarCustomizer = () => {
       isMounted = false;
     };
   }, [format, selectedSize, frameUnitPrice, finish, quantity, selectedFormatObj.fullName, selectedFormatObj.productId, currentSizeObj.size]);
-
-  const handleDirectOrderSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!clientName.trim() || !clientPhone.trim()) {
-      alert('Please provide your name and contact phone number.');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const leadMessage = `Customizer Direct Inquiry:
-• Product: ${selectedFormatObj.fullName}
-• Frame Size: ${currentSizeObj.size} (Base Rate: ₹${frameUnitPrice}/unit)
-• Selected Finish: ${finish}
-• Order Volume: ${quantity} units
-• Estimated Unit Rate: ₹${quote ? quote.unitPrice : frameUnitPrice}/unit
-• Estimated Total: ₹${quote ? quote.subtotal.toLocaleString() : (frameUnitPrice * quantity).toLocaleString()}
-• Client: ${clientName} (${company || 'Individual/Trader'})
-• Phone: ${clientPhone}
-• Email: ${clientEmail || 'N/A'}
-• Branding / Notes: ${clientNotes || 'Standard'}`;
-
-      await sendCustomerMessage(
-        clientName,
-        clientPhone,
-        leadMessage,
-        {
-          email: clientEmail,
-          product: selectedFormatObj.fullName,
-          size: currentSizeObj.size,
-          quantity,
-          notes: `Total: ₹${quote?.subtotal || 0}. ${clientNotes}`
-        }
-      );
-
-      // Register official quote with backend
-      const res = await calculateQuote({
-        productId: selectedFormatObj.productId,
-        format: selectedFormatObj.fullName,
-        size: currentSizeObj.size,
-        customUnitPrice: frameUnitPrice,
-        finish,
-        binding: 'Standard Mount',
-        paperGsm: '400 GSM Rigid Board',
-        quantity,
-        clientName,
-        company,
-        clientEmail,
-        clientPhone,
-        notes: clientNotes
-      });
-      setQuote(res);
-      setSubmitSuccess(true);
-      setSubmitting(false);
-    } catch {
-      alert('Unable to submit inquiry. Please call our direct helpline.');
-      setSubmitting(false);
-    }
-  };
 
   const handleFinalSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -458,32 +397,25 @@ export const CalendarCustomizer = () => {
           
           {/* Left Column: Clean Unified Specs & Quantity */}
           <div className="specs-unified-panel">
-            <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="step-badge">2</span> Configure Specifications & Quantity
-            </h3>
-
-            {/* Selected Product Banner */}
-            <div className="active-format-banner">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <span style={{ fontSize: '2rem' }}>{selectedFormatObj.icon}</span>
-                <div>
-                  <div style={{ fontSize: '1.08rem', fontWeight: 700, color: '#fff' }}>
-                    {selectedFormatObj.fullName}
-                  </div>
-                  <div className="gold-gradient-text" style={{ fontSize: '0.8rem', fontWeight: 700, marginTop: '2px' }}>
-                    {selectedFormatObj.tag} • Base Dimensions: {selectedFormatObj.size}
-                  </div>
-                </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '10px' }}>
+              <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span className="step-badge">2</span> Configure Specifications & Quantity
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(215, 134, 0, 0.1)', border: '1px solid var(--border-gold)', borderRadius: '20px', padding: '4px 12px' }}>
+                <span style={{ fontSize: '1.1rem' }}>{selectedFormatObj.icon}</span>
+                <span style={{ fontSize: '0.84rem', color: 'var(--accent-gold-bright)', fontWeight: 700 }}>
+                  {selectedFormatObj.label}
+                </span>
               </div>
             </div>
 
-            {/* Specifications Form Grid: Simplified, Frame Size Wise */}
+            {/* Specifications Form Grid */}
             <div className="specs-form-grid">
               
               {/* 1. FRAME SIZE SELECTION WITH SIZE-SPECIFIC PRICING */}
               <div className="spec-form-group">
                 <label className="spec-label">
-                  <span>Frame Dimensions & Frame-Specific Rate</span>
+                  <span>Frame Dimensions & Press Rate</span>
                   <span className="spec-tag gold-gradient-text" style={{ fontWeight: 700 }}>Frame Size</span>
                 </label>
                 <div className="customizer-sizes-grid">
@@ -506,15 +438,12 @@ export const CalendarCustomizer = () => {
                     );
                   })}
                 </div>
-                <p className="spec-hint" style={{ marginTop: '8px' }}>
-                  Wholesale rate automatically updates based on selected frame size.
-                </p>
               </div>
 
               {/* 2. FRAME STYLE & DELUXE FINISH */}
               <div className="spec-form-group">
                 <label className="spec-label">
-                  <span>Frame Border & Deluxe Finish</span>
+                  <span>Border Style & Deluxe Finish</span>
                   <span className="spec-tag">Embellishment</span>
                 </label>
                 <select
@@ -528,16 +457,18 @@ export const CalendarCustomizer = () => {
                     </option>
                   ))}
                 </select>
-                <p className="spec-hint">{selectedFinishObj?.desc}</p>
+                {selectedFinishObj?.desc && (
+                  <p className="spec-hint">{selectedFinishObj.desc}</p>
+                )}
               </div>
             </div>
 
             {/* Quantity & Bulk Discount Section */}
             <div className="quantity-section-box">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <span style={{ fontSize: '0.94rem', color: '#fff', fontWeight: 600 }}>Order Volume</span>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block' }}>Direct factory wholesale price tiers applied</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block' }}>Direct factory wholesale rates</span>
                 </div>
                 
                 {/* Quantity Stepper */}
@@ -570,158 +501,35 @@ export const CalendarCustomizer = () => {
                 </div>
               </div>
 
-              {/* Quick Preset Volume Pills */}
+              {/* Quick Preset Volume Pills with Embedded Wholesale Discount */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginRight: '4px' }}>Preset Volumes:</span>
-                {[100, 250, 500, 1000, 2500, 5000].map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => setQuantity(q)}
-                    className={`qty-preset-pill ${quantity === q ? 'active' : ''}`}
-                  >
-                    {q.toLocaleString()}
-                  </button>
-                ))}
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginRight: '4px' }}>Standard Batches:</span>
+                {[100, 250, 500, 1000, 2500, 5000].map((q) => {
+                  const matchingTier = discounts?.filter(d => q >= d.minQty).sort((a, b) => b.minQty - a.minQty)[0];
+                  return (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => setQuantity(q)}
+                      className={`qty-preset-pill ${quantity === q ? 'active' : ''}`}
+                    >
+                      <span>{q.toLocaleString()} pcs</span>
+                      {matchingTier && matchingTier.discountPercentage > 0 && (
+                        <span style={{ fontSize: '0.7rem', marginLeft: '5px', opacity: 0.85, fontWeight: 700 }}>
+                          -{matchingTier.discountPercentage}%
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* Active Wholesale Tier Badges from Admin */}
-              {discounts && discounts.length > 0 && (
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
-                  {discounts.map((t) => (
-                    <span
-                      key={t.id}
-                      style={{
-                        fontSize: '0.72rem',
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        background: quantity >= t.minQty ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                        border: `1px solid ${quantity >= t.minQty ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
-                        color: quantity >= t.minQty ? '#4ade80' : 'var(--text-muted)'
-                      }}
-                    >
-                      {t.minQty}+ pcs: {t.discountPercentage}% OFF
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Discount Callout */}
+              {/* Clean, Elegant Discount Callout */}
               {quote && quote.discountPercentage > 0 && (
-                <div className="bulk-tier-banner">
-                  <span>🎉 <strong>{quote.discountPercentage}% Wholesale Tier Discount Applied!</strong></span>
+                <div className="bulk-tier-banner" style={{ marginTop: '16px' }}>
+                  <span>🎉 <strong>{quote.discountPercentage}% Wholesale Volume Discount Applied!</strong></span>
                   <span className="savings-highlight">You save ₹{quote.totalSavings.toLocaleString()}</span>
                 </div>
-              )}
-            </div>
-
-            {/* Direct Factory Inquiry Form inside Customizer */}
-            <div className="customizer-direct-inquiry-box" style={{ marginTop: '24px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-                <div>
-                  <h4 style={{ fontSize: '1.05rem', color: '#fff', fontWeight: 700, margin: 0 }}>
-                    Direct Factory Order & Proof Request
-                  </h4>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                    Submit your details. This inquiry logs directly into our Sivakasi admin works queue.
-                  </p>
-                </div>
-                <span className="foil-badge" style={{ fontSize: '0.7rem' }}>DIRECT WORKS LEAD</span>
-              </div>
-
-              {submitSuccess ? (
-                <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '8px', padding: '18px', textAlign: 'center' }}>
-                  <span style={{ fontSize: '2rem' }}>✅</span>
-                  <div style={{ color: '#34d399', fontWeight: 800, fontSize: '1.05rem', marginTop: '6px' }}>
-                    Inquiry Submitted to Sivakasi Works Desk!
-                  </div>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', marginTop: '4px' }}>
-                    Thank you, {clientName}! Ref: <strong>{quote?.quoteId || 'AA-INQ'}</strong>. Our factory manager will call you at <strong>{clientPhone}</strong> to confirm delivery and corporate branding.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSubmitSuccess(false)}
-                    className="btn-outline-gold"
-                    style={{ marginTop: '10px', padding: '6px 14px', fontSize: '0.8rem' }}
-                  >
-                    Configure Another Specification
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleDirectOrderSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Your Name *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Ramesh Kumar"
-                        value={clientName}
-                        onChange={(e) => setClientName(e.target.value)}
-                        className="form-input"
-                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Phone Number *</label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="+91 98765 43210"
-                        value={clientPhone}
-                        onChange={(e) => setClientPhone(e.target.value)}
-                        className="form-input"
-                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Email Address</label>
-                      <input
-                        type="email"
-                        placeholder="corporate@company.com"
-                        value={clientEmail}
-                        onChange={(e) => setClientEmail(e.target.value)}
-                        className="form-input"
-                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Company / Temple Name (Optional)</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Sri Krishna Enterprises"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
-                        className="form-input"
-                        style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Branding / Crest Header Notes (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Print company logo and branch addresses on header"
-                      value={clientNotes}
-                      onChange={(e) => setClientNotes(e.target.value)}
-                      className="form-input"
-                      style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="btn-gold"
-                    style={{ width: '100%', padding: '13px', fontSize: '0.92rem', marginTop: '4px', cursor: 'pointer' }}
-                  >
-                    {submitting ? 'Submitting to Factory Desk...' : '⚡ Submit Order Inquiry to Sivakasi Works'}
-                  </button>
-                </form>
               )}
             </div>
           </div>
@@ -797,6 +605,32 @@ export const CalendarCustomizer = () => {
                 >
                   📄 Request Official PDF Proposal & Proof
                 </button>
+
+                {/* WhatsApp Quick Order Inquiry */}
+                <a
+                  href={`https://wa.me/919443152599?text=${encodeURIComponent(
+                    `Hello Amazing Ads! I have configured a wholesale order:\n• Product: ${selectedFormatObj.fullName}\n• Frame Size: ${currentSizeObj.size}\n• Finish: ${finish}\n• Quantity: ${quantity} units\n• Estimated Total: ₹${quote ? quote.subtotal.toLocaleString() : (frameUnitPrice * quantity).toLocaleString()}\n\nPlease share dispatch timeline and artwork template.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-outline-gold"
+                  style={{
+                    width: '100%',
+                    padding: '11px',
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    textDecoration: 'none',
+                    borderColor: 'rgba(37, 211, 102, 0.6)',
+                    color: '#25D366',
+                    borderRadius: 'var(--radius-sm)'
+                  }}
+                >
+                  <span>💬</span> WhatsApp Instant Inquiry
+                </a>
               </div>
 
               <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '14px', lineHeight: 1.4 }}>
