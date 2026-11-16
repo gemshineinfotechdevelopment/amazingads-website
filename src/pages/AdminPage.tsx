@@ -17,6 +17,7 @@ import {
   fetchQuotes,
   fetchInquiries,
   fetchSampleKits,
+  uploadImageToCloudinary,
   DEFAULT_DISCOUNT_TIERS,
   DEFAULT_FACTORY_SETTINGS,
   type CalendarProduct,
@@ -350,7 +351,7 @@ export const AdminPage = () => {
     setUploadedFileName(null);
   };
 
-  // Device Image File Upload Handler with Auto Canvas Compression
+  // Device Image File Upload Handler with Auto Canvas Compression & Cloudinary Sync
   const handleImageFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -358,8 +359,16 @@ export const AdminPage = () => {
       try {
         const compressedBase64 = await compressImageFile(file, 900, 0.82);
         if (compressedBase64) {
-          setFormData(prev => ({ ...prev, mockupImg: compressedBase64 }));
-          showToast(`Image "${file.name}" optimized and loaded successfully!`);
+          // Attempt Cloudinary upload via backend
+          const uploadRes = await uploadImageToCloudinary(compressedBase64, 'amazingads/products');
+          if (uploadRes.success && uploadRes.url) {
+            setFormData(prev => ({ ...prev, mockupImg: uploadRes.url! }));
+            showToast(`Image "${file.name}" uploaded to Cloudinary successfully!`);
+          } else {
+            // Fallback to local compressed base64 if Cloudinary is not configured yet
+            setFormData(prev => ({ ...prev, mockupImg: compressedBase64 }));
+            showToast(`Image "${file.name}" loaded successfully!`);
+          }
         }
       } catch {
         showToast('Failed to process image file', 'error');
@@ -593,8 +602,14 @@ export const AdminPage = () => {
       try {
         const compressedLogo = await compressImageFile(file, 500, 0.9);
         if (compressedLogo) {
-          setFactorySettings(prev => ({ ...prev, logoUrl: compressedLogo }));
-          showToast(`Logo "${file.name}" uploaded successfully! Click "Save Settings" to apply.`);
+          const uploadRes = await uploadImageToCloudinary(compressedLogo, 'amazingads/branding');
+          if (uploadRes.success && uploadRes.url) {
+            setFactorySettings(prev => ({ ...prev, logoUrl: uploadRes.url! }));
+            showToast(`Logo "${file.name}" uploaded to Cloudinary! Click "Save Settings" to apply.`);
+          } else {
+            setFactorySettings(prev => ({ ...prev, logoUrl: compressedLogo }));
+            showToast(`Logo "${file.name}" loaded successfully! Click "Save Settings" to apply.`);
+          }
         }
       } catch {
         showToast('Failed to process logo file', 'error');

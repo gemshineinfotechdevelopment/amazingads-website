@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { Quote } from '../models/Quote.js';
 import { SampleKit } from '../models/SampleKit.js';
 import { Inquiry } from '../models/Inquiry.js';
+import cloudinary, { isCloudinaryConfigured } from '../config/cloudinary.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1334,6 +1335,61 @@ router.get('/dielines', (req, res) => {
       }
     ]
   });
+});
+
+// ==========================================
+// Cloudinary Media Upload Endpoints
+// ==========================================
+
+// Check Cloudinary Status
+router.get('/upload/status', (req, res) => {
+  res.json({
+    configured: isCloudinaryConfigured(),
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || null
+  });
+});
+
+// Upload image to Cloudinary (accepts base64 or remote image URL)
+router.post('/upload', async (req, res) => {
+  try {
+    const { image, folder = 'amazingads/products' } = req.body;
+    if (!image) {
+      return res.status(400).json({ success: false, message: 'No image data provided' });
+    }
+
+    if (!isCloudinaryConfigured()) {
+      return res.status(503).json({
+        success: false,
+        configured: false,
+        message: 'Cloudinary environment variables not configured. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in server/.env'
+      });
+    }
+
+    const uploadResponse = await cloudinary.uploader.upload(image, {
+      folder,
+      resource_type: 'auto',
+      transformation: [
+        { quality: 'auto:good' },
+        { fetch_format: 'auto' }
+      ]
+    });
+
+    return res.json({
+      success: true,
+      url: uploadResponse.secure_url,
+      publicId: uploadResponse.public_id,
+      format: uploadResponse.format,
+      width: uploadResponse.width,
+      height: uploadResponse.height
+    });
+  } catch (error) {
+    console.error('[Cloudinary Upload Error]', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to upload image to Cloudinary',
+      error: error.message
+    });
+  }
 });
 
 export default router;

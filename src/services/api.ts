@@ -1181,6 +1181,32 @@ export async function fetchDielines(): Promise<DielineSpec[]> {
   ];
 }
 
+// 12. Cloudinary Media Upload Helper
+export interface CloudinaryUploadResponse {
+  success: boolean;
+  url?: string;
+  publicId?: string;
+  message?: string;
+  configured?: boolean;
+}
+
+export async function uploadImageToCloudinary(image: string, folder = 'amazingads/products'): Promise<CloudinaryUploadResponse> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image, folder })
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    return {
+      success: false,
+      message: (error as Error).message || 'Failed to connect to upload server'
+    };
+  }
+}
+
 // 10. Real-time Multi-Tab Synchronizer
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
