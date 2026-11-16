@@ -442,12 +442,13 @@ export const AdminPage = () => {
       sanitizedSizePrices[s] = (parsed && parsed > 0) ? parsed : (formData.startingPrice || 125);
     });
 
+    const allPrices = Object.values(sanitizedSizePrices);
+    const minStartingPrice = allPrices.length > 0 ? Math.min(...allPrices) : (formData.startingPrice || 125);
     const firstSize = formData.sizes[0];
-    const computedPrice = (firstSize && sanitizedSizePrices[firstSize]) ? sanitizedSizePrices[firstSize] : (formData.startingPrice || 125);
     
     const payloadToSave: CalendarProduct = {
       ...formData,
-      startingPrice: computedPrice,
+      startingPrice: minStartingPrice,
       sizePrices: sanitizedSizePrices,
       category: formData.category.trim(),
       tag: formData.category.trim() || 'Wholesale',
@@ -1573,6 +1574,19 @@ export const AdminPage = () => {
                   {filteredProducts.map((p) => {
                     const displaySizes = p.sizes && p.sizes.length > 0 ? p.sizes : [p.dimensions || 'Standard'];
 
+                    const sizeEntries = displaySizes.map((s) => {
+                      const customPrice = p.sizePrices?.[s];
+                      const resolvedPrice = (customPrice !== undefined && Number(customPrice) > 0)
+                        ? Number(customPrice)
+                        : (p.startingPrice || 125);
+                      return { size: s, price: resolvedPrice };
+                    });
+
+                    const rates = sizeEntries.map(e => e.price);
+                    const minRate = Math.min(...rates);
+                    const maxRate = Math.max(...rates);
+                    const priceLabel = minRate === maxRate ? `₹${minRate}` : `₹${minRate} – ₹${maxRate}`;
+
                     return (
                       <div
                         key={p.id}
@@ -1596,8 +1610,9 @@ export const AdminPage = () => {
                           <div style={{ position: 'absolute', top: '10px', left: '10px', background: '#1e3a8a', color: '#ffffff', padding: '3px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 800 }}>
                             {p.category}
                           </div>
-                          <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: '#ffffff', padding: '4px 12px', borderRadius: '16px', fontWeight: 900, color: '#0284c7', fontSize: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                            ₹{p.startingPrice} <span style={{ fontSize: '0.7rem', color: '#64748b' }}>/unit</span>
+                          <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: '#ffffff', padding: '4px 12px', borderRadius: '16px', fontWeight: 900, color: '#0284c7', fontSize: '0.92rem', boxShadow: '0 2px 8px rgba(0,0,0,0.12)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <span>{priceLabel}</span>
+                            <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>/unit</span>
                           </div>
                         </div>
 
@@ -1619,13 +1634,39 @@ export const AdminPage = () => {
                           </p>
 
                           <div style={{ marginBottom: '14px', flex: 1 }}>
-                            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0284c7', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                              Available Sizes ({displaySizes.length}):
+                            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0284c7', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                              Available Sizes & Specific Rates ({displaySizes.length}):
                             </span>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                              {displaySizes.map((s, idx) => (
-                                <span key={idx} style={{ background: '#f0f9ff', border: '1px solid #bae6fd', color: '#0369a1', padding: '3px 8px', borderRadius: '6px', fontSize: '0.74rem', fontWeight: 600 }}>
-                                  📏 {s}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                              {sizeEntries.map((entry, idx) => (
+                                <span
+                                  key={idx}
+                                  style={{
+                                    background: '#f0f9ff',
+                                    border: '1px solid #bae6fd',
+                                    color: '#0369a1',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                  }}
+                                >
+                                  <span>📏 {entry.size}</span>
+                                  <span
+                                    style={{
+                                      background: '#0284c7',
+                                      color: '#ffffff',
+                                      padding: '1px 6px',
+                                      borderRadius: '4px',
+                                      fontWeight: 800,
+                                      fontSize: '0.72rem'
+                                    }}
+                                  >
+                                    ₹{entry.price}
+                                  </span>
                                 </span>
                               ))}
                             </div>
