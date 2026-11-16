@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
   getStoredFactorySettings,
-  getStoredCatalog,
-  SIVAKASI_CATALOG,
   getPressStats,
   type FactorySettings,
-  type CalendarProduct,
   type PressStats
 } from '../services/api';
 
@@ -16,10 +13,6 @@ interface HeroProps {
 
 export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
-  const [products, setProducts] = useState<CalendarProduct[]>(() => {
-    const stored = getStoredCatalog();
-    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
-  });
   const [stats, setStats] = useState<PressStats>({
     calendarsPrintedYearToDate: '14,205,000+',
     corporateClientsServed: '4,500+',
@@ -41,17 +34,9 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
       else setSettings(getStoredFactorySettings());
     };
 
-    const handleCatalogUpdate = () => {
-      const stored = getStoredCatalog();
-      if (stored && stored.length > 0) setProducts(stored);
-    };
-
     window.addEventListener('factory-settings-updated', handleSettingsUpdate);
-    window.addEventListener('catalog-updated', handleCatalogUpdate);
-
     return () => {
       window.removeEventListener('factory-settings-updated', handleSettingsUpdate);
-      window.removeEventListener('catalog-updated', handleCatalogUpdate);
     };
   }, []);
 
@@ -98,38 +83,15 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
             <p
               className="hero-subtext"
               style={{
-                fontSize: 'clamp(1rem, 2vw, 1.18rem)',
-                lineHeight: '1.65',
-                color: '#ffffff',
-                opacity: 0.94,
-                maxWidth: '680px',
-                marginBottom: '26px',
-                textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)'
+                fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
+                lineHeight: '1.6',
+                color: 'var(--text-secondary)',
+                maxWidth: '560px',
+                marginBottom: '26px'
               }}
             >
-              {settings.tagline || "India’s premier manufacturing atelier for Gold/Silver PET Foil Calendars, Custom 5D Holographic Calendars, Stone Art Calendars, Hand Fans & Special Products."}
+              Direct manufacturing press based in Sivakasi, Tamil Nadu. Specializing in 24K Gold Foil Stamped Wall Calendars, 5D Holographic Motion, Daily Sheet Panchangam, and Luxury Tabletop Easels.
             </p>
-
-            {/* Product Quick-Tag Highlights */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
-              {products.slice(0, 5).map((p) => (
-                <span
-                  key={p.id}
-                  style={{
-                    background: 'rgba(255, 215, 0, 0.12)',
-                    border: '1px solid rgba(255, 215, 0, 0.45)',
-                    padding: '5px 14px',
-                    borderRadius: '20px',
-                    fontSize: '0.76rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.02em',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)'
-                  }}
-                >
-                  <span className="gold-gradient-text">✦ {p.name}</span>
-                </span>
-              ))}
-            </div>
 
             {/* CTAs */}
             <div className="hero-cta-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '36px' }}>
@@ -209,7 +171,7 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
           position: relative;
           overflow: hidden;
           padding: 95px 0 115px;
-          background-image: 
+          background-image:
             linear-gradient(180deg, rgba(3, 3, 3, 0.72) 0%, rgba(20, 22, 24, 0.78) 50%, rgba(46, 47, 43, 0.92) 100%),
             url('/images/Luxurious%202026%20Calendar%20Showcase.png');
           background-size: cover;

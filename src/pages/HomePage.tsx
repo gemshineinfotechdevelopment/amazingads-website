@@ -1,75 +1,51 @@
-import { useState, useEffect, type CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
+import { ProductCatalog } from '../components/ProductCatalog';
 import { ThreeDViewer } from '../components/ThreeDViewer';
-import {
-  getStoredFactorySettings,
-  getStoredCatalog,
-  getCalendarProducts,
-  SIVAKASI_CATALOG,
-  type FactorySettings,
-  type CalendarProduct
-} from '../services/api';
 
 export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) => {
   const { navigate } = useRouter();
-  const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
-  const [catalog, setCatalog] = useState<CalendarProduct[]>(() => {
-    const stored = getStoredCatalog();
-    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
-  });
-
-  useEffect(() => {
-    getCalendarProducts().then((data) => {
-      if (data && data.length > 0) setCatalog(data);
-    }).catch(() => {});
-
-    const handleUpdate = (e: Event) => {
-      const custom = e as CustomEvent<FactorySettings>;
-      if (custom.detail) setSettings(custom.detail);
-      else setSettings(getStoredFactorySettings());
-    };
-
-    const handleCatalogUpdate = (e: Event) => {
-      const custom = e as CustomEvent<CalendarProduct[]>;
-      if (custom.detail && Array.isArray(custom.detail)) {
-        setCatalog(custom.detail);
-      } else {
-        const stored = getStoredCatalog();
-        if (stored && stored.length > 0) setCatalog(stored);
-      }
-    };
-
-    window.addEventListener('factory-settings-updated', handleUpdate);
-    window.addEventListener('catalog-updated', handleCatalogUpdate);
-    return () => {
-      window.removeEventListener('factory-settings-updated', handleUpdate);
-      window.removeEventListener('catalog-updated', handleCatalogUpdate);
-    };
-  }, []);
-
-  const targetPhone = (settings.phone || '+919790472767').replace(/[^0-9+]/g, '');
 
   return (
-    <div className="page-view" style={{ padding: '0 0 90px' }}>
-      {/* Immersive Full-Screen Hero */}
+    <div className="page-view" style={{ padding: '0 0 60px' }}>
+      {/* 1. Immersive Editorial Hero */}
       <Hero
         onScrollToCustomizer={() => navigate('calculator')}
         onOpenSampleKit={onOpenSampleKit}
       />
 
-      {/* 3D Interactive Model Showcase */}
-      <section style={{ padding: '20px 0 60px' }}>
+      {/* 2. Signature 2027 Calendar Collection - Our Products (Front & Center) */}
+      <section style={{ padding: '40px 0 50px' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 36px' }}>
+            <span className="foil-badge" style={{ marginBottom: '10px' }}>
+              ✦ 2027 SIVAKASI PRESS EDITIONS
+            </span>
+            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
+              Our <span className="gold-gradient-text">Products</span>
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
+              Direct factory wholesale pricing. Real 24K gold foil stamping, 5D holographic motion, stone art relief, and promotional hand fans.
+            </p>
+          </div>
+
+          <ProductCatalog onSelectProduct={(productName) => navigate('calculator', { product: productName })} />
+        </div>
+      </section>
+
+      {/* 3. Interactive 3D Virtual Studio */}
+      <section style={{ padding: '50px 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 28px' }}>
             <span className="foil-badge" style={{ marginBottom: '10px' }}>
               ✦ 3D SIMULATOR
             </span>
             <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
-              Interactive 3D <span className="gold-gradient-text">Models</span>
+              Interactive 3D <span className="gold-gradient-text">Studio</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              Move your mouse to tilt the 3D card. Experience real 24K gold foil reflection glare and 3D lenticular image morphing.
+              Rotate in real time to experience 24K gold foil reflection glare, 5D lenticular motion, and daily leaf tear-off.
             </p>
           </div>
 
@@ -77,652 +53,132 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         </div>
       </section>
 
-      {/* Our Products - Dynamic Admin Catalog Showcase */}
-      <section style={{ padding: '40px 0 60px' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 42px' }}>
-            <span className="foil-badge" style={{ marginBottom: '12px' }}>
-              ✦ SIVAKASI PRESS EDITIONS
-            </span>
-            <h2 style={{ fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', color: '#fff', marginBottom: '12px' }}>
-              Our <span className="gold-gradient-text">Products</span>
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-              Direct factory wholesale manufacturing. Explore our signature manufacturing lines engineered with 24K gold foil, 5D lenticular lenses, sculpted stone craft, and promotional tools.
-            </p>
-          </div>
-
-          {/* Dynamic Product Catalog Grid - Directly Synchronized from Admin Side */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '28px',
-              marginBottom: '40px'
-            }}
-          >
-            {catalog.map((cat) => (
-              <div
-                key={cat.id}
-                className="product-cat-card"
-                style={{
-                  background: 'linear-gradient(180deg, #222320 0%, #171816 100%)',
-                  border: '1px solid #454545',
-                  borderRadius: '18px',
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
-                }}
-              >
-                {/* Product Category Image Preview */}
-                <div
-                  style={{
-                    position: 'relative',
-                    height: '240px',
-                    width: '100%',
-                    overflow: 'hidden',
-                    backgroundColor: '#10110e'
-                  }}
-                >
-                  <img
-                    src={cat.mockupImg || '/images/pet-foil-calendar-real.jpg'}
-                    alt={cat.name}
-                    className="product-cat-img"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block'
-                    }}
-                    loading="lazy"
-                  />
-
-                  {/* Top Badges */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      left: '12px',
-                      right: '12px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '8px',
-                      zIndex: 3
-                    }}
-                  >
-                    <span
-                      style={{
-                        background: 'rgba(3, 3, 3, 0.85)',
-                        backdropFilter: 'blur(8px)',
-                        border: '1px solid #FFD700',
-                        color: '#FFD700',
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        letterSpacing: '0.04em'
-                      }}
-                    >
-                      {cat.tag || cat.category || 'Direct Press'}
-                    </span>
-
-                    <span
-                      style={{
-                        background: 'linear-gradient(135deg, #FFF59D 0%, #FFD700 50%, #E69500 100%)',
-                        color: '#030303',
-                        fontSize: '0.74rem',
-                        fontWeight: 900,
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        letterSpacing: '0.02em',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)'
-                      }}
-                    >
-                      Starts ₹{cat.startingPrice}
-                    </span>
-                  </div>
-
-                  {/* Gradient Shade on Bottom of Image */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: '70px',
-                      background: 'linear-gradient(180deg, transparent 0%, rgba(34, 35, 32, 0.95) 100%)',
-                      pointerEvents: 'none'
-                    }}
-                  />
-                </div>
-
-                {/* Card Information & Action */}
-                <div
-                  style={{
-                    padding: '22px 24px 26px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flex: 1,
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div>
-                    <h3
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        fontSize: '1.25rem',
-                        fontWeight: 800,
-                        color: '#ffffff',
-                        marginBottom: '8px',
-                        lineHeight: '1.3'
-                      }}
-                    >
-                      {cat.name}
-                    </h3>
-
-                    <p
-                      style={{
-                        fontSize: '0.88rem',
-                        color: '#f1f5f9',
-                        lineHeight: '1.55',
-                        marginBottom: '16px'
-                      }}
-                    >
-                      {cat.subtitle || cat.description}
-                    </p>
-
-                    {/* Feature Highlights */}
-                    {cat.features && cat.features.length > 0 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '22px' }}>
-                        {cat.features.slice(0, 3).map((h, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              fontSize: '0.8rem',
-                              color: '#ffffff'
-                            }}
-                          >
-                            <span style={{ color: '#FFD700', fontSize: '0.72rem', flexShrink: 0 }}>✦</span>
-                            <span>{h}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
-                    <button
-                      onClick={() => navigate('calculator', { product: cat.name })}
-                      className="btn-gold"
-                      style={{
-                        flex: 1,
-                        padding: '11px 16px',
-                        fontSize: '0.86rem',
-                        borderRadius: '8px',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      Configure & Quote →
-                    </button>
-
-                    <button
-                      onClick={() => navigate('collections')}
-                      className="btn-outline-gold"
-                      style={{
-                        padding: '11px 16px',
-                        fontSize: '0.86rem',
-                        borderRadius: '8px',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Wholesale Catalog Link Banner */}
-          <div
-            style={{
-              background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(34, 35, 32, 0.8) 100%)',
-              border: '1px solid #454545',
-              borderRadius: '16px',
-              padding: '24px 32px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '18px'
-            }}
-          >
-            <div>
-              <h4 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '4px', fontWeight: 800 }}>
-                Looking for Detailed Specifications & Tiered Factory Pricing?
-              </h4>
-              <p style={{ fontSize: '0.88rem', color: '#f1f5f9', margin: 0 }}>
-                Filter products by minimum order quantities, paper GSM, sizes, and instant tiered volume discounts.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => navigate('collections')}
-                className="btn-gold"
-                style={{ padding: '12px 24px', fontSize: '0.9rem' }}
-              >
-                View Full Wholesale Catalog →
-              </button>
-              <button
-                onClick={onOpenSampleKit}
-                className="btn-outline-gold"
-                style={{ padding: '12px 20px', fontSize: '0.9rem' }}
-              >
-                Request Swatch Kit
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Amazing Ads Sivakasi Works - 4 Key Advantages */}
-      <section style={{ padding: '60px 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+      {/* 4. The Sivakasi Manufacturing Advantage (Clean 4-Pillar Grid) */}
+      <section style={{ padding: '70px 0' }}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 40px' }}>
             <span className="foil-badge" style={{ marginBottom: '10px' }}>
-              ✦ MANUFACTURING ADVANTAGE
+              ✦ FACTORY ASSURANCE
             </span>
             <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
               Why Order Direct from <span className="gold-gradient-text">Sivakasi Works</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              Direct factory production with zero intermediaries and complete quality control.
+              Direct factory production with strict Heidelberg quality control and zero middleman markups.
             </p>
           </div>
 
-          <div className="advantages-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+          <div className="advantages-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px' }}>
             <div style={advantageCardStyle}>
-              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🏭</span>
-              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Wholesale Factory Direct</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                Save 30% to 42% by purchasing direct from the Sivakasi manufacturing press. No middleman commissions.
+              <span style={{ fontSize: '2rem', marginBottom: '12px', display: 'block' }}>🏭</span>
+              <h3 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>Direct Factory Pricing</h3>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Save 30% to 42% by purchasing direct from our Sivakasi manufacturing presses. Transparent volume tier slabs.
               </p>
             </div>
 
             <div style={advantageCardStyle}>
-              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>👑</span>
-              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>24K Hot Foil & 5-Color Offset</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                130°C heated brass foil die stamping and Heidelberg presses ensure razor-sharp registration on virgin board.
+              <span style={{ fontSize: '2rem', marginBottom: '12px', display: 'block' }}>👑</span>
+              <h3 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>130°C Heated 24K Gold Die</h3>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                German metallic foils and brass die stamping on virgin kappa board for guaranteed flat hanging and mirror shine.
               </p>
             </div>
 
             <div style={advantageCardStyle}>
-              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🔍</span>
-              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Free Digital Proofing</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                We generate a 3D digital proof with your corporate branding and advertisement details before going to press.
+              <span style={{ fontSize: '2rem', marginBottom: '12px', display: 'block' }}>📐</span>
+              <h3 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>Free 3D Digital Proofing</h3>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Review a 3D digital color proof with your exact corporate branding and advertisement details before press run.
               </p>
             </div>
 
             <div style={advantageCardStyle}>
-              <span style={{ fontSize: '2.2rem', marginBottom: '14px', display: 'block' }}>🚚</span>
-              <h3 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '8px' }}>Safe All-India Transport</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                Corrugated master box packing with direct delivery via VRL, BlueDart, and ST Courier across India.
+              <span style={{ fontSize: '2rem', marginBottom: '12px', display: 'block' }}>🚚</span>
+              <h3 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>Pan-India Doorstep Dispatch</h3>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Corrugated master box packing with tracked priority delivery via BlueDart, VRL, and express freight across India.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Simple 4-Step Order Workflow */}
-      <section style={{ padding: '70px 0' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 40px' }}>
-            <span className="foil-badge" style={{ marginBottom: '10px' }}>
-              ✦ SIMPLE ORDERING
-            </span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
-              How It <span className="gold-gradient-text">Works</span>
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              From model selection to doorstep delivery in 4 simple steps.
-            </p>
-          </div>
-
-          <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-            {[
-              { step: '01', title: 'Choose Model', desc: 'Select from 24K Gold Foil Wall, Daily Panchangam, Desk Easel, or Devotional Frame.' },
-              { step: '02', title: 'Send Branding', desc: 'Share your company name, logo, phone, and address via online quote or inquiry form.' },
-              { step: '03', title: 'Approve Proof', desc: 'Review the complimentary digital color proof with exact text positioning.' },
-              { step: '04', title: 'Fast Dispatch', desc: 'Pressed on high-speed lines in Sivakasi and dispatched safely to your location.' }
-            ].map((s, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '28px 24px',
-                  position: 'relative'
-                }}
-              >
-                <div className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, marginBottom: '10px' }}>
-                  {s.step}
-                </div>
-                <h4 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px' }}>{s.title}</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{s.desc}</p>
-              </div>
-            ))}
+      {/* 5. Minimalist Corporate Trust Strip */}
+      <section style={{ padding: '24px 0', background: 'rgba(255, 255, 255, 0.02)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700, marginBottom: '10px' }}>
+            ✦ Trusted by Over 4,500+ Corporate Brands, Jewellers & Retail Distributors Pan-India
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '0.82rem', color: 'var(--accent-gold-bright)', fontFamily: 'var(--font-mono)' }}>
+            <span>Chennai</span>
+            <span>•</span>
+            <span>Bengaluru</span>
+            <span>•</span>
+            <span>Mumbai</span>
+            <span>•</span>
+            <span>Hyderabad</span>
+            <span>•</span>
+            <span>Coimbatore</span>
+            <span>•</span>
+            <span>Madurai</span>
+            <span>•</span>
+            <span>New Delhi</span>
           </div>
         </div>
       </section>
 
-      {/* Client Press Work */}
-      <section style={{ padding: '60px 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 40px' }}>
-            <span className="foil-badge" style={{ marginBottom: '10px' }}>
-              ✦ CLIENT PORTFOLIO
-            </span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '10px' }}>
-              Client <span className="gold-gradient-text">Work</span>
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-              Corporate editions for Tata, Taj Hotels, and Zoho.
-            </p>
-          </div>
-
-          <div className="clients-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
-            {[
-              {
-                client: 'Tata Motors & Titan',
-                project: '365-Day Tear-off Ingot Edition',
-                units: '8,500 Units',
-                finish: '24K Triple Edge Gilding',
-                quote: 'The foil edge gilding turned our annual calendar into a permanent executive desk piece.',
-                reviewer: 'Rohan Mehra, Brand Identity'
-              },
-              {
-                client: 'Taj Hotels & Resorts',
-                project: 'Architectural Wall Calendar A3',
-                units: '12,000 Units',
-                finish: '350 GSM Linen + Gold Monogram',
-                quote: 'Zero color variance on our photographic prints. Exceptional Heidelberg press calibration.',
-                reviewer: 'Ananya Singhania, Marketing VP'
-              },
-              {
-                client: 'Zoho Corporation',
-                project: 'Plantable Wildflower Seed Calendar',
-                units: '25,000 Units',
-                finish: '100% Recycled Kraft & Seed Paper',
-                quote: 'A magnificent sustainable edition. 25,000 clients bloomed wildflowers from each calendar leaf.',
-                reviewer: 'Karthik S., Sustainability Lead'
-              }
-            ].map((study, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'var(--bg-card)',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--border-card)',
-                  padding: '28px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  boxShadow: 'var(--shadow-md)'
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <span className="gold-gradient-text" style={{ fontSize: '0.82rem', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
-                      {study.units}
-                    </span>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{study.finish}</span>
-                  </div>
-                  <h4 style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '4px' }}>{study.client}</h4>
-                  <p className="gold-gradient-text" style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '14px' }}>{study.project}</p>
-                  <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.6', fontStyle: 'italic', marginBottom: '18px' }}>
-                    "{study.quote}"
-                  </p>
-                </div>
-                <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  — {study.reviewer}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About Amazing Ads Sivakasi Works Section */}
-      <section style={{ padding: '60px 0', position: 'relative' }}>
-        <div className="container">
-          <div
-            className="about-banner-card home-about-box"
-            style={{
-              background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
-              border: '1px solid #454545',
-              borderRadius: 'var(--radius-xl)',
-              padding: '48px 40px',
-              boxShadow: '0 25px 60px rgba(3,3,3,0.8), 0 0 35px rgba(215, 134, 0, 0.2)'
-            }}
-          >
-            <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '48px', alignItems: 'center' }} className="about-grid">
-              <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <span className="foil-badge">SIVAKASI PRESS HEADQUARTERS</span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                    ESTABLISHED 2008
-                  </span>
-                </div>
-
-                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', marginBottom: '16px' }}>
-                  About <span className="gold-gradient-text">Amazing Ads</span>
-                </h2>
-
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem', lineHeight: '1.7', marginBottom: '20px' }}>
-                  Operating from the heart of Sivakasi — India’s celebrated printing and calendar manufacturing capital — <strong>Amazing Ads</strong> is an industry leader in precision calendar manufacturing, 24K gold foil die stamping, and luxury devotional photo frames.
-                </p>
-
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: '1.7', marginBottom: '28px' }}>
-                  With over 18 years of specialized press expertise, we serve corporate enterprises, retail trade distributors, temple devasthanams, and agencies across India with factory-direct pricing, strict registration tolerances, and guaranteed timely delivery.
-                </p>
-
-                {/* Sivakasi Press Capabilities Checklist */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '32px' }} className="cap-grid">
-                  {[
-                    { label: 'Heidelberg Speedmaster Presses', desc: 'Flawless 4 & 5-color offset dot reproduction' },
-                    { label: 'High-Tonnage Foil Embossing', desc: '130°C heated brass die stamping on rigid kappa' },
-                    { label: '75 LPI Lenticular Micro-Lenses', desc: 'Dual-angle 3D spatial depth & morphing' },
-                    { label: '365 Daily Sheet Panchangam', desc: 'Rotary web offset with micro-perforations' }
-                  ].map((cap, i) => (
-                    <div key={i} style={{ background: 'var(--bg-input)', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-                      <p style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fff' }}>✓ {cap.label}</p>
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>{cap.desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={() => navigate('calculator')}
-                    className="btn-gold"
-                    style={{ padding: '12px 24px', fontSize: '0.9rem', cursor: 'pointer' }}
-                  >
-                    ⚡ Instant Factory Customizer
-                  </button>
-                  <a
-                    href={`tel:${targetPhone}`}
-                    className="btn-outline-gold"
-                    style={{ padding: '12px 22px', fontSize: '0.9rem', textDecoration: 'none' }}
-                  >
-                    📞 Call: {settings.phone || '+91 97904 72767'}
-                  </a>
-                </div>
-              </div>
-
-              {/* Right Column: Factory Location & Contact Card */}
-              <div
-                style={{
-                  background: 'var(--bg-card)',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--border-subtle)',
-                  padding: '32px',
-                  boxShadow: 'var(--shadow-md)'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                  <div
-                    style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #FFF59D 0%, #FFD700 50%, #E69500 100%)',
-                      color: '#030303',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.2rem',
-                      fontWeight: 800
-                    }}
-                  >
-                    AA
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>{settings.factoryName || 'Amazing Ads Sivakasi'}</h3>
-                    <p className="gold-gradient-text" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                      Official Portal: {settings.websiteUrl || 'amazingads.in'}
-                    </p>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  <div>
-                    <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>🏭 Manufacturing Hub & Press Works:</strong>
-                    <span>{settings.address || '3/1, Vannakara Street, Chairman P.K.S.A. Arumuganadar Road, Sivakasi 626189, Virudhunagar District, Tamil Nadu'}</span>
-                  </div>
-
-                  <div>
-                    <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📞 Direct Phone Lines:</strong>
-                    <span className="gold-gradient-text" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
-                      {settings.phone || '+91 97904 72767'}{settings.secondaryPhone ? ` / ${settings.secondaryPhone}` : ''}
-                    </span>
-                  </div>
-
-                  <div>
-                    <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>📱 Corporate Management Hotline:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.secondaryPhone || '+91 98400 55220'}</span>
-                  </div>
-
-                  <div>
-                    <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>✉️ Official Communications:</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>{settings.email || 'aamazingads@gmail.com'}</span>
-                  </div>
-
-                  <div style={{ borderTop: '1px solid #454545', paddingTop: '14px', marginTop: '6px' }}>
-                    <strong style={{ color: '#fff', display: 'block', marginBottom: '3px' }}>🚚 Dispatch & Freight Partners:</strong>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      Direct daily transport via VRL Logistics, BlueDart, ST Courier, Professional Couriers, and container freight to all Indian states.
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Swatch Box Callout Section */}
-      <section style={{ padding: '60px 0 0' }}>
+      {/* 6. Complimentary Swatch Box Callout Banner */}
+      <section style={{ padding: '60px 0 20px' }}>
         <div className="container">
           <div
             className="swatch-banner-card home-swatch-box"
             style={{
-              background: 'linear-gradient(145deg, #2E2F2B 0%, #121310 100%)',
-              border: '1px solid #454545',
+              background: 'linear-gradient(145deg, #1b1e24 0%, #0d0f14 100%)',
+              border: '1px solid var(--border-gold)',
               borderRadius: 'var(--radius-xl)',
-              padding: '48px',
+              padding: '40px 48px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: '28px',
-              boxShadow: '0 20px 45px rgba(3,3,3,0.7), 0 0 30px rgba(215, 134, 0, 0.2)'
+              gap: '24px',
+              boxShadow: '0 20px 45px rgba(0,0,0,0.6), 0 0 30px rgba(215, 134, 0, 0.15)'
             }}
           >
-            <div style={{ maxWidth: '650px' }}>
-              <span className="foil-badge" style={{ marginBottom: '12px' }}>FREE COURIER DISPATCH</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '8px' }}>
-                Experience Our Papers & Heated Foils in Person
+            <div style={{ maxWidth: '600px' }}>
+              <span className="foil-badge" style={{ marginBottom: '10px' }}>
+                COMPLIMENTARY CONCIERGE
+              </span>
+              <h3 style={{ fontSize: '1.6rem', color: '#fff', marginBottom: '8px' }}>
+                Inspect Our 400 GSM Kappa Boards & 24K Metallic Foils In Person
               </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
-                We ship a complimentary Master Swatch Box containing 12 paper grammages, 4 metallic foil color chips, and miniature wire-o proofs to your office.
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: '1.6' }}>
+                We ship a complimentary Master Swatch Box containing tactile paper grammages, metallic foil color chips, and print proofs to corporate brand leaders across India. Free of charge.
               </p>
             </div>
             <button
               onClick={onOpenSampleKit}
               className="btn-gold"
-              style={{ padding: '16px 32px', fontSize: '1rem' }}
+              style={{ padding: '14px 28px', fontSize: '0.95rem' }}
             >
-              Order Free Master Swatch Kit →
+              Request Free Master Swatch Kit →
             </button>
           </div>
         </div>
       </section>
 
       <style>{`
-        .product-cat-card {
-          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        .product-cat-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.35) !important;
-          border-color: #FFD700 !important;
-        }
-        .product-cat-img {
-          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .product-cat-card:hover .product-cat-img {
-          transform: scale(1.06);
-        }
-        .dept-card {
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .dept-card:hover {
-          border-color: var(--border-gold-hover) !important;
-          transform: translateY(-5px);
-          box-shadow: 0 16px 35px rgba(3,3,3,0.6), 0 0 25px rgba(215, 134, 0, 0.25);
-        }
-        @media (max-width: 960px) {
-          .about-grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-          }
-        }
         @media (max-width: 768px) {
-          .advantages-grid, .steps-grid, .clients-grid {
+          .advantages-grid {
             grid-template-columns: 1fr !important;
-            gap: 16px !important;
+            gap: 14px !important;
           }
-          .about-banner-card, .home-about-box, .swatch-banner-card, .home-swatch-box {
+          .swatch-banner-card, .home-swatch-box {
             padding: 24px 18px !important;
           }
           .swatch-banner-card button, .home-swatch-box button {
             width: 100% !important;
-          }
-        }
-        @media (max-width: 600px) {
-          .cap-grid {
-            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
@@ -734,8 +190,9 @@ const advantageCardStyle: CSSProperties = {
   background: 'var(--bg-card)',
   border: '1px solid var(--border-card)',
   borderRadius: 'var(--radius-lg)',
-  padding: '30px 24px',
+  padding: '26px 20px',
   display: 'flex',
   flexDirection: 'column',
-  boxShadow: 'var(--shadow-md)'
+  boxShadow: 'var(--shadow-md)',
+  transition: 'border-color 0.2s ease'
 };
