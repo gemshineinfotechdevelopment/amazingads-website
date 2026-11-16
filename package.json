@@ -9,7 +9,13 @@
     "dev:server": "nodemon server/index.js",
     "client": "vite",
     "server": "node server/index.js",
+    "start": "node server/index.js",
     "build": "tsc -b && vite build",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:restart": "pm2 restart ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop ecosystem.config.cjs",
+    "pm2:logs": "pm2 logs amazingads-backend",
+    "db:init": "node server/scripts/init-vps-db.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },

@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
-import { v2 as cloudinary } from 'cloudinary';
 import { Quote } from '../models/Quote.js';
 import { SampleKit } from '../models/SampleKit.js';
 import { Inquiry } from '../models/Inquiry.js';
