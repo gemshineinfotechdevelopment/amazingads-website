@@ -136,12 +136,16 @@ const syncFormatOptionsWithCatalog = (catalog: CalendarProduct[]): FormatOption[
       opt.id.toLowerCase().includes(item.category.toLowerCase())
     );
     if (p) {
+      const updatedSizes = (p.sizes && p.sizes.length > 0)
+        ? p.sizes.map(s => ({ size: s, price: p.sizePrices?.[s] || p.startingPrice || opt.base }))
+        : opt.defaultSizes;
       return {
         ...opt,
         base: p.startingPrice || opt.base,
         size: p.dimensions || opt.size,
         img: p.mockupImg || opt.img,
-        fullName: p.name || opt.fullName
+        fullName: p.name || opt.fullName,
+        defaultSizes: updatedSizes
       };
     }
     return opt;
@@ -236,6 +240,11 @@ export const CalendarCustomizer = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handlePhoneChange = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 10);
+    setClientPhone(digits);
+  };
+
   const selectedFormatObj = FORMAT_OPTIONS.find(f => f.id === format) || FORMAT_OPTIONS[0];
   const liveProduct = liveCatalog.find(p => p.id === selectedFormatObj.productId || p.name.toLowerCase().includes(selectedFormatObj.label.toLowerCase()));
 
@@ -300,8 +309,13 @@ export const CalendarCustomizer = () => {
 
   const handleDirectOrderSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!clientName.trim() || !clientPhone.trim()) {
-      alert('Please provide your name and contact phone number.');
+    const cleanPhone = clientPhone.replace(/\D/g, '');
+    if (!clientName.trim() || !cleanPhone) {
+      alert('Please provide your name and 10-digit contact phone number.');
+      return;
+    }
+    if (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      alert('Mobile number must be exactly 10 digits.');
       return;
     }
 
@@ -315,13 +329,13 @@ export const CalendarCustomizer = () => {
 • Estimated Unit Rate: ₹${quote ? quote.unitPrice : frameUnitPrice}/unit
 • Estimated Total: ₹${quote ? quote.subtotal.toLocaleString() : (frameUnitPrice * quantity).toLocaleString()}
 • Client: ${clientName} (${company || 'Individual/Trader'})
-• Phone: ${clientPhone}
+• Phone: ${cleanPhone}
 • Email: ${clientEmail || 'N/A'}
 • Branding / Notes: ${clientNotes || 'Standard'}`;
 
       await sendCustomerMessage(
         clientName,
-        clientPhone,
+        cleanPhone,
         leadMessage,
         {
           email: clientEmail,
@@ -345,7 +359,7 @@ export const CalendarCustomizer = () => {
         clientName,
         company,
         clientEmail,
-        clientPhone,
+        clientPhone: cleanPhone,
         notes: clientNotes
       });
       setQuote(res);
@@ -359,8 +373,13 @@ export const CalendarCustomizer = () => {
 
   const handleFinalSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!clientName.trim() || (!clientEmail.trim() && !clientPhone.trim())) {
-      alert('Please provide your name and phone number or email.');
+    const cleanPhone = clientPhone.replace(/\D/g, '');
+    if (!clientName.trim() || (!clientEmail.trim() && !cleanPhone)) {
+      alert('Please provide your name and 10-digit phone number or email.');
+      return;
+    }
+    if (cleanPhone && (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+      alert('Mobile number must be exactly 10 digits.');
       return;
     }
 
@@ -663,13 +682,15 @@ export const CalendarCustomizer = () => {
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Phone Number *</label>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Phone Number (10 Digits) *</label>
                       <input
                         type="tel"
                         required
-                        placeholder="+91 98765 43210"
+                        maxLength={10}
+                        pattern="[6-9][0-9]{9}"
+                        placeholder="10-digit mobile number"
                         value={clientPhone}
-                        onChange={(e) => setClientPhone(e.target.value)}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
                         className="form-input"
                         style={{ width: '100%', padding: '10px 12px', fontSize: '0.85rem' }}
                       />
@@ -900,13 +921,15 @@ export const CalendarCustomizer = () => {
                   </div>
 
                   <div>
-                    <label>Contact Phone Number *</label>
+                    <label>Contact Phone Number (10 Digits) *</label>
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98765 43210"
+                      maxLength={10}
+                      pattern="[6-9][0-9]{9}"
+                      placeholder="10-digit mobile number"
                       value={clientPhone}
-                      onChange={(e) => setClientPhone(e.target.value)}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
                     />
                   </div>
 
@@ -1121,7 +1144,7 @@ export const CalendarCustomizer = () => {
         }
 
         .format-card-price strong {
-          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          background: linear-gradient(135deg, #FFF59D 0%, #FFD700 45%, #E69500 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-family: var(--font-mono);
@@ -1344,7 +1367,7 @@ export const CalendarCustomizer = () => {
           font-family: var(--font-mono);
           font-size: 2.2rem;
           font-weight: 800;
-          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          background: linear-gradient(135deg, #FFF59D 0%, #FFD700 45%, #E69500 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           line-height: 1;
@@ -1422,7 +1445,7 @@ export const CalendarCustomizer = () => {
         }
 
         .customizer-size-price {
-          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          background: linear-gradient(135deg, #FFF59D 0%, #FFD700 45%, #E69500 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-size: 0.95rem;
@@ -1439,7 +1462,7 @@ export const CalendarCustomizer = () => {
 
         .customizer-size-badge {
           font-size: 0.68rem;
-          background: linear-gradient(135deg, #FFD72E 0%, #D78600 55%, #c07700 100%);
+          background: linear-gradient(135deg, #FFF59D 0%, #FFD700 45%, #E69500 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-weight: 700;

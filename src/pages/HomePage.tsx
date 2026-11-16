@@ -2,84 +2,50 @@ import { useState, useEffect, type CSSProperties } from 'react';
 import { useRouter } from '../context/RouterContext';
 import { Hero } from '../components/Hero';
 import { ThreeDViewer } from '../components/ThreeDViewer';
-import { getStoredFactorySettings, type FactorySettings } from '../services/api';
-
-interface ProductCategoryItem {
-  id: string;
-  title: string;
-  tag: string;
-  image: string;
-  description: string;
-  startingPrice: string;
-  targetProduct: string;
-  highlights: string[];
-}
-
-const PRODUCT_CATEGORIES: ProductCategoryItem[] = [
-  {
-    id: 'pet-foil',
-    title: 'Gold / Silver PET Foil Calendars',
-    tag: '👑 24K Gold & Silver Foil',
-    image: '/images/pet-foil-calendar-real.jpg',
-    description: 'High-temperature metallic gold & silver foil stamping on tear-proof, moisture-resistant PET film with deep hydraulic relief embossing.',
-    startingPrice: '₹125',
-    targetProduct: 'Gold / Silver PET Foil Calendar',
-    highlights: ['Mirror Metallic PET Foil', 'Hydraulic Relief Embossing', 'Tear-Proof & Water-Proof']
-  },
-  {
-    id: 'custom-5d',
-    title: 'Custom 5D Holographic Calendars',
-    tag: '🌀 5D Lenticular Motion',
-    image: '/images/custom-5d-calendar-real.jpg',
-    description: 'Micro-optical lenticular lenses delivering dynamic 3D optical depth perception and animated angle-morphing motion flip with golden frames.',
-    startingPrice: '₹220',
-    targetProduct: 'Custom 5D Calendars (Lord Murugan Edition)',
-    highlights: ['True 5D Optical Depth', 'Dual-Angle Image Morph Flip', 'Deluxe Golden Moulded Frame']
-  },
-  {
-    id: 'stone-art',
-    title: 'Stone Art Sculptural Calendars',
-    tag: '🗿 Sculpted Stone Relief',
-    image: '/images/stone-art-calendar-real.jpg',
-    description: 'Heirloom decorative calendars simulating temple stone carvings with tactile relief, hand-finished stone washes, and antique gold brushing.',
-    startingPrice: '₹250',
-    targetProduct: 'Stone Art Sculptural Calendars (Lord Balaji Edition)',
-    highlights: ['Sculpted Stone Relief Texture', 'Hand-Brushed Antique Patina', 'Carved Heritage Frame Finish']
-  },
-  {
-    id: 'hand-fan',
-    title: 'Promotional Advertising Hand Fans',
-    tag: '🪭 High-Impact Promotion',
-    image: '/images/hand-fan-promo-real.jpg',
-    description: 'Unbreakable virgin PP plastic and waterproof laminated duplex hand fans engineered for mass-reach corporate and festival advertising.',
-    startingPrice: '₹28',
-    targetProduct: 'Promotional Hand Fan (Lord Ganesha Edition)',
-    highlights: ['Unbreakable Virgin PP Plastic', 'Double-Sided 4-Color Vibrant Print', 'Ergonomic Non-Snap Grip Handle']
-  },
-  {
-    id: 'special-products',
-    title: 'Special Products & VIP Gift Sets',
-    tag: '🎁 Bespoke Corporate Gifts',
-    image: '/images/special-products-gift-real.jpg',
-    description: '24K Devotional Gold Foil Frames, illuminated acrylic LED calendars, bespoke luxury gift boxes, and executive hampers for corporate milestones.',
-    startingPrice: '₹195',
-    targetProduct: '24K Devotional Gold Foil Frame (Lord Ayyappan Edition)',
-    highlights: ['Laser Engraved & Spot UV Finishing', 'Illuminated Acrylic LED Options', 'Luxury Magnetic Gift Box Sets']
-  }
-];
+import {
+  getStoredFactorySettings,
+  getStoredCatalog,
+  getCalendarProducts,
+  SIVAKASI_CATALOG,
+  type FactorySettings,
+  type CalendarProduct
+} from '../services/api';
 
 export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) => {
   const { navigate } = useRouter();
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
+  const [catalog, setCatalog] = useState<CalendarProduct[]>(() => {
+    const stored = getStoredCatalog();
+    return (stored && stored.length > 0) ? stored : SIVAKASI_CATALOG;
+  });
 
   useEffect(() => {
+    getCalendarProducts().then((data) => {
+      if (data && data.length > 0) setCatalog(data);
+    }).catch(() => {});
+
     const handleUpdate = (e: Event) => {
       const custom = e as CustomEvent<FactorySettings>;
       if (custom.detail) setSettings(custom.detail);
       else setSettings(getStoredFactorySettings());
     };
+
+    const handleCatalogUpdate = (e: Event) => {
+      const custom = e as CustomEvent<CalendarProduct[]>;
+      if (custom.detail && Array.isArray(custom.detail)) {
+        setCatalog(custom.detail);
+      } else {
+        const stored = getStoredCatalog();
+        if (stored && stored.length > 0) setCatalog(stored);
+      }
+    };
+
     window.addEventListener('factory-settings-updated', handleUpdate);
-    return () => window.removeEventListener('factory-settings-updated', handleUpdate);
+    window.addEventListener('catalog-updated', handleCatalogUpdate);
+    return () => {
+      window.removeEventListener('factory-settings-updated', handleUpdate);
+      window.removeEventListener('catalog-updated', handleCatalogUpdate);
+    };
   }, []);
 
   const targetPhone = (settings.phone || '+919790472767').replace(/[^0-9+]/g, '');
@@ -111,7 +77,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         </div>
       </section>
 
-      {/* Our Products - 5 Signature Manufacturing Categories */}
+      {/* Our Products - Dynamic Admin Catalog Showcase */}
       <section style={{ padding: '40px 0 60px' }}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 42px' }}>
@@ -122,11 +88,11 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
               Our <span className="gold-gradient-text">Products</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-              Direct factory wholesale manufacturing. Explore our 5 signature manufacturing lines engineered with 24K gold foil, 5D lenticular lenses, sculpted stone craft, and promotional tools.
+              Direct factory wholesale manufacturing. Explore our signature manufacturing lines engineered with 24K gold foil, 5D lenticular lenses, sculpted stone craft, and promotional tools.
             </p>
           </div>
 
-          {/* 5 Product Categories Grid */}
+          {/* Dynamic Product Catalog Grid - Directly Synchronized from Admin Side */}
           <div
             style={{
               display: 'grid',
@@ -135,7 +101,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
               marginBottom: '40px'
             }}
           >
-            {PRODUCT_CATEGORIES.map((cat) => (
+            {catalog.map((cat) => (
               <div
                 key={cat.id}
                 className="product-cat-card"
@@ -160,8 +126,8 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                   }}
                 >
                   <img
-                    src={cat.image}
-                    alt={cat.title}
+                    src={cat.mockupImg || '/images/pet-foil-calendar-real.jpg'}
+                    alt={cat.name}
                     className="product-cat-img"
                     style={{
                       width: '100%',
@@ -190,8 +156,8 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                       style={{
                         background: 'rgba(3, 3, 3, 0.85)',
                         backdropFilter: 'blur(8px)',
-                        border: '1px solid #D78600',
-                        color: '#FFD72E',
+                        border: '1px solid #FFD700',
+                        color: '#FFD700',
                         fontSize: '0.72rem',
                         fontWeight: 700,
                         padding: '4px 10px',
@@ -199,12 +165,12 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                         letterSpacing: '0.04em'
                       }}
                     >
-                      {cat.tag}
+                      {cat.tag || cat.category || 'Direct Press'}
                     </span>
 
                     <span
                       style={{
-                        background: 'linear-gradient(135deg, #FFD72E 0%, #D78600 100%)',
+                        background: 'linear-gradient(135deg, #FFF59D 0%, #FFD700 50%, #E69500 100%)',
                         color: '#030303',
                         fontSize: '0.74rem',
                         fontWeight: 900,
@@ -214,7 +180,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)'
                       }}
                     >
-                      Starts {cat.startingPrice}
+                      Starts ₹{cat.startingPrice}
                     </span>
                   </div>
 
@@ -253,44 +219,46 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                         lineHeight: '1.3'
                       }}
                     >
-                      {cat.title}
+                      {cat.name}
                     </h3>
 
                     <p
                       style={{
-                        fontSize: '0.86rem',
-                        color: '#cbd5e1',
+                        fontSize: '0.88rem',
+                        color: '#f1f5f9',
                         lineHeight: '1.55',
                         marginBottom: '16px'
                       }}
                     >
-                      {cat.description}
+                      {cat.subtitle || cat.description}
                     </p>
 
                     {/* Feature Highlights */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '22px' }}>
-                      {cat.highlights.map((h, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            fontSize: '0.78rem',
-                            color: '#e2e8f0'
-                          }}
-                        >
-                          <span style={{ color: '#FFD72E', fontSize: '0.72rem', flexShrink: 0 }}>✦</span>
-                          <span>{h}</span>
-                        </div>
-                      ))}
-                    </div>
+                    {cat.features && cat.features.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '22px' }}>
+                        {cat.features.slice(0, 3).map((h, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              fontSize: '0.8rem',
+                              color: '#ffffff'
+                            }}
+                          >
+                            <span style={{ color: '#FFD700', fontSize: '0.72rem', flexShrink: 0 }}>✦</span>
+                            <span>{h}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Action Buttons */}
                   <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
                     <button
-                      onClick={() => navigate('calculator', { product: cat.targetProduct })}
+                      onClick={() => navigate('calculator', { product: cat.name })}
                       className="btn-gold"
                       style={{
                         flex: 1,
@@ -324,7 +292,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
           {/* Wholesale Catalog Link Banner */}
           <div
             style={{
-              background: 'linear-gradient(135deg, rgba(215, 134, 0, 0.12) 0%, rgba(34, 35, 32, 0.8) 100%)',
+              background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(34, 35, 32, 0.8) 100%)',
               border: '1px solid #454545',
               borderRadius: '16px',
               padding: '24px 32px',
@@ -336,10 +304,10 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
             }}
           >
             <div>
-              <h4 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '4px', fontWeight: 800 }}>
+              <h4 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '4px', fontWeight: 800 }}>
                 Looking for Detailed Specifications & Tiered Factory Pricing?
               </h4>
-              <p style={{ fontSize: '0.88rem', color: '#cbd5e1', margin: 0 }}>
+              <p style={{ fontSize: '0.88rem', color: '#f1f5f9', margin: 0 }}>
                 Filter products by minimum order quantities, paper GSM, sizes, and instant tiered volume discounts.
               </p>
             </div>
@@ -618,7 +586,7 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
                       width: '44px',
                       height: '44px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #FFD72E 0%, #D78600 100%)',
+                      background: 'linear-gradient(135deg, #FFF59D 0%, #FFD700 50%, #E69500 100%)',
                       color: '#030303',
                       display: 'flex',
                       alignItems: 'center',
@@ -717,8 +685,8 @@ export const HomePage = ({ onOpenSampleKit }: { onOpenSampleKit: () => void }) =
         }
         .product-cat-card:hover {
           transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(215, 134, 0, 0.35) !important;
-          border-color: #D78600 !important;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.35) !important;
+          border-color: #FFD700 !important;
         }
         .product-cat-img {
           transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { RouterProvider, useRouter } from './context/RouterContext';
+import { CartProvider } from './context/CartContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { SampleKitModal } from './components/SampleKitModal';
+import { GlobalCartDrawer } from './components/GlobalCartDrawer';
 import { fetchFactorySettings, getCalendarProducts, fetchFactoryDiscounts } from './services/api';
 
 // Dedicated Standalone Pages
@@ -70,6 +72,9 @@ const AppContent = () => {
       {/* Atelier Footer */}
       <Footer onOpenSampleKit={() => setIsSampleKitOpen(true)} />
 
+      {/* Global Slide-Over Wholesale Cart & Floating Cart Button */}
+      <GlobalCartDrawer />
+
       {/* Master Swatch Kit Concierge Modal */}
       <SampleKitModal
         isOpen={isSampleKitOpen}
@@ -82,7 +87,9 @@ const AppContent = () => {
 export function App() {
   return (
     <RouterProvider>
-      <AppContent />
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
     </RouterProvider>
   );
 }

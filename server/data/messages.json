@@ -1,67 +1,34 @@
 [
   {
-    "id": "MSG-4282",
-    "name": "Siva",
-    "phone": "9578457152",
+    "id": "MSG-3216",
+    "name": "prabhu",
+    "phone": "9584658578",
     "email": "",
-    "product": "Stone Art Sculptural Calendars (Lord Balaji Edition), Stone Art Sculptural Calendars (Lord Balaji Edition)",
-    "size": "14 × 20 inches, 18 × 24 inches",
-    "quantity": 4,
-    "notes": "Total: ₹1350. Notes: RJPM",
-    "message": "Catalog Cart Order (4 units, Est. Total: ₹1,350):\n1. Stone Art Sculptural Calendars (Lord Balaji Edition) (14 × 20 inches) × 2 units @ ₹280 = ₹560\n2. Stone Art Sculptural Calendars (Lord Balaji Edition) (18 × 24 inches) × 2 units @ ₹395 = ₹790\nCustomer Notes: RJPM",
-    "createdAt": "2026-11-14T10:11:34.282Z",
-    "status": "New"
+    "product": "Bulk Cart (2 item types, 6 units)",
+    "size": "",
+    "quantity": 6,
+    "notes": "Cart Total: ₹753 | Delivery: Direct",
+    "message": "WHOLESALE CART ORDER INQUIRY:\n• Promotional Hand Fan (Lord Ganesha Edition) [Size: 8 × 8 inches (Standard Circle)] × 1 units @ ₹28/unit = ₹28\n• Gold / Silver PET Foil Calendar [Size: 15 × 20 inches (Standard Wall)] × 5 units @ ₹145/unit = ₹725\n\nTotal Items: 6 units\nTotal Estimated Value: ₹753\n\nNotes / Location: Direct Delivery",
+    "status": "New",
+    "createdAt": "2026-11-16T08:29:53.216Z",
+    "updatedAt": "2026-11-16T08:29:53.216Z"
   },
   {
-    "id": "MSG-5578",
-    "name": "Kala",
-    "phone": "9857645123",
-    "email": "kala24@gmail.com",
-    "product": "Stone Art Calendars",
-    "size": "15 × 20 in",
-    "quantity": null,
-    "notes": "Trade Customer",
-    "message": "Murugan Image",
-    "createdAt": "2026-11-14T07:09:45.578Z",
-    "status": "New"
-  },
-  {
-    "id": "INQ-9021",
+    "id": "MSG-1001",
     "name": "Karthik Raja",
     "phone": "+91 98401 23456",
-    "email": "karthik.raja@senthiltextiles.com",
-    "product": "Stone Art Sculptural Calendars (Lord Balaji Edition)",
-    "size": "15 × 20 in",
-    "quantity": 500,
-    "notes": "Need company foil monogram and address line in Tamil & English. Dispatch to Madurai.",
-    "message": "Customizer Order Inquiry:\n• Product: Stone Art Sculptural Calendars (Lord Balaji Edition)\n• Frame Size: 15 × 20 in (Base Rate: ₹145/unit)\n• Order Volume: 500 units\n• Estimated Total: ₹61,625\n• Client: Karthik Raja (Senthil Textiles)",
-    "createdAt": "2026-11-14T06:30:00.000Z",
-    "status": "New"
+    "message": "Hello, need wholesale rate for 500 pcs Lord Balaji Stone Art calendar with our company name printed at the top.",
+    "status": "New",
+    "createdAt": "2026-11-14T03:43:03.097Z",
+    "updatedAt": "2026-11-14T05:47:04.295Z"
   },
   {
-    "id": "INQ-9018",
+    "id": "MSG-1002",
     "name": "Lakshmi Narayanan",
     "phone": "+91 97904 88765",
-    "email": "lakshmi.jewellers@gmail.com",
-    "product": "Gold / Silver PET Foil Calendar",
-    "size": "12 × 18 in",
-    "quantity": 1000,
-    "notes": "Sample kit received. We want to place order for Deepavali gifts.",
-    "message": "Direct Factory Inquiry:\nRequesting formal proforma invoice for 1,000 units of Gold / Silver PET Foil Calendar (12 × 18 in). Delivery to Coimbatore.",
-    "createdAt": "2026-11-14T04:15:00.000Z",
-    "status": "Replied"
-  },
-  {
-    "id": "INQ-9010",
-    "name": "Murugan Transports",
-    "phone": "+91 98421 11223",
-    "email": "info@murugantrans.in",
-    "product": "Daily Sheet Devotional Calendar",
-    "size": "Standard Size",
-    "quantity": 250,
-    "notes": "Standard tin plate top binding required.",
-    "message": "Website Contact Inquiry: Please confirm delivery schedule for 250 daily sheet calendars before December 15.",
-    "createdAt": "2026-11-13T14:20:00.000Z",
-    "status": "Replied"
+    "message": "Hi Amazing Ads, can you share the sample kit and delivery timeline to Madurai?",
+    "status": "Replied",
+    "createdAt": "2026-11-14T00:43:03.097Z",
+    "updatedAt": "2026-11-14T05:47:04.295Z"
   }
 ]

@@ -292,32 +292,50 @@ export async function getBackendHealth(): Promise<{ status: string; system: stri
 // 2. Local Storage Sync & Catalog Storage Helpers
 const LOCAL_STORAGE_CATALOG_KEY = 'amazingads_catalog_v2';
 
+// Strict deduplicator to guarantee zero duplicate products across whole frontend
+export function deduplicateProducts(products: CalendarProduct[]): CalendarProduct[] {
+  if (!Array.isArray(products)) return [];
+  const seenIds = new Set<string>();
+  const seenNames = new Set<string>();
+  return products.filter((p) => {
+    if (!p) return false;
+    const idKey = p.id ? String(p.id).trim().toLowerCase() : null;
+    const nameKey = p.name ? String(p.name).trim().toLowerCase() : null;
+    if (idKey && seenIds.has(idKey)) return false;
+    if (nameKey && seenNames.has(nameKey)) return false;
+    if (idKey) seenIds.add(idKey);
+    if (nameKey) seenNames.add(nameKey);
+    return true;
+  });
+}
+
 export function getStoredCatalog(): CalendarProduct[] | null {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_CATALOG_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) return deduplicateProducts(parsed);
     }
   } catch {}
   return null;
 }
 
 export function saveStoredCatalog(catalog: CalendarProduct[]) {
+  const unique = deduplicateProducts(catalog);
   try {
-    localStorage.setItem(LOCAL_STORAGE_CATALOG_KEY, JSON.stringify(catalog));
-    window.dispatchEvent(new CustomEvent('catalog-updated', { detail: catalog }));
+    localStorage.setItem(LOCAL_STORAGE_CATALOG_KEY, JSON.stringify(unique));
+    window.dispatchEvent(new CustomEvent('catalog-updated', { detail: unique }));
   } catch {
     // If quota exceeded, optimize large base64 thumbnails to safely preserve all product metadata
     try {
-      const sanitized = catalog.map(p => ({
+      const sanitized = unique.map(p => ({
         ...p,
         mockupImg: (p.mockupImg && p.mockupImg.startsWith('data:image') && p.mockupImg.length > 25000)
           ? '/images/stone-art-calendar-real.jpg'
           : p.mockupImg
       }));
       localStorage.setItem(LOCAL_STORAGE_CATALOG_KEY, JSON.stringify(sanitized));
-      window.dispatchEvent(new CustomEvent('catalog-updated', { detail: catalog }));
+      window.dispatchEvent(new CustomEvent('catalog-updated', { detail: unique }));
     } catch {}
   }
 }
@@ -333,17 +351,18 @@ export async function getCalendarProducts(category?: string): Promise<CalendarPr
     if (res.ok) {
       const json = await res.json();
       if (json.data && json.data.length > 0) {
+        const unique = deduplicateProducts(json.data);
         if (!category || category === 'All') {
-          saveStoredCatalog(json.data);
+          saveStoredCatalog(unique);
         }
-        return json.data;
+        return unique;
       }
     }
   } catch {
     // Graceful fallback to local storage or static Sivakasi catalog
   }
 
-  const stored = getStoredCatalog() || SIVAKASI_CATALOG;
+  const stored = getStoredCatalog() || deduplicateProducts(SIVAKASI_CATALOG);
   if (category && category !== 'All') {
     return stored.filter((item) => item.category.toLowerCase() === category.toLowerCase());
   }
@@ -444,6 +463,36 @@ export async function resetCalendarProducts(): Promise<CalendarProduct[]> {
 
   saveStoredCatalog([...SIVAKASI_CATALOG]);
   return SIVAKASI_CATALOG;
+}
+
+// Upload Image to Cloudinary (for Products & Branding)
+export async function uploadImageToCloudinary(
+  imageFileOrBase64: string,
+  folder = 'amazingads'
+): Promise<{ success: boolean; url: string; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageFileOrBase64, folder })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success && data.url) {
+      return { success: true, url: data.url };
+    }
+    return {
+      success: false,
+      url: imageFileOrBase64,
+      error: data.message || 'Cloudinary upload failed'
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      url: imageFileOrBase64,
+      error: err.message || 'Network error reaching upload server'
+    };
+  }
 }
 
 // 3. Instant Quote with fallback Sivakasi pricing formula

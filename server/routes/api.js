@@ -3,9 +3,18 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import { Quote } from '../models/Quote.js';
 import { SampleKit } from '../models/SampleKit.js';
 import { Inquiry } from '../models/Inquiry.js';
+
+// Configure Cloudinary from Environment
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'kkbtbhkk',
+  api_key: process.env.CLOUDINARY_API_KEY || '154186186419795',
+  api_secret: process.env.CLOUDINARY_API_SECRET || '2oQ3LWeYf8WrO5ZDxCIkGseqF74',
+  secure: true
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -278,6 +287,25 @@ const DEFAULT_CALENDAR_CATALOG = [
   }
 ];
 
+// Strict deduplicator to guarantee zero duplicate products or messages
+function deduplicateItems(items) {
+  if (!Array.isArray(items)) return [];
+  const seenIds = new Set();
+  const seenNames = new Set();
+  return items.filter(item => {
+    if (!item) return false;
+    const idKey = item.id ? String(item.id).trim().toLowerCase() : null;
+    const nameKey = item.name ? String(item.name).trim().toLowerCase() : null;
+
+    if (idKey && seenIds.has(idKey)) return false;
+    if (nameKey && seenNames.has(nameKey)) return false;
+
+    if (idKey) seenIds.add(idKey);
+    if (nameKey) seenNames.add(nameKey);
+    return true;
+  });
+}
+
 function loadProductsFromDisk() {
   ensureDataDir();
   try {
@@ -285,22 +313,24 @@ function loadProductsFromDisk() {
       const raw = fs.readFileSync(PRODUCTS_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return deduplicateItems(parsed);
       }
     }
   } catch (err) {
     console.warn('[Storage] Error reading products.json:', err.message);
   }
+  const defaultList = deduplicateItems(DEFAULT_CALENDAR_CATALOG);
   try {
-    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(DEFAULT_CALENDAR_CATALOG, null, 2), 'utf-8');
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(defaultList, null, 2), 'utf-8');
   } catch {}
-  return JSON.parse(JSON.stringify(DEFAULT_CALENDAR_CATALOG));
+  return defaultList;
 }
 
 function saveProductsToDisk(products) {
   ensureDataDir();
   try {
-    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf-8');
+    const unique = deduplicateItems(products);
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(unique, null, 2), 'utf-8');
   } catch (err) {
     console.error('[Storage] Error writing products.json:', err.message);
   }
@@ -313,7 +343,7 @@ function loadMessagesFromDisk() {
       const raw = fs.readFileSync(MESSAGES_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        return parsed;
+        return deduplicateItems(parsed);
       }
     }
   } catch (err) {
@@ -346,7 +376,8 @@ function loadMessagesFromDisk() {
 function saveMessagesToDisk(messages) {
   ensureDataDir();
   try {
-    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2), 'utf-8');
+    const unique = deduplicateItems(messages);
+    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(unique, null, 2), 'utf-8');
   } catch (err) {
     console.error('[Storage] Error writing messages.json:', err.message);
   }
@@ -418,35 +449,33 @@ if (mongoose.connection) {
   mongoose.connection.on('connected', async () => {
     try {
       if (ProductModel) {
-        const count = await ProductModel.countDocuments();
-        if (count === 0) {
+        const mongoProducts = await ProductModel.find().lean();
+        if (mongoProducts && mongoProducts.length > 0) {
+          const cleaned = mongoProducts.map(p => {
+            const { _id, __v, ...rest } = p;
+            return rest;
+          });
+          calendarCatalog = deduplicateItems(cleaned);
+          saveProductsToDisk(calendarCatalog);
+          console.log(`[MongoDB] Synced ${calendarCatalog.length} unique products from MongoDB Atlas to disk cache`);
+        } else {
+          calendarCatalog = deduplicateItems(calendarCatalog);
           await ProductModel.insertMany(calendarCatalog);
           console.log('[MongoDB] Seeded products collection from disk cache');
-        } else {
-          const mongoProducts = await ProductModel.find().lean();
-          if (mongoProducts && mongoProducts.length > 0) {
-            calendarCatalog = mongoProducts.map(p => {
-              const { _id, __v, ...rest } = p;
-              return rest;
-            });
-            saveProductsToDisk(calendarCatalog);
-            console.log('[MongoDB] Synced products from MongoDB Atlas to disk cache');
-          }
         }
       }
       if (MessageModel) {
-        const count = await MessageModel.countDocuments();
-        if (count === 0 && customerMessages.length > 0) {
+        const mongoMessages = await MessageModel.find().sort({ createdAt: -1 }).lean();
+        if (mongoMessages && mongoMessages.length > 0) {
+          const cleanedMsgs = mongoMessages.map(m => {
+            const { _id, __v, ...rest } = m;
+            return rest;
+          });
+          customerMessages = deduplicateItems(cleanedMsgs);
+          saveMessagesToDisk(customerMessages);
+        } else if (customerMessages.length > 0) {
+          customerMessages = deduplicateItems(customerMessages);
           await MessageModel.insertMany(customerMessages);
-        } else {
-          const mongoMessages = await MessageModel.find().sort({ createdAt: -1 }).lean();
-          if (mongoMessages && mongoMessages.length > 0) {
-            customerMessages = mongoMessages.map(m => {
-              const { _id, __v, ...rest } = m;
-              return rest;
-            });
-            saveMessagesToDisk(customerMessages);
-          }
         }
       }
       if (SettingsModel) {
@@ -486,13 +515,13 @@ router.get('/health', (req, res) => {
   });
 });
 
-// 2. Get All Catalog Items
+// 2. Get All Catalog Items (Strictly Deduplicated)
 router.get('/calendar-products', (req, res) => {
   const { category } = req.query;
-  let items = [...calendarCatalog];
+  let items = deduplicateItems(calendarCatalog);
 
   if (category && category !== 'All') {
-    items = items.filter(item => item.category.toLowerCase() === category.toLowerCase());
+    items = items.filter(item => item.category && item.category.toLowerCase() === category.toLowerCase());
   }
 
   res.json({
@@ -500,6 +529,54 @@ router.get('/calendar-products', (req, res) => {
     total: items.length,
     data: items
   });
+});
+
+// 2-upload. Upload Image Directly to Cloudinary
+router.post('/upload', async (req, res) => {
+  try {
+    const { image, folder = 'amazingads' } = req.body;
+    if (!image) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image provided. Please provide an image file or base64 data.'
+      });
+    }
+
+    try {
+      const uploadRes = await cloudinary.uploader.upload(image, {
+        folder: folder,
+        resource_type: 'image'
+      });
+
+      console.log('[Cloudinary] Image uploaded successfully:', uploadRes.secure_url);
+      return res.json({
+        success: true,
+        message: 'Image successfully uploaded to Cloudinary',
+        url: uploadRes.secure_url,
+        public_id: uploadRes.public_id,
+        format: uploadRes.format
+      });
+    } catch (cloudErr) {
+      console.warn('[Cloudinary API Notice]:', cloudErr.message || cloudErr);
+
+      if (cloudErr.http_code === 403 || String(cloudErr.message).includes('missing permissions')) {
+        return res.status(403).json({
+          success: false,
+          error: 'CLOUDINARY_PERMISSIONS_ERROR',
+          message: 'Cloudinary credentials connected, but API Key lacks "create" permissions in Cloudinary console. Please enable "Create" under Settings -> Access Keys, or use an unsigned preset.',
+          details: cloudErr.message
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: cloudErr.message || 'Cloudinary upload error'
+      });
+    }
+  } catch (err) {
+    console.error('[Upload Endpoint Error]:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // 2b. Update Catalog Product (Admin)

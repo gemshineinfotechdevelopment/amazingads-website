@@ -232,7 +232,7 @@ export const Craftsmanship = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '1.8rem', color: 'var(--accent-gold-bright)' }}>{f.icon}</span>
-                  <span style={{ fontSize: '0.7rem', color: '#FFD72E', background: 'rgba(215, 134, 0, 0.16)', padding: '3px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.7rem', color: '#FFD700', background: 'rgba(255, 215, 0, 0.12)', padding: '3px 8px', borderRadius: '4px', fontWeight: 600 }}>
                     {f.badge}
                   </span>
                 </div>

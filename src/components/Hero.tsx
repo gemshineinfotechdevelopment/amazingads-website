@@ -116,8 +116,8 @@ export const Hero = ({ onScrollToCustomizer, onOpenSampleKit }: HeroProps) => {
                 <span
                   key={p.id}
                   style={{
-                    background: 'rgba(215, 134, 0, 0.16)',
-                    border: '1px solid rgba(215, 134, 0, 0.45)',
+                    background: 'rgba(255, 215, 0, 0.12)',
+                    border: '1px solid rgba(255, 215, 0, 0.45)',
                     padding: '5px 14px',
                     borderRadius: '20px',
                     fontSize: '0.76rem',
