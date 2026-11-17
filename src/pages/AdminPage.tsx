@@ -1246,7 +1246,7 @@ export const AdminPage = () => {
       </aside>
 
       {/* B. MAIN CONTENT IN CRISP WHITE WITH BLUE GRADIENTS */}
-      <div style={{ flex: 1, minWidth: 0, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="admin-main-wrapper" style={{ flex: 1, minWidth: 0, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         
         {/* Top Header */}
         <header
@@ -1287,11 +1287,36 @@ export const AdminPage = () => {
                 Admin / {activeTab === 'messages' ? 'Inquiries' : activeTab === 'catalog' ? 'Catalog' : activeTab === 'matrix' ? 'Matrix' : activeTab === 'quotes' ? 'Quotes' : 'Settings'}
               </div>
               <h2 className="admin-top-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0, fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {activeTab === 'messages' && 'Customer Inquiries'}
-                {activeTab === 'catalog' && 'Product Catalog'}
-                {activeTab === 'matrix' && 'Quick Price & Size Matrix'}
-                {activeTab === 'quotes' && 'Quotes & Online Estimates'}
-                {activeTab === 'settings' && 'Company Settings'}
+                {activeTab === 'messages' && (
+                  <>
+                    <span className="hide-mobile">Customer Inquiries</span>
+                    <span className="show-mobile">Inquiries</span>
+                  </>
+                )}
+                {activeTab === 'catalog' && (
+                  <>
+                    <span className="hide-mobile">Product Catalog</span>
+                    <span className="show-mobile">Catalog</span>
+                  </>
+                )}
+                {activeTab === 'matrix' && (
+                  <>
+                    <span className="hide-mobile">Quick Price & Size Matrix</span>
+                    <span className="show-mobile">Price Matrix</span>
+                  </>
+                )}
+                {activeTab === 'quotes' && (
+                  <>
+                    <span className="hide-mobile">Quotes & Online Estimates</span>
+                    <span className="show-mobile">Quotes & Leads</span>
+                  </>
+                )}
+                {activeTab === 'settings' && (
+                  <>
+                    <span className="hide-mobile">Company Settings</span>
+                    <span className="show-mobile">Settings</span>
+                  </>
+                )}
               </h2>
             </div>
           </div>
@@ -1428,7 +1453,7 @@ export const AdminPage = () => {
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
                       }}
                     >
-                      <div style={{ flex: '1 1 320px' }}>
+                      <div className="admin-inquiry-content" style={{ flex: '1 1 320px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
                           <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.04rem' }}>
                             {msg.name}
@@ -1525,7 +1550,7 @@ export const AdminPage = () => {
                         </div>
                       </div>
 
-                      <div className="admin-message-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div className="admin-message-actions admin-inquiry-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                         {msg.email && (
                           <a
                             href={`mailto:${msg.email}`}
@@ -1606,7 +1631,7 @@ export const AdminPage = () => {
                   boxShadow: '0 2px 12px rgba(2, 132, 199, 0.04)'
                 }}
               >
-                <div style={{ flex: '1 1 260px', position: 'relative' }}>
+                <div className="admin-search-wrapper" style={{ flex: '1 1 260px', position: 'relative' }}>
                   <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>🔍</span>
                   <input
                     type="text"
@@ -2354,7 +2379,7 @@ export const AdminPage = () => {
                   </p>
                 </div>
 
-                <div className="admin-btn-group" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <div className="admin-btn-group admin-card-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <button
                     type="button"
                     onClick={handleResetFactoryDefaults}
@@ -2411,7 +2436,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div className="admin-logo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '22px', alignItems: 'center' }}>
+                  <div className="admin-logo-grid admin-form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '22px', alignItems: 'center' }}>
                     {/* Logo Preview Box */}
                     <div
                       style={{
@@ -2557,7 +2582,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div className="admin-settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                  <div className="admin-settings-grid admin-form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
                         Company / Factory Name *
@@ -2685,7 +2710,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div className="admin-settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                  <div className="admin-settings-grid admin-form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
                         Primary Factory Hotline Phone *
@@ -2842,7 +2867,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div className="admin-settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                  <div className="admin-settings-grid admin-form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
                         Standard Order Turnaround Time
@@ -3036,7 +3061,7 @@ export const AdminPage = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '14px' }}>
+            <div className="admin-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '14px' }}>
               <div>
                 <h3
                   style={{
@@ -3196,7 +3221,7 @@ export const AdminPage = () => {
                 </div>
 
                 {/* Add New Frame Size with Specific Price */}
-                <div className="admin-modal-size-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div className="admin-modal-size-row admin-modal-size-inputs" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <input
                     type="text"
                     value={newSizeInput}
@@ -3220,7 +3245,7 @@ export const AdminPage = () => {
                       outline: 'none'
                     }}
                   />
-                  <div className="admin-modal-rate-wrap" style={{ position: 'relative', width: '120px' }}>
+                  <div className="admin-modal-rate-wrap admin-modal-size-inputs-row2" style={{ position: 'relative', width: '120px' }}>
                     <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 800 }}>₹</span>
                     <input
                       type="text"
@@ -3273,7 +3298,7 @@ export const AdminPage = () => {
                 </div>
 
                 {/* Quick Frame Size Preset Shortcuts */}
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px', alignItems: 'center' }}>
+                <div className="admin-modal-suggestions" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.72rem', color: '#0369a1', fontWeight: 700 }}>Quick suggestions:</span>
                   {['10 × 15 in', '12 × 18 in', '14 × 20 in', '15 × 20 in', '17 × 27 in', '18 × 24 in', 'Custom Shape'].map((preset) => (
                     <button
