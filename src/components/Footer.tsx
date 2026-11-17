@@ -9,6 +9,8 @@ interface FooterProps {
   onOpenSampleKit: () => void;
 }
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const Footer = ({ onOpenSampleKit }: FooterProps) => {
   const { navigate } = useRouter();
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
@@ -155,7 +157,7 @@ export const Footer = ({ onOpenSampleKit }: FooterProps) => {
           }}
         >
           <div>
-            © {estYear}–{new Date().getFullYear()} {brandName} ({settings.websiteUrl?.replace(/^https?:\/\//, '') || 'amazingads.in'}). All Rights Reserved.
+            © {estYear}–{CURRENT_YEAR} {brandName} ({settings.websiteUrl?.replace(/^https?:\/\//, '') || 'amazingads.in'}). All Rights Reserved.
           </div>
           <div style={{ display: 'flex', gap: '20px' }}>
             <span>Sivakasi Printing Works</span>

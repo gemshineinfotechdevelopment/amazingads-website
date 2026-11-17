@@ -54,7 +54,7 @@ export interface CartItem {
   image: string;
 }
 
-export const getProductSizePrice = (item: CalendarProduct, sizeString: string): number => {
+const getProductSizePrice = (item: CalendarProduct, sizeString: string): number => {
   if (item.sizePrices && item.sizePrices[sizeString] !== undefined) {
     return Number(item.sizePrices[sizeString]);
   }

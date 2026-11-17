@@ -255,8 +255,11 @@ export const AdminPage = () => {
   };
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (isAuthenticated) {
-      loadData();
+      timer = setTimeout(() => {
+        loadData();
+      }, 0);
     }
 
     const handleNewMessage = (e: Event) => {
@@ -273,6 +276,7 @@ export const AdminPage = () => {
 
     window.addEventListener('new-customer-message', handleNewMessage);
     return () => {
+      if (timer) clearTimeout(timer);
       window.removeEventListener('new-customer-message', handleNewMessage);
     };
   }, [isAuthenticated]);

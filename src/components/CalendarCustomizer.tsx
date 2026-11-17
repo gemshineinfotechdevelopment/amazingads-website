@@ -119,7 +119,7 @@ const FORMAT_OPTIONS: FormatOption[] = [
   }
 ];
 
-export const FINISH_OPTIONS = [
+const FINISH_OPTIONS = [
   { id: 'Mirror 24K Gold & Silver Foil Emboss', label: 'Mirror 24K Gold & Silver Foil Emboss', surcharge: 22, desc: 'High-gloss mirror metallic reflection on deities and corporate crest' },
   { id: 'Deluxe Moulded Synthetic Gold Frame', label: 'Deluxe Carved Royal Synthetic Frame', surcharge: 35, desc: 'Heavy moulded frame with wood-grain or gold foil border finish' },
   { id: 'Antique Stone Wash & Kundan Work', label: 'Sculpted Stone Wash & Gems Relief', surcharge: 55, desc: 'Hand-crafted stone relief textures with antique metallic highlights' },
@@ -210,7 +210,9 @@ export const CalendarCustomizer = () => {
   const [quantity, setQuantity] = useState(250);
 
   // Sync format if pageParams changes subsequently
-  useEffect(() => {
+  const [prevProductParam, setPrevProductParam] = useState(pageParams?.product);
+  if (pageParams?.product !== prevProductParam) {
+    setPrevProductParam(pageParams?.product);
     if (pageParams?.product) {
       const p = pageParams.product.toLowerCase();
       const matched = formatOptions.find(opt => 
@@ -224,7 +226,7 @@ export const CalendarCustomizer = () => {
         setFinish(matched.defaultFinish);
       }
     }
-  }, [pageParams?.product, format, formatOptions]);
+  }
 
   // Quote calculation state
   const [quote, setQuote] = useState<QuoteResult | null>(null);
@@ -274,7 +276,11 @@ export const CalendarCustomizer = () => {
   // Calculate whenever selections change
   useEffect(() => {
     let isMounted = true;
-    setCalculating(true);
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        setCalculating(true);
+      }
+    }, 0);
 
     const payload: QuotePayload = {
       productId: selectedFormatObj.productId,
@@ -302,6 +308,7 @@ export const CalendarCustomizer = () => {
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, [format, selectedSize, frameUnitPrice, finish, quantity, selectedFormatObj.fullName, selectedFormatObj.productId, currentSizeObj.size]);
 

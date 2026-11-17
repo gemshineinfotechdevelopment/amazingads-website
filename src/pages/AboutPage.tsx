@@ -11,6 +11,8 @@ interface AboutPageProps {
   onOpenSampleKit?: () => void;
 }
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
   const { navigate } = useRouter();
   const [settings, setSettings] = useState<FactorySettings>(getStoredFactorySettings());
@@ -42,8 +44,7 @@ export const AboutPage = ({ onOpenSampleKit }: AboutPageProps) => {
   }, []);
 
   const estYear = settings.establishedYear || stats.establishedYear || 2008;
-  const currentYear = new Date().getFullYear();
-  const yearsOfCraftsmanship = `${currentYear - estYear}+`;
+  const yearsOfCraftsmanship = `${CURRENT_YEAR - estYear}+`;
   const brandName = settings.factoryName || 'Amazing Ads';
 
   const statItems = [
