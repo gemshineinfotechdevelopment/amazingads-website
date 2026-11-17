@@ -705,6 +705,138 @@ label {
   /* Horizontal Tables Momentum Touch */
   .admin-table-container {
     -webkit-overflow-scrolling: touch !important;
+    overflow-x: auto !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Table Minimum Widths for Touch Horizontal Scrolling */
+  .admin-matrix-table {
+    min-width: 760px !important;
+    width: 100% !important;
+  }
+
+  .admin-quotes-table {
+    min-width: 620px !important;
+    width: 100% !important;
+  }
+
+  .admin-inquiries-table {
+    min-width: 680px !important;
+    width: 100% !important;
+  }
+
+  .admin-samplekits-table {
+    min-width: 680px !important;
+    width: 100% !important;
+  }
+
+  /* Settings Mobile Layout */
+  .admin-settings-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .admin-logo-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .admin-header-actions-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+
+  .admin-btn-group {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  .admin-btn-group button {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 10px !important;
+  }
+
+  .admin-save-bar {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .admin-save-bar button {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  /* Modal Form Controls on Mobile */
+  .admin-modal-size-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .admin-modal-size-row input,
+  .admin-modal-size-row .admin-modal-rate-wrap,
+  .admin-modal-size-row button {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-modal-actions {
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+
+  .admin-modal-actions button {
+    width: 100% !important;
+    padding: 12px !important;
+  }
+
+  /* Inquiries / Messages Action Buttons on Mobile */
+  .admin-message-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .admin-message-actions button,
+  .admin-message-actions a {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  /* Admin Login Card on Mobile */
+  .admin-login-card {
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px !important;
+  }
+
+  .admin-login-header {
+    padding: 26px 18px !important;
+  }
+}
+
+/* Global Website Floating Cart & Drawer on Mobile Viewports */
+@media (max-width: 600px) {
+  .global-floating-cart-pill {
+    bottom: 16px !important;
+    right: 16px !important;
+    padding: 10px 16px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .cart-drawer-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-left: none !important;
   }
 }
 

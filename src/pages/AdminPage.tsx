@@ -725,6 +725,7 @@ export const AdminPage = () => {
         }}
       >
         <div
+          className="admin-login-card"
           style={{
             background: '#ffffff',
             borderRadius: '26px',
@@ -736,6 +737,7 @@ export const AdminPage = () => {
         >
           {/* Dark Blue to Sky Blue Gradient Header */}
           <div
+            className="admin-login-header"
             style={{
               background: BLUE_GRADIENT,
               padding: '38px 30px',
@@ -1523,7 +1525,7 @@ export const AdminPage = () => {
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div className="admin-message-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                         {msg.email && (
                           <a
                             href={`mailto:${msg.email}`}
@@ -1833,7 +1835,7 @@ export const AdminPage = () => {
               </div>
 
               <div className="admin-table-container" style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                <table className="admin-matrix-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
                       <th style={{ padding: '10px 12px' }}>Photo</th>
@@ -2106,7 +2108,7 @@ export const AdminPage = () => {
                     </button>
                   </div>
                   <div className="admin-table-container" style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                    <table className="admin-quotes-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                       <thead>
                         <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
                           <th style={{ padding: '10px 12px' }}>Quote ID</th>
@@ -2168,7 +2170,7 @@ export const AdminPage = () => {
                     </div>
                   ) : (
                     <div className="admin-table-container" style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                      <table className="admin-inquiries-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                         <thead>
                           <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
                             <th style={{ padding: '10px 12px' }}>Inquiry ID</th>
@@ -2263,7 +2265,7 @@ export const AdminPage = () => {
                     </div>
                   ) : (
                     <div className="admin-table-container" style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                      <table className="admin-samplekits-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                         <thead>
                           <tr style={{ background: '#f8fafc', borderBottom: '2px solid #bae6fd', color: '#0369a1', textTransform: 'uppercase', fontSize: '0.74rem' }}>
                             <th style={{ padding: '10px 12px' }}>Tracking ID</th>
@@ -2329,7 +2331,7 @@ export const AdminPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
               {/* Header Action Card */}
               <div
-                className="admin-card"
+                className="admin-card admin-header-actions-card"
                 style={{
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
@@ -2352,7 +2354,7 @@ export const AdminPage = () => {
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div className="admin-btn-group" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <button
                     type="button"
                     onClick={handleResetFactoryDefaults}
@@ -2409,7 +2411,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '22px', alignItems: 'center' }}>
+                  <div className="admin-logo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '22px', alignItems: 'center' }}>
                     {/* Logo Preview Box */}
                     <div
                       style={{
@@ -2555,7 +2557,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                  <div className="admin-settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
                         Company / Factory Name *
@@ -2683,7 +2685,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                  <div className="admin-settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
                         Primary Factory Hotline Phone *
@@ -2840,7 +2842,7 @@ export const AdminPage = () => {
                     </h4>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                  <div className="admin-settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#0c4a6e', marginBottom: '4px' }}>
                         Standard Order Turnaround Time
@@ -2907,7 +2909,7 @@ export const AdminPage = () => {
                 </div>
 
                 {/* Save Button Bar */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingBottom: '30px' }}>
+                <div className="admin-save-bar" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingBottom: '30px' }}>
                   <button
                     type="button"
                     onClick={handleResetFactoryDefaults}
@@ -3194,7 +3196,7 @@ export const AdminPage = () => {
                 </div>
 
                 {/* Add New Frame Size with Specific Price */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div className="admin-modal-size-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <input
                     type="text"
                     value={newSizeInput}
@@ -3218,7 +3220,7 @@ export const AdminPage = () => {
                       outline: 'none'
                     }}
                   />
-                  <div style={{ position: 'relative', width: '120px' }}>
+                  <div className="admin-modal-rate-wrap" style={{ position: 'relative', width: '120px' }}>
                     <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7', fontWeight: 800 }}>₹</span>
                     <input
                       type="text"
@@ -3357,7 +3359,7 @@ export const AdminPage = () => {
               </div>
 
               {/* Form Buttons */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
+              <div className="admin-modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
                 <button
                   type="button"
                   onClick={handleCloseModal}

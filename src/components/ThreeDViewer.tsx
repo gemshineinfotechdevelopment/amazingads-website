@@ -1357,7 +1357,6 @@ touchAction: 'pan-y'
             gap: 6px !important;
           }
         }
-        }
       `}</style>
     </div>
   );
