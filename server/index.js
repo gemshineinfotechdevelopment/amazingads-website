@@ -15,10 +15,14 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5029;
+const PORT = process.env.PORT || 5000;
 
-// Middleware with 50MB payload limit for high-resolution product imagery & mockups
-app.use(cors());
+// Bulletproof CORS & Middleware with 50MB payload limit
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -55,9 +59,12 @@ app.use((req, res, next) => {
   });
 });
 
-// Connect to MongoDB and start server
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`[Backend] Server is running on port ${PORT} (http://localhost:${PORT})`);
-  });
+// Start HTTP Server immediately so API is responsive instantly
+app.listen(PORT, () => {
+  console.log(`[Backend] Server is running on port ${PORT} (http://localhost:${PORT})`);
+});
+
+// Connect to MongoDB asynchronously (falls back to local JSON disk-cache if connecting or offline)
+connectDB().catch((err) => {
+  console.warn('[MongoDB] Background connection notice:', err?.message);
 });
