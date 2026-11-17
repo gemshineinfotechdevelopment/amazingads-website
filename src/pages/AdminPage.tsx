@@ -913,13 +913,9 @@ export const AdminPage = () => {
     <div
       className="admin-portal-root"
       style={{
-        height: '100vh',
-        maxHeight: '100vh',
         background: '#f8fafc',
         color: '#0f172a',
-        display: 'flex',
-        fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif",
-        overflow: 'hidden'
+        fontFamily: "'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif"
       }}
     >
       
@@ -957,20 +953,11 @@ export const AdminPage = () => {
         />
       )}
 
-      {/* A. WHITE THEME ADMIN SIDEBAR (PERMANENT FIXED NON-SCROLLING) */}
+      {/* A. WHITE THEME ADMIN SIDEBAR */}
       <aside
         style={{
-          width: '270px',
           background: '#ffffff',
           borderRight: '1px solid #e2e8f0',
-          display: 'flex',
-          flexDirection: 'column',
-          flexShrink: 0,
-          height: '100vh',
-          maxHeight: '100vh',
-          overflowY: 'auto',
-          position: 'relative',
-          zIndex: 100,
           boxShadow: '2px 0 16px rgba(2, 132, 199, 0.05)'
         }}
         className={sidebarOpen ? 'admin-sidebar open admin-fixed-sidebar' : 'admin-sidebar admin-fixed-sidebar'}
@@ -1246,7 +1233,7 @@ export const AdminPage = () => {
       </aside>
 
       {/* B. MAIN CONTENT IN CRISP WHITE WITH BLUE GRADIENTS */}
-      <div style={{ flex: 1, minWidth: 0, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="admin-main-wrapper" style={{ flex: 1, minWidth: 0, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         
         {/* Top Header */}
         <header
@@ -1383,7 +1370,7 @@ export const AdminPage = () => {
         </header>
 
         {/* Dashboard Main Content */}
-        <main className="admin-main-content" style={{ padding: '26px 28px', flex: 1, height: 'calc(100vh - 70px)', overflowY: 'auto', background: '#f8fafc' }}>
+        <main className="admin-main-content" style={{ background: '#f8fafc' }}>
 
           {/* TAB 1: CUSTOMER INQUIRIES & FORM SUBMISSIONS */}
           {activeTab === 'messages' && (
@@ -1415,6 +1402,7 @@ export const AdminPage = () => {
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
+                      className="admin-inquiry-card"
                       style={{
                         background: msg.status === 'New' ? '#f0f9ff' : '#ffffff',
                         border: `1px solid ${msg.status === 'New' ? '#7dd3fc' : '#e2e8f0'}`,
@@ -1591,7 +1579,7 @@ export const AdminPage = () => {
           {activeTab === 'catalog' && (
             <div>
               <div
-                className="admin-card"
+                className="admin-card admin-catalog-toolbar"
                 style={{
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
@@ -1803,7 +1791,7 @@ export const AdminPage = () => {
           {/* TAB 3: BULK PRICE & FRAME SIZE MATRIX */}
           {activeTab === 'matrix' && (
             <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 4px 20px rgba(126, 34, 206, 0.05)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
+              <div className="admin-card-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
                     Fast Bulk Matrix & Frame Size Pricing
@@ -3133,13 +3121,14 @@ export const AdminPage = () => {
                   </span>
                 </div>
                 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px', minHeight: '44px', background: '#ffffff', padding: '10px', borderRadius: '10px', border: '1px solid #bae6fd' }}>
+                <div className="admin-modal-sizes-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px', minHeight: '44px', background: '#ffffff', padding: '10px', borderRadius: '10px', border: '1px solid #bae6fd' }}>
                   {formData.sizes && formData.sizes.map((s, idx) => {
                     const rawVal = formData.sizePrices?.[s];
                     const currentPrice = rawVal !== undefined ? rawVal : (formData.startingPrice ?? 125);
                     return (
                       <div
                         key={idx}
+                        className="admin-modal-size-chip"
                         style={{
                           background: '#e0f2fe',
                           border: '1px solid #bae6fd',
