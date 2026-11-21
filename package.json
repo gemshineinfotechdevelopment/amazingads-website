@@ -11,6 +11,7 @@
     "server": "node server/index.js",
     "start": "node server/index.js",
     "build": "tsc -b && vite build",
+    "deploy": "bash deploy.sh",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:restart": "pm2 restart ecosystem.config.cjs",
     "pm2:stop": "pm2 stop ecosystem.config.cjs",

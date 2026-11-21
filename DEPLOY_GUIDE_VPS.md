@@ -191,6 +191,8 @@ sudo certbot --nginx -d amazingads-website.gemshine.tech
 
 | Task | Command |
 |---|---|
+| **One-Click Redeployment** | `./deploy.sh` or `npm run deploy` |
+| **Update App After Git Push** | `./deploy.sh` |
 | **View Backend Logs** | `npm run pm2:logs` or `pm2 logs amazingads-backend` |
 | **Restart Backend** | `npm run pm2:restart` |
 | **Stop Backend** | `npm run pm2:stop` |
